@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="std" docName="draft-ietf-bfd-secure-sequence-numbers-08"
+     ipr="trust200902" updates="5880">
+  <front>
+    <title abbrev="Securing next sequence number">Secure BFD Sequence
+    Numbers</title>
+
+    <author fullname="Mahesh Jethanandani" initials="M" surname="Jethanandani">
+      <organization>Kloud Services</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <email>mjethanandani@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Sonal Agarwal" initials="S" surname="Agarwal">
+      <organization>Cisco Systems, Inc</organization>
+
+      <address>
+        <postal>
+          <street>170 W. Tasman Drive</street>
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95070</code>
+
+          <country>USA</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>agarwaso@cisco.com</email>
+
+        <uri>www.cisco.com</uri>
+      </address>
+    </author>
+
+    <author fullname="Ashesh Mishra" initials="A" surname="Mishra">
+      <organization>O3b Networks</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>mishra.ashesh@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Ankur Saxena" initials="A" surname="Saxena">
+      <organization>Ciena Corporation</organization>
+
+      <address>
+        <postal>
+          <street>3939 North First Street</street>
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>ankurpsaxena@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Alan DeKok" initials="A" surname="Dekok">
+      <organization>Network RADIUS SARL</organization>
+
+      <address>
+        <postal>
+          <street>100 Centrepointe Drive #200</street>
+
+          <city>Ottowa</city>
+
+          <region>ON</region>
+
+          <code>K2G 6B1</code>
+
+          <country>Canada</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>aland@freeradius.org</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <date day="17" month="February" year="2021"/>
+
+    <abstract>
+      <t>This document describes a security enhancement for the sequence
+      number used in BFD control packets. This document updates RFC 5880.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t><xref target="RFC5880">BFD</xref> section 6.7 describes the use of
+      monotonically incrementing 32-bit sequence numbers for use in
+      authentication of BFD packets. While this method protects against simple
+      replay attacks, the monotonically incrementing sequence numbers are
+      predictable and vulnerable to more complex attack vectors. This document
+      proposes the use of non-monotonically-incrementing sequence numbers in
+      the BFD authentication section to enhance the security of BFD sessions.
+      Specifically, the document presents a method to generate pseudo-random
+      sequence numbers on the frame by algorithmically hashing monotonically
+      increasing sequence numbers. Since the monotonically increasing sequence
+      number does not appear on the wire, it is difficult for a third party to
+      launch a replay attack.</t>
+    </section>
+
+    <section title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+      document are to be interpreted as described in <xref
+      target="RFC2119">RFC 2119</xref>.</t>
+    </section>
+
+    <section title="Theory of operation">
+      <t>Instead of inserting a monotonically, sometimes occasionally,
+      increasing sequence number in BFD control packets, the ciphertext result
+      from a symmetric key algorithm operation (Symmetric-key algorithms
+      require both the sender and the recipient of a message to have the same
+      shared secret key) is inserted. The result is computed, using a shared
+      key, on the sequence number. That ciphertext result is then inserted
+      into the sequence number field of the packet. In case of <xref
+      target="I-D.ietf-bfd-optimizing-authentication">BFD
+      Authentication</xref>, the sequence number used in computing an
+      authenticated packet would be this new computed ciphertext. Even though
+      the <xref target="I-D.ietf-bfd-optimizing-authentication">BFD
+      Authentication</xref> sequence number is independent of this
+      enhancement, it would benefit by using the computed ciphertext.</t>
+
+      <t>As currently defined in <xref target="RFC5880">BFD</xref>, a BFD
+      packet with authentication will undergo the following steps, where:</t>
+
+      <t>[O]: original RFC 5880 packet with monotonically increasing sequence
+      number</t>
+
+      <t>[S]: pseudo random sequence number</t>
+
+      <t>[A]: Authentication</t>
+
+      <t><figure>
+          <artwork align="center" name="Sequence of Operations"><![CDATA[Sender                    Receiver
+
+[O] [S] [A] ------------- [A] [S] [O]]]></artwork>
+        </figure></t>
+
+      <t>This document proposes that for enhanced security in sequence number
+      encoding, the sender would identify a symmetric key algorithm that would
+      create a 32 bit ciphertext. The symmetric key is provisioned securely on
+      the sender and receiver of the BFD session. The mechanism of
+      provisioning such a key is outside the scope of this document. This key
+      SHOULD be different from the symmetric key used to to authenticate the
+      packet. Instead of sending the sequence number, the sender encrypts the
+      sequence number using it as input to the symmetric algorithm to produce
+      the ciphertext, which is then inserted in place of the sequence
+      number.</t>
+
+      <t>Upon receiving the BFD Control packet, the receiver decrypts the
+      ciphertext using the same provisioned shared key to produce the received
+      sequence number. It compares the received sequence number against the
+      expected sequence number. The mechanism used for comparing is an
+      implementation detail (implementations may pre-calculate the expected
+      sequence number, or decrypt the received sequence number before
+      comparing against expected value). To tolerate dropped frames, the receiver
+      must compare the received sequence number against the current expected
+      sequence number. <xref target="RFC5880">BFD</xref> mentions that received
+      sequence number should be between (bfd.RcvAuthSeq(+1) to
+      bfd.RcvAuthSeq+(3*Detect Mult) inclusive. Note: The first sequence number
+      can be obtained using the same principles stated in  <xref target="RFC5880">BFD</xref>
+      i.e. (using bfd.AuthSeqKnown and bfd.RcvAuthSeq)</t>
+
+      <t>K: symmetric key</t>
+
+      <t>S: sequence number</t>
+
+      <t>S': encrypted sequence number OR ciphertext result</t>
+
+      <t>O: original RFC 5880 packet with monotonically increasing sequence
+      number</t>
+
+      <t>f(S, K) = S', where f is a symmetric encryption algorithm</t>
+
+      <t>f(S', K) = S, where f is a symmetric decryption algorithm</t>
+
+      <t><figure>
+          <artwork align="center" name="Authentication algorithm"><![CDATA[Sender                Receiver
+
+[O] [S'] [A] -------- [A] [S] [O]]]></artwork>
+        </figure></t>
+
+      <t>The above diagram describes how the sender encrypts and receiver
+      decrypts the sequence number. The sender starts by taking the
+      monotonically increasing (but non linear) sequence number and encrypting
+      it using a symmetric encryption algorithm. The resulting ciphertext
+      replaces the sequence number. As per <xref target="RFC5880">BFD</xref>,
+      it then calculates the hash for the entire packet and appends the hash
+      value to the end of the packet, before transmitting it.</t>
+
+      <t>The receiver hashes the entire packet as part of receiver
+      authentication. On successful authentication, it decrypts the ciphertext
+      with the same key used to encrypt it, in order to obtain the original
+      sequence number. If it is greater than the previously received
+      monotonically increasing sequence number, then the receiver knows it's a
+      valid sequence number.</t>
+    </section>
+
+    <section title="Impact of using a hash">
+      <t>Under this proposal, every packet&rsquo;s sequence number is encoded
+      in ciphertext. Therefore, there is some impact on the system and its
+      performance while doing encryption/decryption. As security measures go, this
+      enhancement greatly increases the security of the packet with or without
+      authentication of the entire packet.</t>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document makes no request of IANA.</t>
+
+      <t>Note to RFC Editor: this section may be removed on publication as an
+      RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>In a symmetric key algorithm, the key is shared between the two systems.
+      Distribution of this key to all the systems at the same time can be quite a
+      cumbersome task. BFD sessions running a fast rate will require these keys to
+      be refreshed often, which poses a further challenge. Therefore, it is difficult
+      to change the keys during the operation of a BFD session without affecting the
+      stability of the BFD session. Therefore, it is recommended to administratively
+      disable the BFD session before changing the keys. If the keys are not changed
+      frequently, an attacker can try to guess the key to launch a replay attack.</t>
+
+      <t>This method allows the BFD end-points to detect a malicious packet (the decrypted
+      sequence number will not be in sequence). The behavior of the session, when such a
+      packet is detected, is based on the implementation. A flood of such malicious packets
+      may cause a BFD session to be operationally down.</t>
+
+      <t>The symmetric algorithm and key size will determine the difficulty for an attacker
+      to decipher the key from the transmitted BFD frames. The sequential nature of the
+      payload (sequence numbers) simplifies the decoding of the key. It is, therefore,
+      recommended to use longer keys or more secure symmetric algorithms.</t>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The authors would like to thank Jeff Haas and Reshad Rahman for their reviews
+      of and suggestions for the document.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="reference.RFC.2119"?>
+
+      <?rfc include='reference.RFC.5880'?>
+    </references>
+
+    <references title="Informative References">
+      <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication'?>
+    </references>
+  </back>
+</rfc>
