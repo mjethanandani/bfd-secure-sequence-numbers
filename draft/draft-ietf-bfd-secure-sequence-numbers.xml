@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc
+    category="std"
+    docName="draft-ietf-bfd-secure-sequence-numbers-08"
+    ipr="trust200902"
+    submissionType="IETF"
+    updates="5880"
+    consensus="true">
+  
+  <front>
+    <title abbrev="Securing next sequence number">Secure BFD Sequence
+    Numbers</title>
+
+    <author fullname="Mahesh Jethanandani" initials="M" surname="Jethanandani">
+      <organization>Kloud Services</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <email>mjethanandani@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Sonal Agarwal" initials="S" surname="Agarwal">
+      <organization>Cisco Systems, Inc</organization>
+
+      <address>
+        <postal>
+          <street>170 W. Tasman Drive</street>
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95070</code>
+
+          <country>USA</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>agarwaso@cisco.com</email>
+
+        <uri>www.cisco.com</uri>
+      </address>
+    </author>
+
+    <author fullname="Ashesh Mishra" initials="A" surname="Mishra">
+      <organization>O3b Networks</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>mishra.ashesh@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Ankur Saxena" initials="A" surname="Saxena">
+      <organization>Ciena Corporation</organization>
+
+      <address>
+        <postal>
+          <street>3939 North First Street</street>
+
+          <city>San Jose</city>
+
+          <region>CA</region>
+
+          <code>95134</code>
+
+          <country>USA</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>ankurpsaxena@gmail.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Alan DeKok" initials="A" surname="Dekok">
+      <organization>Network RADIUS SARL</organization>
+
+      <address>
+        <postal>
+          <street>100 Centrepointe Drive #200</street>
+
+          <city>Ottawa</city>
+
+          <region>ON</region>
+
+          <code>K2G 6B1</code>
+
+          <country>Canada</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>aland@freeradius.org</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <date/>
+
+    <abstract>
+      <t>This document describes a new BFD Authentication mechanism,
+      Meticulous Keyed FNV1A.  The mechanism can be used to
+      authenticate BFD packets at less cost than using MD5 or SHA1, at
+      the cost of decreased security/.  This document updates RFC
+      5880.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t><xref target="RFC5880">BFD</xref> defines a number of
+      authentication mechanisms, including Simple Password (Section
+      6.7.2), and various other methods based on MD5 and SHA1 hashes.
+      The benefit of using cryptographic hashes is that they are
+      secure.  The downside to cryptographic hashes is that they are
+      expensive and time consuming on resource-constrained
+      hardware.</t>
+
+      <t>This document proposes the use of an Authentication Section
+      which provides meticulous keying, but which has less impact on
+      resource constrained systems.  The algorithms chosen are <xref
+      target="ISAAC">ISAAC</xref>, which is a fast cryptographic
+      random number generator, and FNV-1a <xref
+      target="FNV1A">FNV1A</xref> which is a fast (but
+      non-cryptographic) hash.  ISAAC has been subject to significant
+      cryptanalysis in the past thirty years, and has not yet been
+      broken.  Similarly, FNV-1a is fast, and has passed similar
+      analysis.</t>
+    </section>
+
+    <section title="Requirements Language">
+      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
+      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
+      "OPTIONAL" in this document are to be interpreted as described
+      in <xref target="RFC2119">RFC 2119</xref>.</t>
+    </section>
+
+    <section title="Theory of operation">
+      <t>Each packet is signed with a non-cryptographic hash, <xref
+      target="FNV1A">FNV-1a</xref>.  This hash is very fast, it has
+      good distribution, and collisions are rare.  However, it is
+      linear, and potentially reversible.  In addition, its output is
+      only 32 bits, and it is not crytographically strong.  These
+      issues are addressed via the keying process.</t>
+
+      <t>The keying process for this authentication mechanism is not
+      to use a statically defined input key, as with "keyed MD5" or
+      "meticulously keyed MD5".  Instead, the input key is used to
+      initialize a cryptographically strong pseudo-random-number
+      generator (CSPRNG) <xref target="ISAAC">ISAAC</xref>.  ISAAC is
+      in turn used to generate an infinite series of random numbers,
+      and these random numbers are used to key the hashing of each
+      individual packet.</t>
+
+      <t>In effect, each packet is signed with a unique, per-packet
+      key.  This process means that even if the FNV-1a hash is
+      "cracked" for one packet, the only information gained will be a
+      key which will never be re-used, and will therefore be useless
+      to an attacker.  Further, even if the attacker can "crack" a
+      sequence of packets to obtain a stream of keys, the
+      cryptographic nature of ISAAC makes it impossible for the
+      attacker to derive the input key which is used to "seed" the
+      ISAAC state.</t>
+
+      <t>The final problem is to note that ISAAC produces an infinite
+      sequence of numbers, so there must be a way for sender and
+      receiver to agree where in the sequence they are.  The solution
+      here is to bootstrap the ISAAC seed when the BFD session is in
+      the "INIT" state, at which point both parties agree that they
+      are beginning a new BFD session</t>
+
+    </section>
+
+    <section title="FNV1A Authentication Mechanism">
+      <t>The format of the FNV1A Authentication Mechanism is as
+      follows:</t>
+
+      <t> (diagram of Auth Mechanism, with 32-bit sequence, 32-bit
+      Generation Number, and 32-bit hash)</t>
+
+      <t>Auth Type</t>
+
+      <t>The Authentication Type, which in this case is 6 (Meticulous
+      Keyed FNV1A)</t>
+
+      <t>Auth Len</t>
+
+      <t>The length of the Authentication Section, in bytes.  For and
+      Meticulous Keyed FNV1A authentication, the length is 16</t>
+
+      <t>Auth Key ID</t>
+
+      <t>The authentication key ID in use for this packet.  This allows
+      multiple keys to be active simultaneously.</t>
+
+      <t>Reserved</t>
+
+      <t>This byte MUST be set to zero on transmit, and ignored on
+      receipt.</t>
+
+      <t>Sequence Number</t>
+
+      <t>The sequence number for this packet.  For Meticulous Keyed
+      MD5 Authentication, this value is incremented for each
+      successive packet transmitted for a session.  This provides
+      protection against replay attacks.</t>
+
+      <t>Generation Number</t>
+
+      <t>A 32-bit value which MUST remain the same during the lifetime
+      of the BFD session.</t>
+
+      <t>Digest</t>
+
+      <t>This field carries the 4-octet FNV1A digest for the packet.
+      The shared key MUST be encoded and configured as described in
+      Section TBD.</t>
+    </section>
+
+    <section title="Calculating the FNV1A Digest">
+      <t>In this methods of authentication, one or more secret keys
+      (with corresponding key IDs) are configured in each system.  One
+      of the keys is included in an FNV1A digest calculated over the
+      outgoing BFD Control packet, but the Key itself is not carried
+      in the packet.  To help avoid replay attacks, a sequence number
+      is also carried in each packet.  For Meticulous Keyed FNV1A, the
+      sequence number is incremented on every packet.</t>
+
+      <t>The receiving system accepts the packet if the key ID matches
+      one of the configured Keys, an FNV-1a digest including the selected
+      key matches the digest carried in the packet, and the sequence
+      number is strictly greater than the last sequence number
+      received.</t>
+
+      <t>Transmission Using Meticulous Keyed FNV1A Authentication</t>
+
+      <t>The Auth Type field MUST be set to 6 (Meticulous Keyed MD5).
+      The Auth Len field MUST be set to 16.  The Auth Key ID field
+      MUST be set to the ID of the current authentication key.  The
+      Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
+
+      <t>The Digest field MUST be set to the value of the FNV-1a
+      digest, as described below.</t>
+
+      <t>For Meticulous Keyed FNV1A, bfd.XmitAuthSeq MUST be
+      incremented on each packet, in a circular fashion (when treated
+      as an unsigned 32-bit value).  The bfd.XmitAuthSeq SHOULD NOT be
+      incremented by more than one for a packet.</t>
+      
+      <t>Receipt Using Keyed MD5 and Meticulous Keyed MD5
+      Authentication</t>
+
+      <t>If the received BFD Control packet does not contain an
+      Authentication Section, or the Auth Type is not correct (6 for
+      Meticulous Keyed FNV1A), then the received packet MUST be
+      discarded.</t>
+
+      <t>If the Auth Key ID field does not match the ID of a configured
+      authentication key, the received packet MUST be discarded.</t>
+
+      <t>If the Auth Len field is not equal to 16, the packet MUST be
+      discarded.</t>
+
+      <t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
+      For Meticulous Keyed FNV1A, if the sequence number lies outside of
+      the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
+      inclusive (when treated as an unsigned 32-bit circular number
+      space) the received packet MUST be discarded.</t>
+
+      <t>Otherwise (bfd.AuthSeqKnown is 0), bfd.AuthSeqKnown MUST be
+      set to 1, and bfd.RcvAuthSeq MUST be set to the value of the
+      received Sequence Number field.</t>
+
+      <t>Replace the contents of the Auth Key/Digest field with zeros,
+      and calculate the FNV-1a digest as described below.  If the
+      calculated FNV-1a digest is equal to the received value of the
+      Auth Key/Digest field, the received packet MUST be accepted.
+      Otherwise (the digest does not match the Auth Key/Digest field),
+      the received packet MUST be discarded.</t>
+    </section>
+    
+    <section title="Calculation of the FNV-1a Digest">
+
+      <t>Unlike other authentication mechanisms, the user-supplied
+      key is not placed into the Auth Key / Digest field, and the
+      packet hashed. As FNV-1a is not a cryptographic hash, such a
+      process would simplify the process for an attacker to "crack"
+      the key.</t>
+
+      <t>Instead, a per-packet key (called PKEY) is derived from
+      ISAAC as discussed below. We calculate the FNV-1a hash as</t>
+
+      <t>Digest = FNV-1a(PKEY + Packet + PKEY)</t>
+
+      <t>Where "+" denotes concatentation.  We also note that the
+      "Digest field MUST be initialized to all zeroes before this
+      calculation is performed</t>
+
+      <t>The calculated Digest is then inserted into the packet in
+      the Digest field, and the packet is sent as normal.</t>
+
+    </section>
+
+    <section title="Derivation of PKEY from ISAAC">
+
+      <t>TBD: PKEY is derived from ISAAC, which produces an infinite
+      series of CSPRNs.  There is a 1-1 relationship between a
+      particular PKEY and the sequence number.  i.e. if the sequence
+      number is 1 off from the previously seen value, then we use
+      the next PKEY from ISAAC.  If the sequence number is 2 off
+      from the previously seen value, then we calculate one PKEY,
+      throw it away, and use the next PKEY</t>
+
+    </section>
+
+    <section title="Seeding of ISAAC">
+      <t>TBD - The contents of ISAAC are seeded with (Generation
+      Number + key + zeroes to fill).  ISAAC has 256*4 bytes of
+      internal state.</t>
+      
+      <t>The ISAAC algorithm is then run 10 times to "mix" the
+      contents.</t>
+
+      <t>The typical implementation of ISAAC will produce 256 random
+      numbers at near-zero cost.  It will then require "mixing",
+      which involves operating on all 256 internal state values.
+      This mixing could perhaps also be amortized across each
+      packet.</t>
+
+      <t>TBD: The code for ISAAC is fairly small.  It might be good
+      to have a test implementation on GitHub.  This would also
+      allow us to define test vectors in this document</t>
+
+    </section>
+
+    <section title="Generation Number">
+
+      <t>TBD: should change during INIT state, when ISAAC is
+      bootstrapped?  It may be difficult to rely on
+      bfd.AuthSeqKnown?</t>
+      
+      <t>The authentication digest value is a binary string of 4
+      octets, and MUST be placed into the Digest field.  For
+      interoperability, the management interface by which the key is
+      configured MUST accept ASCII strings, and SHOULD also allow for
+      the configuration of any arbitrary binary string in hexadecimal
+      form.  Other configuration methods MAY be supported.</t>
+    </section>
+
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>This document asks that IANA allocate a new entry in the "BFD
+      Authentication Types" registry.</t>
+
+      <t>Address - 6</t>
+      <t>BFD Authentication Type Name - Meticulous Keyed FNV1A</t>
+      <t>Reference - this document</t>
+
+      <t>Note to RFC Editor: this section may be removed on
+      publication as an RFC.</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>The security of this proposal depends strongly on the length
+      of the secret, and the entropy of the key.  It is RECOMMENDED
+      that the key be 16 octets in length or more.</t>
+
+      <t>The security of this proposal depends loosely on the strength
+      of the FNV-1a hash algorithm.  Using a CSPRNG as the initial
+      seed for the hash limits the ability of an attacker to create
+      their own hash values.</t>
+
+      <t>In a keyed algorithm, the key is shared between the two
+      systems. Distribution of this key to all the systems at the same
+      time can be quite a cumbersome task. BFD sessions running a fast
+      rate will require these keys to be refreshed often, which poses
+      a further challenge. Therefore, it is difficult to change the
+      keys during the operation of a BFD session without affecting the
+      stability of the BFD session. Therefore, it is recommended to
+      administratively disable the BFD session before changing the
+      keys.</t>
+
+      <t>This method allows the BFD end-points to detect a malicious
+      packet, as the calculated hash value will not match the value
+      found in the packet. The behavior of the session, when such a
+      packet is detected, is based on the implementation. A flood of
+      such malicious packets may cause a BFD session to be
+      operationally down.</t>
+
+      <t>The particular format of hashing is chosen because of the
+      non-cryptographic amd reversible nature of the FNV-1a hash.  If
+      the digest had been calculated an (PKEY + Packet), or (Packet +
+      PKey), then an attacker would have significantly less work to do
+      in order to "crack" the hash.  In short the PKEY protects the
+      hash, and and hash protects the PKEY.</t>
+
+      <t>We believe that this construction is reasonably secure, given
+      the constraints.  If cryptographic security is desired, then
+      implementors can use MD5 or SHA1 authentication mechanisms</t>
+    </section>
+
+    <section anchor="Acknowledgements" title="Acknowledgements">
+      <t>The authors would like to thank Jeff Haas and Reshad Rahman
+      for their reviews of and suggestions for the document.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="reference.RFC.2119.xml"?>
+
+      <?rfc include='reference.RFC.5880.xml'?>
+    </references>
+
+    <references title="Informative References">
+      <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
+
+      <reference anchor="ISAAC">
+	<front>
+	  <title>ISAAC</title>
+	  <author initials="R. J." surname="Jenkins" fullname="Robert J. Jenkins Jr."/>
+	  <date year="1996"/>
+	</front>
+	<refcontent>http://www.burtleburtle.net/bob/rand/isaac.html</refcontent>
+      </reference>
+
+      <reference anchor="FNV1A">
+	<front>
+	  <title>FNV-1a</title>
+	  <author initials="L. C." surname="Noll" fullname="Landon Curt Noll"/>
+	  <date year="2013"/>
+	</front>
+	<refcontent>http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-1a</refcontent>
+      </reference>
+    </references>
+  </back>
+</rfc>
