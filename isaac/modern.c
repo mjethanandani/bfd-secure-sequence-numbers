@@ -75,16 +75,16 @@ static void isaac(randctx *ctx)
 }
 
 
-#define mix(a,b,c,d,e,f,g,h) \
+#define mix(a) \
 { \
-	a ^= b << 11;  d += a; b += c;	\
-	b ^= c >> 2;   e += b; c += d;	\
-	c ^= d << 8;   f += c; d += e;	\
-	d ^= e >> 16;  g += d; e += f;	\
-	e ^= f << 10;  h += e; f += g;	\
-	f ^= g >> 4;   a += f; g += h;	\
-	g ^= h << 8;   b += g; h += a;	\
-	h ^= a >> 9;   c += h; a += b;	\
+	a[0] ^= a[1] << 11;  a[3] += a[0]; a[1] += a[2];	\
+	a[1] ^= a[2] >> 2;   a[4] += a[1]; a[2] += a[3];	\
+	a[2] ^= a[3] << 8;   a[5] += a[2]; a[3] += a[4];	\
+	a[3] ^= a[4] >> 16;  a[6] += a[3]; a[4] += a[5];	\
+	a[4] ^= a[5] << 10;  a[7] += a[4]; a[5] += a[6];	\
+	a[5] ^= a[6] >> 4;   a[0] += a[5]; a[6] += a[7];	\
+	a[6] ^= a[7] << 8;   a[1] += a[6]; a[7] += a[0];	\
+	a[7] ^= a[0] >> 9;   a[2] += a[7]; a[0] += a[1];	\
 }
 
 /*
@@ -93,8 +93,8 @@ static void isaac(randctx *ctx)
  */
 void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 {
-	int i;
-	uint32_t a,b,c,d,e,f,g,h;
+	int i, j;
+	uint32_t a[8];
 	uint32_t *m,*r;
 
 	memset(ctx, 0, sizeof(*ctx));
@@ -107,36 +107,29 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 
 	m = ctx->randmem;
 	r = ctx->randrsl;
-	a = b = c = d = e = f= g = h = 0x9e3779b9;  /* the golden ratio */
+
+	for (j = 0; j < 8; j++) a[j] = 0x9e3779b9;  /* the golden ratio */
 
 	for (i = 0; i < 4; ++i) {          /* scramble it */
-		mix(a,b,c,d,e,f,g,h);
+		mix(a);
 	}
 
 	/* initialize using the contents of r[] as the seed */
 	for (i = 0; i < RANDSIZ; i += 8) {
-		a += r[i  ]; b += r[i+1];
-		c += r[i+2]; d += r[i+3];
-		e += r[i+4]; f += r[i+5];
-		g += r[i+6]; h += r[i+7];
+		for (j = 0; j < 8; j++) a[j] += r[i + j];
 
-		mix(a,b,c,d,e,f,g,h);
+		mix(a);
 
-		m[i  ] = a; m[i+1] = b; m[i+2] = c; m[i+3] = d;
-		m[i+4] = e; m[i+5] = f; m[i+6] = g; m[i+7] = h;
+		memcpy(&m[i], a, sizeof(a));
 	}
 
 	/* do a second pass to make all of the seed affect all of m */
 	for (i = 0; i < RANDSIZ; i += 8) {
-		a += m[i  ]; b += m[i+1];
-		c += m[i+2]; d += m[i+3];
-		e += m[i+4]; f += m[i+5];
-		g += m[i+6]; h += m[i+7];
+		for (j = 0; j < 8; j++) a[j] += m[i + j];
 
-		mix(a,b,c,d,e,f,g,h);
+		mix(a);
 
-		m[i  ] = a; m[i+1] = b; m[i+2] = c; m[i+3] = d;
-		m[i+4] = e; m[i+5] = f; m[i+6] = g; m[i+7] = h;
+		memcpy(&m[i], a, sizeof(a));
 	}
 
 	isaac(ctx);            /* fill in the first set of results */
