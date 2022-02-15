@@ -115,7 +115,7 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 		mix(a);
 	}
 
-	/* initialize using the contents of r[] as the seed */
+	/* initialize using the contents of pages[] as the seed */
 	for (i = 0; i < RANDSIZ; i += 8) {
 		for (j = 0; j < 8; j++) a[j] += r[i + j];
 
@@ -124,7 +124,7 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 		memcpy(&m[i], a, sizeof(a));
 	}
 
-	/* do a second pass to make all of the seed affect all of m */
+	/* do a second pass to make all of the seed affect all of the entropy pool */
 	for (i = 0; i < RANDSIZ; i += 8) {
 		for (j = 0; j < 8; j++) a[j] += m[i + j];
 
@@ -139,12 +139,13 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 
 uint32_t isaac_rand(randctx *ctx)
 {
-	uint32_t r;
-
-	r = ctx->remaining--;
-	if (ctx->remaining > 0) return r;
+	if (ctx->remaining > 0) {
+		 ctx->remaining--;
+		 return ctx->page[ctx->remaining];
+	}
 
 	isaac(ctx);
+
 	ctx->remaining = RANDSIZ - 1;
 	return ctx->page[RANDSIZ - 1];
 }
