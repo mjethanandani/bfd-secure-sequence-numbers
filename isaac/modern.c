@@ -38,37 +38,39 @@ typedef struct randctx {
 	uint32_t pool[RANDSIZ];			// pool of secret entropy
 } randctx;
 
-#define ind(mm,x)  ((mm)[(x>>2)&(RANDSIZ-1)])
-#define rngstep(mix,a,b,mm,m,m2,r,x) \
+#define ind(x)  (start[(x >> 2) & (RANDSIZ - 1)])
+#define rngstep(mix,a,b,m,m2,r) \
 { \
-	x = *m;		                                \
-	a = ((a^(mix)) + *(m2++));                      \
-	*(m++) = y = (ind(mm, x) + a + b);	        \
-	*(r++) = b = (ind(mm, y >> RANDSIZL) + x) ;	\
+	uint32_t y, x = *m;		        \
+	a = ((a^(mix)) + *(m2++));              \
+	*(m++) = y = (ind(x) + a + b);	        \
+	*(r++) = b = (ind(y >> RANDSIZL) + x) ;	\
 }
 
 static void isaac(randctx *ctx)
 {
-	uint32_t a,b,x,y,*m,*mm,*m2,*r,*mend;
+	uint32_t a,b;
+	uint32_t *start, *end;
+	uint32_t *m, *m2, *r;
 
-	mm = ctx->pool;
+	start = ctx->pool;
 	r = ctx->page;
 
 	a = ctx->randa;
 	b = ctx->randb + (++ctx->num_pages);
 
-	for (m = mm, mend = m2 = m + (RANDSIZ/2); m < mend; ) {
-		rngstep( a << 13, a, b, mm, m, m2, r, x);
-		rngstep( a >> 6 , a, b, mm, m, m2, r, x);
-		rngstep( a << 2 , a, b, mm, m, m2, r, x);
-		rngstep( a >> 16, a, b, mm, m, m2, r, x);
+	for (m = start, end = m2 = m + (RANDSIZ / 2); m < end; ) {
+		rngstep( a << 13, a, b, m, m2, r);
+		rngstep( a >> 6 , a, b, m, m2, r);
+		rngstep( a << 2 , a, b, m, m2, r);
+		rngstep( a >> 16, a, b, m, m2, r);
 	}
 
-	for (m2 = mm; m2 < mend; ) {
-		rngstep( a << 13, a, b, mm, m, m2, r, x);
-		rngstep( a >> 6 , a, b, mm, m, m2, r, x);
-		rngstep( a << 2 , a, b, mm, m, m2, r, x);
-		rngstep( a >> 16, a, b, mm, m, m2, r, x);
+	for (m2 = start; m2 < end; ) {
+		rngstep( a << 13, a, b, m, m2, r);
+		rngstep( a >> 6 , a, b, m, m2, r);
+		rngstep( a << 2 , a, b, m, m2, r);
+		rngstep( a >> 16, a, b, m, m2, r);
 	}
 
 	ctx->randb = b;
