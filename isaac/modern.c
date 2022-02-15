@@ -1,12 +1,10 @@
 /*
 ------------------------------------------------------------------------------
-rand.c: By Bob Jenkins.  My random number generator, ISAAC.  Public Domain
-MODIFIED:
-  960327: Creation (addition of randinit, really)
-  970719: use context, not global variables, for internal state
-  980324: make a portable version
-  010626: Note this is public domain
-  100725: Mask on use of >32 bits, not on assignment: from Paul Eggert
+rand.c: By Bob Jenkins.  My random number generator, ISAAC.  Public
+Domain MODIFIED: 960327: Creation (addition of randinit, really)
+970719: use context, not global variables, for internal state 980324:
+make a portable version 010626: Note this is public domain 100725:
+Mask on use of >32 bits, not on assignment: from Paul Eggert
 ------------------------------------------------------------------------------
 */
 
@@ -18,6 +16,9 @@ MODIFIED:
  *	* remove "& 0xffffffff" everywhere, as types are now explicitly 32-bits
  *	* randinit() gets passed a seed pointer, not a flag
  *	* main() allows for passing a seed on the command line.
+ *	* move random variables to arrays.  It's less code, and allows for more
+ *	  compiler optimizations
+ *	* rename variables to be a little clearer.
  */
 
 #define RANDSIZL   (8)
@@ -28,13 +29,13 @@ MODIFIED:
 
 /* context of random number generator */
 typedef struct randctx {
-	uint32_t randcnt;
+	uint32_t remaining;			// unused nunbers remaining in this page
 	uint32_t randa;
 	uint32_t randb;
-	uint32_t randc;
+	uint32_t num_pages;			// number of pages we have generated.
 
-	uint32_t randrsl[RANDSIZ];
-	uint32_t randmem[RANDSIZ];
+	uint32_t page[RANDSIZ];			// current page of 256 random numbers to output
+	uint32_t pool[RANDSIZ];			// pool of secret entropy
 } randctx;
 
 #define ind(mm,x)  ((mm)[(x>>2)&(RANDSIZ-1)])
@@ -50,11 +51,11 @@ static void isaac(randctx *ctx)
 {
 	uint32_t a,b,x,y,*m,*mm,*m2,*r,*mend;
 
-	mm = ctx->randmem;
-	r = ctx->randrsl;
+	mm = ctx->pool;
+	r = ctx->page;
 
 	a = ctx->randa;
-	b = ctx->randb + (++ctx->randc);
+	b = ctx->randb + (++ctx->num_pages);
 
 	for (m = mm, mend = m2 = m + (RANDSIZ/2); m < mend; ) {
 		rngstep( a << 13, a, b, mm, m, m2, r, x);
@@ -100,13 +101,13 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 	memset(ctx, 0, sizeof(*ctx));
 
 	if (seed && (seedlen > 0)) {
-		if (seedlen > sizeof(ctx->randrsl)) seedlen = sizeof(ctx->randrsl);
+		if (seedlen > sizeof(ctx->page)) seedlen = sizeof(ctx->page);
 
-		memcpy(ctx->randrsl, seed, seedlen);
+		memcpy(ctx->page, seed, seedlen);
 	}
 
-	m = ctx->randmem;
-	r = ctx->randrsl;
+	m = ctx->pool;
+	r = ctx->page;
 
 	for (j = 0; j < 8; j++) a[j] = 0x9e3779b9;  /* the golden ratio */
 
@@ -133,19 +134,19 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 	}
 
 	isaac(ctx);            /* fill in the first set of results */
-	ctx->randcnt = RANDSIZ;  /* prepare to use the first set of results */
+	ctx->remaining = RANDSIZ;  /* prepare to use the first set of results */
 }
 
 uint32_t isaac_rand(randctx *ctx)
 {
 	uint32_t r;
 
-	r = ctx->randcnt--;
-	if (ctx->randcnt > 0) return r;
+	r = ctx->remaining--;
+	if (ctx->remaining > 0) return r;
 
 	isaac(ctx);
-	ctx->randcnt = RANDSIZ - 1;
-	return ctx->randrsl[RANDSIZ - 1];
+	ctx->remaining = RANDSIZ - 1;
+	return ctx->page[RANDSIZ - 1];
 }
 
 #ifdef NEVER
@@ -166,7 +167,7 @@ int main(int argc, char const *argv[])
 		isaac(&ctx);
 
 		for (j = 0; j < 256; ++j) {
-			printf("%.8x",ctx.randrsl[j]);
+			printf("%.8x", ctx.page[j]);
 
 			if ((j&7) == 7) printf("\n");
 		}
