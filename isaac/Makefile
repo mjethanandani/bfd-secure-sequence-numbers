@@ -3,18 +3,31 @@ all: diff
 clean:
 	@rm -f randport randport.txt *~
 
-diff: randdvec.txt randport.txt modern.txt
+diff: randdvec.txt randport.txt modern.txt sequence.txt
 	@diff randdvec.txt randport.txt
 	@diff randdvec.txt modern.txt
+	@diff randdvec.txt sequence.txt
 
-randport.txt: randport
-	@./randport > $@
+#
+#  Wildcard rule to build output files
+#
+%.txt: %
+	@./$^ > $@
 
+#
+#  The original file
+#
 randport: randport.c standard.h rand.h
 	@$(CC) -DNEVER $< -o $@
 
-modern.txt: modern
-	@./modern > $@
+#
+#  Various cleanups
+#
+modern: modern.c
+	@$(CC) -DNEVER $< -o $@
 
-modern: modern.c standard.h rand.h
+#
+#  Tracking BFD sequence numbers
+#
+sequence: sequence.c
 	@$(CC) -DNEVER $< -o $@
