@@ -152,11 +152,11 @@
     <date/>
 
     <abstract>
-      <t>This document describes a new BFD Authentication mechanism,
-      Meticulous Keyed FNV1A.  The mechanism can be used to
-      authenticate BFD packets at less cost than using MD5 or SHA1, at
-      the cost of decreased security/.  This document updates RFC
-      5880.</t>
+      <t>This document describes two new BFD Authentication mechanism,
+      Meticulous Keyed ISAAC, and Meticulous Keyed FNV1A.  These
+      mechanisms can be used to authenticate BFD packets at less CPU
+      time cost than using MD5 or SHA1, with the tradeoff of decreased
+      security.  This document updates RFC 5880.</t>
     </abstract>
   </front>
 
@@ -170,16 +170,16 @@
       expensive and time consuming on resource-constrained
       hardware.</t>
 
-      <t>This document proposes the use of an Authentication Section
-      which provides meticulous keying, but which has less impact on
+      <t>This document proposes the use of Authentication methods
+      which provides meticulous keying, but which have less impact on
       resource constrained systems.  The algorithms chosen are <xref
       target="ISAAC">ISAAC</xref>, which is a fast cryptographic
       random number generator, and FNV-1a <xref
       target="FNV1A">FNV1A</xref> which is a fast (but
       non-cryptographic) hash.  ISAAC has been subject to significant
       cryptanalysis in the past thirty years, and has not yet been
-      broken.  Similarly, FNV-1a is fast, and has passed similar
-      analysis.</t>
+      broken.  Similarly, FNV-1a is fast, and while not
+      cryptographically secure, it is has good hashing properties.</t>
     </section>
 
     <section title="Requirements Language">
@@ -189,89 +189,384 @@
       in <xref target="RFC2119">RFC 2119</xref>.</t>
     </section>
 
-    <section title="Theory of operation">
-      <t>Each packet is signed with a non-cryptographic hash, <xref
-      target="FNV1A">FNV-1a</xref>.  This hash is very fast, it has
-      good distribution, and collisions are rare.  However, it is
+    <section title="Meticulous Keyed ISAAC">
+
+      <t>If the Authentication Present (A) bit is set in the header,
+      and the State (Sta) field equals 3 (Up), and the Authentication
+      Type field contains TB1 (Meticulous Keyed ISAAC), the
+      Authentication Section has the following format:</t>
+
+      <figure>
+          <artwork><![CDATA[	  
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Auth Type   |   Auth Len    |  Auth Key ID  |   Reserved    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Sequence Number                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             Seed                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                            Auth-Key                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            ]]></artwork>
+        </figure>
+
+   <t>Auth Type</t>
+   <list empty="true">
+     <t>The Authentication Type, which in this case is TB1 (Meticulous
+     Keyed ISAAC).  If the State (Sta) field value is not 3 (Up), then
+     Meticulous Keyed ISAAC MUST NOT be used.</t>
+   </list>
+   
+   <t>Auth Len</t>
+
+   <list empty="true">
+     <t>The length of the Authentication Section, in bytes.  For
+     Meticulous Keyed ISAAC authentication, the length is 16.</t>
+   </list>
+
+   <t>Auth Key ID</t>
+
+   <list empty="true">
+     <t>The authentication key ID in use for this packet.  This allows
+     multiple keys to be active simultaneously.</t>
+   </list>
+
+   <t>Reserved</t>
+
+   <list empty="true">
+     <t>This byte MUST be set to zero on transmit, and ignored on receipt.</t>
+   </list>
+   
+   <t>Sequence Number</t>
+
+   <list empty="true">
+     <t>The sequence number for this packet.  For Meticulous Keyed ISAAC
+     Authentication, this value is incremented for each successive
+     packet transmitted for a session.  This provides protection
+     against replay attacks.</t>
+   </list>
+
+   <t>Seed</t>
+
+   <list empty="true">
+     <t>A 32-bit (4 octet) seed which is used in conjunction with the
+     shared key in order to configure and initialize the ISAAC
+     pseudo-random-number-generator (PRNG).  It is used to identify
+     and distinguish "streams" of random numbers which are generated
+     by ISAAC.</t>
+   </list>
+   
+   <t>Auth-Key</t>
+
+   <list empty="true">
+     <t>This field carries the 32-bit (4 octet) ISAAC output which is
+     associated with the Sequence Number.  The ISAAC PRNG MUST be
+     configured and initialized as given in section TBD.</t>
+
+     <t>Note that the Auth-Key here does not include any summary or
+     hash of the packet.  The packet itself is completely
+     unauthenticated.</t>
+   </list>   
+    </section>
+
+    <section title="Meticulous Keyed FNV1A">
+
+      <t>If the Authentication Present (A) bit is set in the header,
+      and the State (Sta) field equals 3 (Up), and the Authentication
+      Type field contains TB2 (Meticulous Keyed FNV1A), the
+      Authentication Section has the following format:</t>
+
+      <figure>
+          <artwork><![CDATA[
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Auth Type   |   Auth Len    |  Auth Key ID  |   Reserved    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Sequence Number                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             Seed                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             Digest                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+            ]]></artwork>
+        </figure>
+
+   <t>Auth Type</t>
+   <list empty="true">
+     <t>The Authentication Type, which in this case is TB2 (Meticulous
+     Keyed FNV1A).  If the State (Sta) field value is not 3 (Up), then
+     Meticulous Keyed FNV1A MUST NOT be used.</t>
+   </list>
+
+   <t>Auth Len</t>
+
+   <list empty="true">
+     <t>The length of the Authentication Section, in bytes.  For
+     Meticulous Keyed FNV1A authentication, the length is 16.</t>
+   </list>
+
+   <t>Auth Key ID</t>
+
+   <list empty="true">
+     <t>The authentication key ID in use for this packet.  This allows
+     multiple keys to be active simultaneously.</t>
+   </list>
+
+   <t>Reserved</t>
+
+   <list empty="true">
+     <t>This byte MUST be set to zero on transmit, and ignored on receipt.</t>
+   </list>
+   
+   <t>Sequence Number</t>
+
+   <list empty="true">
+     <t>The sequence number for this packet.  For Meticulous Keyed FNV1A
+     Authentication, this value is incremented for each successive
+     packet transmitted for a session.  This provides protection
+     against replay attacks.</t>
+   </list>
+
+   <t>Seed</t>
+
+   <list empty="true">
+     <t>A 32-bit (4 octet) seed which is used in conjunction with the
+     shared key in order to configure and initialize the ISAAC PRNG.
+     It is also used to identify and distinguish "streams" of random
+     numbers which are generated by ISAAC.</t>
+   </list>
+   
+   <t>Digest</t>
+
+   <list empty="true">
+     <t>This field carries the 32-bit (4 octet) FNV1A digest
+     associated with the Sequence Number.  The ISAAC PRNG MUST be
+     configured and initialized as given in section TBD.</t>
+
+     <t>Note that the ISAAC PRNG output is still used with this
+     authentication type.  The FNV1A hash is fast, but it is not
+     secure.  In order to reach an acceptable level of security with
+     FNV1A, we use ISAAC to generate secure per-packet "signing keys".
+     These per-packet keys are then used with FNV1A in order to
+     perform a keyed of hash the packet, and therefore create the
+     Digest.</t>
+   </list>   
+    </section>
+
+    <section title="Operation">
+      <t>BFD requires fast and reasonably secure authentication of
+      messages which are exchanged.  Methods using MD5 or SHA1 are CPU
+      intensive, and can negatively impact systems with limited CPU
+      power.</t>
+
+      <t>We use ISAAC here as a way to generate an infinite stream of
+      pseudo-random numbers.  With Meticulous Keyed ISAAC, these
+      numbers are used as a signal that the sending party is
+      authentic.  That is, only the sending party can generate the
+      numbers.  Therefore if the receiving party sees a correct
+      number, then only the sending party could have generated that
+      number.  The sender is therefore authentic, even if the packet
+      contents are not necessarily trusted.</t>
+
+      <t>Note that since the packets are not signed with this
+      authentication type, the Meticulous Keyed ISAAC method MUST NOT
+      be used to signal BFD state changes.  Instead, the packets
+      containing Meticulous Keyed ISAAC are only a signal that the
+      sending party is still alive, and that the sending party is
+      authentic.  That is, these Auth Type methods must only be used
+      when bfd.SessionState=Up, and the State (Sta) field equals 3
+      (Up).</t>
+
+      <t>If slightly more security is desired, the packets can be
+      authenticated via the Meticulous Keyed FNV1A method.  This
+      method is similar to the Meticulous Keyed ISAAC authentication
+      type, except that the FNV-1A hash function is used to hash a
+      combination of the packet, and per-packet ISAAC pseudo-random
+      number.  If the receiving party is able to validate the hash,
+      then the receiver knows both that the sender is authentic, and
+      that the packet contents have likely not been modified.</t>
+
+      <t>As this hash function is not very secure, this method can be
+      used only in situations where the Meticulous Keyed ISAAC method
+      can be used.  The Meticulous Keyed FNV1A method MUST NOT be used
+      to signal BFD state changes.</t>
+
+    <section title="Seeding and Operation of ISAAC">
+      <t>The ISAAC PRNG state is initialized with the 32-bit Seed,
+      followed by the secret key, and then the rest of the state is
+      filled with zeros. The internal state of ISAAC is 1024 bytes, so
+      the secret key is limited to 1020 bytes in length.</t>
+
+      <t>The origin of the Seed field is discussed later in this
+      document.  For now, we note that each time a new Seed is used,
+      the bfd.XmitAuthSeq value MUST be set to zero.</t>
+
+      <t>Once the state has been initialized, the standard ISAAC
+      initial mixing function is run.  Once his operation has been
+      performed, ISAAC will be able to produce 256 random numbers at
+      near-zero cost.  When all 256 numbers are consumed, the ISAAC
+      mixing function is run, which then results in another set of 256
+      random numbers</t>
+
+      <t>ISAAC can be thought of here as producing an infinite stream
+      of numbers, based on a secret key, where the numbers are
+      produced in "pages" of 256 32-bit vlaues.  This property of
+      ISAAC allows for essentially zero-cost "seeking" within a page.
+      The expensive operation of mixing is performed only once per 256
+      packets, which means that most BFD packet exchanges can be fast
+      and efficient.</t>
+
+      <t>The Sequence number is used to "seek" within a the stream of
+      32-bit numbers produced by ISAAC. The sending party increments
+      the Sequence Number on every packet sent, to indicate to the
+      receiving party where it is in the sequence.</t>
+
+      <t>The receiving party can then look at the Sequence Number to
+      determine which particular PRNG value is being used in the
+      packet.  The Sequence Number thus permits the two parties to
+      synchronise if/when a packet or packets are lost.  Incrementing
+      the Sequence Number for every packet also prevents the re-use of
+      any individual pseudo-random number which was derived from
+      ISAAC.</t>
+
+      <t>The Sequence Number can increment without bounds, though it
+      can wrap once it reaches the limit of the 32-bit counter field.
+      ISAAC has a cycle length of 2^8287, so there is no issue with
+      using more than 2^32 values from it.</t>
+
+      <t>The result of the above operation is an infinite series of
+      numbers which are unguessable, and which can be used to
+      authenticate the sending party.</t>
+    </section>
+
+    <section title="Secret Key">
+      <t>For interoperability, the management interface by which the
+      key is configured MUST accept ASCII strings, and SHOULD also
+      allow for the configuration of any arbitrary binary string in
+      hexadecimal form.  Other configuration methods MAY be
+      supported.</t>
+
+      <t>The secret Key is mixed with the Seed before being used in
+      ISAAC.  If instead ISAAC was initialized without a Seed, then an
+      attacker could pre-compute ISAAC states for many keys, and
+      perform an off-line dictionary attack.  The addition of the Seed
+      makes these attacks infeasable.</t>
+
+      <t>As a result, it is safe to use the same secret Key for the
+      Auth Types defined here, and also for other Auth Types.</t>
+    </section>
+
+    <section title="Seeding ISAAC">
+      <t>The value of the Seed field SHOULD be derived from a secure
+      source.  Exactly how this can be done is outside of the scope of
+      this document.</t>
+
+      <t>The Seed value SHOULD remain the same for the duration of a
+      BFD session.  The Seed value MAY change when the BFD state
+      changes.</t>
+
+      <t>If the sending party changes its Seed value, bfd.XmitAuthSeq
+      value MUST be set to zero, otherwise the receiving party would
+      be unable to synchronize its sequence of numbers produced by the
+      ISAAC generator.  There is no way to signal or negotiate Seed
+      changes.  The receiving party MUST remember the current Seed
+      value, and then detect if the Seed changes.  Note that the Seed
+      value MUST NOT change unless sending party has signalled a BFD
+      state change with a a packet that is authenticated using a more
+      secure Auth Type method.</t>
+    </section>
+  </section>
+
+    <section title="Meticulous Keyed ISAAC Authentication">
+      <t>In this method of authentication, one or more secret keys
+      (with corresponding key IDs) are configured in each system.  One
+      of the keys is used to seed the ISAAC PRNG.  The output of ISAAC
+      (I) is used to signal that the sender is authentic.  To help
+      avoid replay attacks, a sequence number is also carried in each
+      packet.  For Meticulous Keyed ISAAC, the sequence number is
+      incremented on every packet.</t>
+
+      <t>The receiving system accepts the packet if the key ID matches
+      one of the configured Keys, the Auth-Key derived from the
+      selected Key, Seed, and Sequence Number matches the Auth-Key
+      carried in the packet, and the sequence number is strictly
+      greater than the last sequence number received (modulo wrap at
+      2^32)</t>
+
+      <t>Transmission Using Meticulous Keyed ISAAC Authentication</t>
+
+      <list empty="true">
+	<t>The Auth Type field MUST be set to TBD1 (Meticulous Keyed
+	ISAAC).  The Auth Len field MUST be set to 16.  The Auth Key ID
+	field MUST be set to the ID of the current authentication key.
+	The Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
+
+	<t>The Seed field MUST be set to the value of the current seed
+	used for this sequence.</t>
+
+	<t>The Auth-Key field MUST be set to the output of ISAAC, which
+	depends on the secret Key, the current Seed, and the Sequence
+	Number.</t>
+
+	<t>For Meticulous Keyed ISAAC, bfd.XmitAuthSeq MUST be
+	incremented on each packet, in a circular fashion (when treated
+	as an unsigned 32-bit value).  The bfd.XmitAuthSeq MUST NOT be
+	incremented by more than one for a packet.</t>
+      </list>
+
+      <t>Receipt using Meticulous Keyed ISAAC Authentication</t>
+
+      <list empty="true">
+	<t>If the received BFD Control packet does not contain an
+	Authentication Section, or the Auth Type is not correct (TBD2 for
+	Meticulous Keyed ISAAC), then the received packet MUST be
+	discarded.</t>
+
+	<t>If the Auth Key ID field does not match the ID of a configured
+	authentication key, the received packet MUST be discarded.</t>
+
+	<t>If the Auth Len field is not equal to 16, the packet MUST be
+	discarded.</t>
+
+	<t>If the Seed field does not match the current Seed value, the
+	packet MUST be discarded.</t>
+
+	<t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
+	For Meticulous Keyed FNV1A, if the sequence number lies outside of
+	the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
+	inclusive (when treated as an unsigned 32-bit circular number
+	space) the received packet MUST be discarded.</t>
+
+	<t>Calculate the current expected output of ISAAC, which
+	depends on the secret Key, the current Seed, and the Sequence
+	Number.  If the value does not matches the Auth-Key field,
+	then the packet MUST be discarded.</t>
+
+	<t>Note that in some cases, calculating the expected output of
+	ISAAC will result in the creation of a new "page" of 256
+	numbers.  This process will irreversible, and will destroy the
+	current "page".  As a result, if the generation of a new
+	output will create a new "page", the receiving party MUST save
+	a copy of the entire ISAAC state before proceeding with this
+	calculation.  If the outputs match, then the saved copy can be
+	discarded, and the new ISAAC state is used.  If the outputs do
+	not match, then the saved copy MUST be restored, and the
+	modified copy discarded.</t>
+      </list>
+    </section>
+
+    <section title="Meticulous Keyed FNV1A Authentication">
+      <t>Where slightly more security is needed, the sender can use
+      Meticulous Keyed FNV1A.  In this method, each packet is signed
+      with a non-cryptographic hash, <xref
+      target="FNV1A">FNV-1a</xref>.  This hash is reasonably fast, it
+      has good distribution, and collisions are rare.  However, it is
       linear, and potentially reversible.  In addition, its output is
-      only 32 bits, and it is not crytographically strong.  These
-      issues are addressed via the keying process.</t>
+      only 32 bits, and it is not cryptographically strong.</t>
 
-      <t>The keying process for this authentication mechanism is not
-      to use a statically defined input key, as with "keyed MD5" or
-      "meticulously keyed MD5".  Instead, the input key is used to
-      initialize a cryptographically strong pseudo-random-number
-      generator (CSPRNG) <xref target="ISAAC">ISAAC</xref>.  ISAAC is
-      in turn used to generate an infinite series of random numbers,
-      and these random numbers are used to key the hashing of each
-      individual packet.</t>
-
-      <t>In effect, each packet is signed with a unique, per-packet
-      key.  This process means that even if the FNV-1a hash is
-      "cracked" for one packet, the only information gained will be a
-      key which will never be re-used, and will therefore be useless
-      to an attacker.  Further, even if the attacker can "crack" a
-      sequence of packets to obtain a stream of keys, the
-      cryptographic nature of ISAAC makes it impossible for the
-      attacker to derive the input key which is used to "seed" the
-      ISAAC state.</t>
-
-      <t>The final problem is to note that ISAAC produces an infinite
-      sequence of numbers, so there must be a way for sender and
-      receiver to agree where in the sequence they are.  The solution
-      here is to bootstrap the ISAAC seed when the BFD session is in
-      the "INIT" state, at which point both parties agree that they
-      are beginning a new BFD session</t>
-
-    </section>
-
-    <section title="FNV1A Authentication Mechanism">
-      <t>The format of the FNV1A Authentication Mechanism is as
-      follows:</t>
-
-      <t> (diagram of Auth Mechanism, with 32-bit sequence, 32-bit
-      Generation Number, and 32-bit hash)</t>
-
-      <t>Auth Type</t>
-
-      <t>The Authentication Type, which in this case is 6 (Meticulous
-      Keyed FNV1A)</t>
-
-      <t>Auth Len</t>
-
-      <t>The length of the Authentication Section, in bytes.  For and
-      Meticulous Keyed FNV1A authentication, the length is 16</t>
-
-      <t>Auth Key ID</t>
-
-      <t>The authentication key ID in use for this packet.  This allows
-      multiple keys to be active simultaneously.</t>
-
-      <t>Reserved</t>
-
-      <t>This byte MUST be set to zero on transmit, and ignored on
-      receipt.</t>
-
-      <t>Sequence Number</t>
-
-      <t>The sequence number for this packet.  For Meticulous Keyed
-      MD5 Authentication, this value is incremented for each
-      successive packet transmitted for a session.  This provides
-      protection against replay attacks.</t>
-
-      <t>Generation Number</t>
-
-      <t>A 32-bit value which MUST remain the same during the lifetime
-      of the BFD session.</t>
-
-      <t>Digest</t>
-
-      <t>This field carries the 4-octet FNV1A digest for the packet.
-      The shared key MUST be encoded and configured as described in
-      Section TBD.</t>
-    </section>
-
-    <section title="Calculating the FNV1A Digest">
       <t>In this methods of authentication, one or more secret keys
       (with corresponding key IDs) are configured in each system.  One
       of the keys is included in an FNV1A digest calculated over the
@@ -281,132 +576,101 @@
       sequence number is incremented on every packet.</t>
 
       <t>The receiving system accepts the packet if the key ID matches
-      one of the configured Keys, an FNV-1a digest including the selected
-      key matches the digest carried in the packet, and the sequence
-      number is strictly greater than the last sequence number
-      received.</t>
+      one of the configured Keys, an FNV-1a digest including the
+      selected key matches the digest carried in the packet, and the
+      sequence number is strictly greater than the last sequence
+      number received (modulo wrap at 2^32)</t>
 
       <t>Transmission Using Meticulous Keyed FNV1A Authentication</t>
 
-      <t>The Auth Type field MUST be set to 6 (Meticulous Keyed MD5).
-      The Auth Len field MUST be set to 16.  The Auth Key ID field
-      MUST be set to the ID of the current authentication key.  The
-      Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
+      <list empty="true">
+	<t>The Auth Type field MUST be set to TBD2 (Meticulous Keyed
+	FNV1A).  The Auth Len field MUST be set to 16.  The Auth Key ID
+	field MUST be set to the ID of the current authentication key.
+	The Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
 
-      <t>The Digest field MUST be set to the value of the FNV-1a
-      digest, as described below.</t>
+	<t>The Digest field MUST be set to the value of the FNV-1a
+	digest, as described below.</t>
 
-      <t>For Meticulous Keyed FNV1A, bfd.XmitAuthSeq MUST be
-      incremented on each packet, in a circular fashion (when treated
-      as an unsigned 32-bit value).  The bfd.XmitAuthSeq SHOULD NOT be
-      incremented by more than one for a packet.</t>
-      
-      <t>Receipt Using Keyed MD5 and Meticulous Keyed MD5
-      Authentication</t>
+	<t>For Meticulous Keyed FNV1A, bfd.XmitAuthSeq MUST be
+	incremented on each packet, in a circular fashion (when treated
+	as an unsigned 32-bit value).  The bfd.XmitAuthSeq MUST NOT be
+	incremented by more than one for a packet.</t>
+      </list>
 
-      <t>If the received BFD Control packet does not contain an
-      Authentication Section, or the Auth Type is not correct (6 for
-      Meticulous Keyed FNV1A), then the received packet MUST be
-      discarded.</t>
+      <t>Receipt Using Meticulous Keyed FNV1A Authentication</t>
 
-      <t>If the Auth Key ID field does not match the ID of a configured
-      authentication key, the received packet MUST be discarded.</t>
+      <list empty="true">
+	<t>If the received BFD Control packet does not contain an
+	Authentication Section, or the Auth Type is not correct (TBD2 for
+	Meticulous Keyed FNV1A), then the received packet MUST be
+	discarded.</t>
 
-      <t>If the Auth Len field is not equal to 16, the packet MUST be
-      discarded.</t>
+	<t>If the Auth Key ID field does not match the ID of a configured
+	authentication key, the received packet MUST be discarded.</t>
 
-      <t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
-      For Meticulous Keyed FNV1A, if the sequence number lies outside of
-      the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
-      inclusive (when treated as an unsigned 32-bit circular number
-      space) the received packet MUST be discarded.</t>
+	<t>If the Auth Len field is not equal to 16, the packet MUST be
+	discarded.</t>
 
-      <t>Otherwise (bfd.AuthSeqKnown is 0), bfd.AuthSeqKnown MUST be
-      set to 1, and bfd.RcvAuthSeq MUST be set to the value of the
-      received Sequence Number field.</t>
+	<t>If the Seed field does not match the current Seed value, the
+	packet MUST be discarded.</t>
 
-      <t>Replace the contents of the Auth Key/Digest field with zeros,
-      and calculate the FNV-1a digest as described below.  If the
-      calculated FNV-1a digest is equal to the received value of the
-      Auth Key/Digest field, the received packet MUST be accepted.
-      Otherwise (the digest does not match the Auth Key/Digest field),
-      the received packet MUST be discarded.</t>
-    </section>
+	<t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
+	For Meticulous Keyed FNV1A, if the sequence number lies outside of
+	the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
+	inclusive (when treated as an unsigned 32-bit circular number
+	space) the received packet MUST be discarded.</t>
+	
+	<t>Otherwise (bfd.AuthSeqKnown is 0), bfd.AuthSeqKnown MUST be
+	set to 1, and bfd.RcvAuthSeq MUST be set to the value of the
+	received Sequence Number field.</t>
+	
+	<t>Replace the contents of the Digest field with zeros, and
+	calculate the FNV-1a digest as described below.  If the
+	calculated FNV-1a digest is equal to the received value of the
+	Digest field, the received packet MUST be accepted.  Otherwise
+	(the digest does not match the Digest field), the received
+	packet MUST be discarded.</t>
+      </list>
     
-    <section title="Calculation of the FNV-1a Digest">
+      <section title="Calculation of the FNV-1a Digest">
 
-      <t>Unlike other authentication mechanisms, the user-supplied
-      key is not placed into the Auth Key / Digest field, and the
-      packet hashed. As FNV-1a is not a cryptographic hash, such a
-      process would simplify the process for an attacker to "crack"
-      the key.</t>
+	<t>Unlike other authentication mechanisms, the user-supplied
+	key is not placed into the Auth Key / Digest field, and the
+	packet hashed. As FNV-1a is not a cryptographic hash, such a
+	process would simplify the process for an attacker to "crack"
+	the key.</t>
 
-      <t>Instead, a per-packet key (called PKEY) is derived from
-      ISAAC as discussed below. We calculate the FNV-1a hash as</t>
-
-      <t>Digest = FNV-1a(PKEY + Packet + PKEY)</t>
+	<t>Instead, for a particular packet "P", and ISAAC
+	pseudo-random number "I", the FNV1A digest "D" is calculated
+	as shown below, where "+" indicates concatenation.</t>
+	
+	<figure>
+          <artwork><![CDATA[
+	  D = FNV1A(I + P + I)
+          ]]></artwork>
+	</figure>
 
       <t>Where "+" denotes concatentation.  We also note that the
-      "Digest field MUST be initialized to all zeroes before this
-      calculation is performed</t>
+      Digest field of the packet MUST be initialized to all zeroes
+      before this calculation is performed</t>
 
-      <t>The calculated Digest is then inserted into the packet in
-      the Digest field, and the packet is sent as normal.</t>
-
-    </section>
-
-    <section title="Derivation of PKEY from ISAAC">
-
-      <t>TBD: PKEY is derived from ISAAC, which produces an infinite
-      series of CSPRNs.  There is a 1-1 relationship between a
-      particular PKEY and the sequence number.  i.e. if the sequence
-      number is 1 off from the previously seen value, then we use
-      the next PKEY from ISAAC.  If the sequence number is 2 off
-      from the previously seen value, then we calculate one PKEY,
-      throw it away, and use the next PKEY</t>
-
-    </section>
-
-    <section title="Seeding of ISAAC">
-      <t>TBD - The contents of ISAAC are seeded with (Generation
-      Number + key + zeroes to fill).  ISAAC has 256*4 bytes of
-      internal state.</t>
-      
-      <t>The ISAAC algorithm is then run 10 times to "mix" the
-      contents.</t>
-
-      <t>The typical implementation of ISAAC will produce 256 random
-      numbers at near-zero cost.  It will then require "mixing",
-      which involves operating on all 256 internal state values.
-      This mixing could perhaps also be amortized across each
+      <t>The calculated value "D" is then inserted into the packet in
+      the Digest field, and the packet is sent as normal.  The
+      receiving party reverses this operation in order to validate the
       packet.</t>
-
-      <t>TBD: The code for ISAAC is fairly small.  It might be good
-      to have a test implementation on GitHub.  This would also
-      allow us to define test vectors in this document</t>
-
+      </section>
     </section>
-
-    <section title="Generation Number">
-
-      <t>TBD: should change during INIT state, when ISAAC is
-      bootstrapped?  It may be difficult to rely on
-      bfd.AuthSeqKnown?</t>
-      
-      <t>The authentication digest value is a binary string of 4
-      octets, and MUST be placed into the Digest field.  For
-      interoperability, the management interface by which the key is
-      configured MUST accept ASCII strings, and SHOULD also allow for
-      the configuration of any arbitrary binary string in hexadecimal
-      form.  Other configuration methods MAY be supported.</t>
-    </section>
-
 
     <section anchor="IANA" title="IANA Considerations">
       <t>This document asks that IANA allocate a new entry in the "BFD
       Authentication Types" registry.</t>
 
-      <t>Address - 6</t>
+      <t>Address - TBD1</t>
+      <t>BFD Authentication Type Name - Meticulous Keyed ISAAC</t>
+      <t>Reference - this document</t>
+
+      <t>Address - TBD2</t>
       <t>BFD Authentication Type Name - Meticulous Keyed FNV1A</t>
       <t>Reference - this document</t>
 
@@ -419,10 +683,20 @@
       of the secret, and the entropy of the key.  It is RECOMMENDED
       that the key be 16 octets in length or more.</t>
 
-      <t>The security of this proposal depends loosely on the strength
-      of the FNV-1a hash algorithm.  Using a CSPRNG as the initial
-      seed for the hash limits the ability of an attacker to create
-      their own hash values.</t>
+      <t>The security of this proposal depends strongly on ISAAC.
+      This generator has been analyzed and has not been broken.
+      Research shows few other CSRNGs which are as simple and as fast
+      as ISAAC.  For example, many other generators are based on AES,
+      which is infeasibe for resource constrained systems.</t>
+
+      <t>The security of this proposal depends on the strength of the
+      FNV-1a hash algorithm.  Folding the output of ISAAC into the
+      hash limits the ability of an attacker to reverse the hash, or
+      to perform off-line dictionary attacks.  Even if one particular
+      32-bit per-packet key is found via brute force, that information
+      will be useless, as the next packet will use a different key.
+      And since ISAAC is secure, knowledge of one particular key will
+      give an attacker no ability to predict the next key.</t>
 
       <t>In a keyed algorithm, the key is shared between the two
       systems. Distribution of this key to all the systems at the same
@@ -441,16 +715,81 @@
       such malicious packets may cause a BFD session to be
       operationally down.</t>
 
-      <t>The particular format of hashing is chosen because of the
+      <t>As noted earlier with Meticulous Keyed FNV1A, each packet is
+      associated with a unique, per-packet key.  This process means
+      that even if an observer sees the Auth-Key, or the FNV-1a hash
+      for one packet, the only information gained will be a key which
+      is never be re-used, and will therefore be useless to an
+      attacker.  Further, even if the attacker can "crack" a sequence
+      of packets to obtain a stream of keys, the cryptographic nature
+      of ISAAC makes it impossible for the attacker to derive the
+      input key which is used to "seed" the ISAAC state.</t>
+     
+      <t>The particular method of hashing was chosen because of the
       non-cryptographic amd reversible nature of the FNV-1a hash.  If
-      the digest had been calculated an (PKEY + Packet), or (Packet +
-      PKey), then an attacker would have significantly less work to do
-      in order to "crack" the hash.  In short the PKEY protects the
-      hash, and and hash protects the PKEY.</t>
+      the digest had been calculated any other way, then an attacker
+      would have significantly less work to do in order to "crack" the
+      hash.  In short the per-packet key protects the hash, and and
+      hash protects the per-packet key.</t>
 
       <t>We believe that this construction is reasonably secure, given
       the constraints.  If cryptographic security is desired, then
       implementors can use MD5 or SHA1 authentication mechanisms</t>
+
+      <section title="Spoofing">
+	<t>When Meticulous Keyed ISAAC is used, it is possible for an
+	attacker who can see the packets to observe a particular Auth
+	Key value, and then copy it to a different packet as a
+	"man-in-the-middle" attack.  However, the usefulness of such
+	an attack is limited by the requirements that these packets
+	must not signal state changes in the BFD session, and that the
+	key changes on every packet.</t>
+
+	<t>Performing such an attack would require an attacker to have
+	the following information and capabilities:</t>
+
+	<list>
+	  <t>This is man-in-the-middle active attack.</t>
+
+	  <t>The attacker has the contents of a stable packet</t>
+
+	  <t>The attacker has managed to deduce the ISAAC key and
+	  knows which per-packet key is being used.</t>
+	</list>
+
+	<t>The attack is therefore limited to keeping the BFD session
+	up when it would otherwise drop.</t>
+
+	<t>However, the usual actual attack which we are protecting
+	BFD from is availability.  That is, the attacker is trying to
+	shut down then connection when the attacked parties are trying
+	to keep it up.  As a result, the attacks here seem to be
+	irrelevant in practice.</t>
+      </section>
+
+      <section title="Re-Use of keys">
+	<t>The strength of the Auth-Type methods is significantly
+	different between the strong one like SHA-1 and ISAAC.  While
+	ISAAC has had cryptanalysis, and has not been shown to be
+	broken, that analysis is limited. The question then is whether
+	or not it is safe to use the same key for both Auth Type
+	methods (SHA1 and ISAAC), or should we require different
+	keys for each method?</t>
+
+	<t>If we recommend different keys, then it is possible for the
+	two keys to be configured differently on each side of a BFD
+	lin.  For example.  the strong key can be properly
+	provisioned, which allows to the BFD state machine to advance
+	to Up, Then, when we switch to the weaker Auth Type which uses
+	a different key, that key may not match, and the session will
+	immediatly drop.</t>
+
+	<t>We believe that the use of the same key is acceptable, as
+	the Auth Types which use ISAAC also depend on a Seed.  The use
+	of the Seed increases the difficulty of breaking the key, and
+	makes off-line dictionary attacks infeasible.</t>
+      </section>
+
     </section>
 
     <section anchor="Acknowledgements" title="Acknowledgements">
