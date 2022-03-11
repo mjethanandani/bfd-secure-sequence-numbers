@@ -373,11 +373,14 @@
 
       <t>Note that since the packets are not signed with this
       authentication type, the Meticulous Keyed ISAAC method MUST NOT
-      be used to signal BFD state changes.  Instead, the packets
-      containing Meticulous Keyed ISAAC are only a signal that the
-      sending party is still alive, and that the sending party is
-      authentic.  That is, these Auth Type methods must only be used
-      when bfd.SessionState=Up, and the State (Sta) field equals 3
+      be used to signal BFD state changes. For BFD state changes, and
+      a more optimized way to authenticate packets, please refer to
+      <xref target="I-D.ietf-bfd-optimizing-authentication">BFD
+      Authentication</xref>. Instead, the packets containing
+      Meticulous Keyed ISAAC are only a signal that the sending party
+      is still alive, and that the sending party is authentic.  That
+      is, these Auth Type methods must only be used when
+      bfd.SessionState=Up, and the State (Sta) field equals 3
       (Up).</t>
 
       <t>If slightly more security is desired, the packets can be
