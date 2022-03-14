@@ -17,9 +17,13 @@ should be fairly easy to port it to any other systems.
 These funtions are NOT thread-safe.
 
 The functions assume that they are operating on a packet which is
-stored as an array of `uint8_t` bytes.  That is the caller should
+stored as an array of `uint8_t` bytes.  That is, on send, the caller should
 generate the packet contents via any means that is desired, and then
 call these routines on the "raw" packet data.
+
+Similarly, on receive, the caller should validate that the BFD packet
+is OK, and then call these functions with the pointers directly to the
+"raw" fields of the packet.
 
 ## Initialization
 
@@ -156,7 +160,7 @@ fields in the Auth Type structure of a BFD packet.  There should be
 room to read four (4) octets of data.  The values should be in network
 byte order, as received from the network.
 
-The check saves the `digest value, sets the `digest` value to zero,
+The check saves the `digest` value, sets the `digest` value to zero,
 calculates the expected hash for the particular `sequence`, and then
 compares that calculated value to the saved `digest` value.
 
