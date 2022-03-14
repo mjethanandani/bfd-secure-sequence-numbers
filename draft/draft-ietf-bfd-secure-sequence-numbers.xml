@@ -154,9 +154,10 @@
     <abstract>
       <t>This document describes two new BFD Authentication mechanism,
       Meticulous Keyed ISAAC, and Meticulous Keyed FNV1A.  These
-      mechanisms can be used to authenticate BFD packets at less CPU
-      time cost than using MD5 or SHA1, with the tradeoff of decreased
-      security.  This document updates RFC 5880.</t>
+      mechanisms can be used to authenticate BFD packets, and secure
+      the sequence number exchange, with less CPU time cost than using
+      MD5 or SHA1, with the tradeoff of decreased security.  This
+      document updates RFC 5880.</t>
     </abstract>
   </front>
 
@@ -169,6 +170,17 @@
       secure.  The downside to cryptographic hashes is that they are
       expensive and time consuming on resource-constrained
       hardware.</t>
+
+      <t>When BFD packets are unauthenticated, it is possible for an
+      attacker to forge, modify, and/or replay packets on a link.
+      These attacks have a number of side effects.  They can cause
+      parties to believe that a link is down, or they can cause
+      parties to believe that the link is up when it is, in fact,
+      down.  The goal of these methods is to prevent spoofing of the
+      BFD session by someone who could guess the next sequence number.
+      We therefore define simple and fast Auth Type methods which
+      allow parties to detect and prevent both spoofed sequence
+      numbers, and spoofed packets.</t>
 
       <t>This document proposes the use of Authentication methods
       which provides meticulous keying, but which have less impact on
@@ -269,6 +281,24 @@
      hash of the packet.  The packet itself is completely
      unauthenticated.</t>
    </list>   
+
+     <t>The purpose of this method is to secure the sequence number
+     exchange, and to both detect and prevent spoofing of sequence
+     numbers.  In some cases, it is acceptable to not authenticate the
+     entire packet, in which case this method may be used.</t>
+
+     <t>When the receiving party receives a BFD packet with an
+     expected sequence number, and the correct corresponding ISAAC
+     output, it knows that only the authentic sending party could have
+     sent that message.  The sending party is therefore alive/up, and
+     intended to send the message.</t>
+
+     <t>While the rest of the contents of the BFD packet are
+     unauthenticated and may be modified by an attacker, the same is
+     true of stronger Auth Types, such as MD5 or SHA1.  The Auth Type
+     methods are not designed to prevent such attacks.  Instead, they
+     are designed to prevent an attacker from spoofing identities, and
+     an attacker from artificially keeping a session "Up".
     </section>
 
     <section title="Meticulous Keyed FNV1A">
