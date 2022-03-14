@@ -41,3 +41,7 @@ abbb0f5f393cd98bee11d0ff1be9db5c1b6457ea9d6de0c3e71ba7ac9a557ac3
 2f97fdb8b1d5446c5ea8ad60d05665f4f206f11dc7b68ff0fe2a1eefa9025dbb
 5b407646a7fa4390df71a18510f5eee7daf0cbb35952639534e9c43e3d85dca9
 ```
+
+## BFD API
+
+The BFD API is documented in the [BFD API](sequence.md) file.

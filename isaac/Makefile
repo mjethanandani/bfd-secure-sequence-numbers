@@ -29,5 +29,5 @@ modern: modern.c
 #
 #  Tracking BFD sequence numbers
 #
-sequence: sequence.c
-	@$(CC) -DNEVER $< -o $@
+sequence.o: sequence.c
+	@$(CC) -c $< -o $@
