@@ -146,7 +146,7 @@ The function cannot fail, and returns nothing.
 
 ### Receiving Packets
 
-`int bfd_isaac_fnv1a_check(bfd_isaac_ctx *ctx, uint8_t const *sequence, uint32_t *digest, uint8_t const *packet, size_t packetlen)`
+`int bfd_isaac_fnv1a_check(bfd_isaac_ctx *ctx, uint8_t const *sequence, uint8_t *digest, uint8_t const *packet, size_t packetlen)`
 
 This function takes a `ctx`, and checks if the `sequence` and `digest`
 match what is expected.  Note that this function does not perform any
