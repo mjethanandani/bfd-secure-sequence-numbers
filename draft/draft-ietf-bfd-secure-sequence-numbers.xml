@@ -16,7 +16,7 @@
     submissionType="IETF"
     updates="5880"
     consensus="true">
-  
+
   <front>
     <title abbrev="Securing next sequence number">Secure BFD Sequence
     Numbers</title>
