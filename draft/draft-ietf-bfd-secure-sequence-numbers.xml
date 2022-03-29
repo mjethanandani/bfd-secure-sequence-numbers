@@ -298,7 +298,7 @@
      true of stronger Auth Types, such as MD5 or SHA1.  The Auth Type
      methods are not designed to prevent such attacks.  Instead, they
      are designed to prevent an attacker from spoofing identities, and
-     an attacker from artificially keeping a session "Up".
+     an attacker from artificially keeping a session "Up".</t>
     </section>
 
     <section title="Meticulous Keyed FNV1A">
