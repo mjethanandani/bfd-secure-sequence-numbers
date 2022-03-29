@@ -165,6 +165,23 @@ void bfd_isaac_churn(bfd_isaac_ctx *ctx)
 	isaac(randctx);
 }
 
+static bfd_isaac_randctx *get_next_page(bfd_isaac_ctx *ctx)
+{
+	/*
+	 *	We may already have a second page available.  If so, use that.  Otherwise, just churn
+	 *	the existing pool.  Which avoids a memcpy().
+	 */
+	if (ctx->next_page_valid) {
+		ctx->active ^= 0x01;
+	} else {
+		isaac(&ctx->randctx[ctx->active]);
+	}
+	
+	ctx->next_page_valid = 0;
+
+	return &ctx->randctx[ctx->active];
+}
+
 /*
  *	Get the next sequence number, and the next ISAAC output.
  */
@@ -177,18 +194,7 @@ void bfd_isaac_sequence_next(bfd_isaac_ctx *ctx, uint8_t *sequence, uint8_t *aut
 	 *	Have we used all of the numbers in this page?
 	 */
 	if (randctx->index > 256) {
-		/*
-		 *	We may already have a second page available.
-		 *	If so, use that.
-		 */
-		if (ctx->next_page_valid) {
-			ctx->active ^= 0x01;
-			randctx = &ctx->randctx[ctx->active];
-		} else {
-			isaac(randctx);
-		}
-
-		ctx->next_page_valid = 0;
+		randctx = get_next_page(ctx);
 	}
 
 	r = randctx->page[randctx->index++];
@@ -238,8 +244,7 @@ void bfd_isaac_fnv1a_next(bfd_isaac_ctx *ctx, uint32_t *sequence, uint32_t *dige
 	uint32_t r, hash;
 
 	if (randctx->index > 256) {
-		isaac(randctx);
-		ctx->next_page_valid = 0;
+		randctx = get_next_page(ctx);
 	}
 
 	*digest = 0;
