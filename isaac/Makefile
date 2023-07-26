@@ -1,12 +1,11 @@
-all: diff
+all: diff sequence
 
 clean:
-	@rm -f randport randport.txt *~
+	@rm -f randport randport.txt modern.txt sequence *.o *~
 
-diff: randdvec.txt randport.txt modern.txt sequence.txt
+diff: randdvec.txt randport.txt modern.txt
 	@diff randdvec.txt randport.txt
 	@diff randdvec.txt modern.txt
-	@diff randdvec.txt sequence.txt
 
 #
 #  Wildcard rule to build output files
@@ -29,5 +28,5 @@ modern: modern.c
 #
 #  Tracking BFD sequence numbers
 #
-sequence.o: sequence.c
-	@$(CC) -c $< -o $@
+sequence: sequence.c
+	@$(CC) -DNEVER $< -o $@
