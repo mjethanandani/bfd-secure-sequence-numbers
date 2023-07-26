@@ -74,13 +74,13 @@ static void isaac(bfd_isaac_randctx *ctx)
 		_array[3] = _num & 0xff; \
 	} while (0)
 
-#define from_network(_p) (((_p)[0] << 24) | ((_p)[1] << 16) | ((_p)[2] << 8) | (_p)[0])
+#define from_network(_p) ((((uint32_t) (_p)[0]) << 24) | (((uint32_t) (_p)[1]) << 16) | (((uint32_t) (_p)[2]) << 8) | ((uint32_t) (_p)[3]))
 
 /*
  *	Initialize the random context with a seed.  If there's no
  *	seed, just use all zeroes.
  */
-void bfd_isaac_init(bfd_isaac_ctx *ctx, uint32_t sequence, uint32_t seed, uint8_t const *key, size_t keylen)
+void bfd_isaac_init(bfd_isaac_ctx *ctx,  uint32_t seed, uint32_t discriminator, uint8_t const *key, size_t keylen)
 {
 	int i, j;
 	uint32_t a[8];
@@ -92,14 +92,17 @@ void bfd_isaac_init(bfd_isaac_ctx *ctx, uint32_t sequence, uint32_t seed, uint8_
 	if (key && (keylen > 0)) {
 		uint8_t *p = (uint8_t *) &randctx->page[0];
 
-		if (keylen > (sizeof(randctx->page) - 4)) keylen = sizeof(randctx->page) - 4;
+		if (keylen > (sizeof(randctx->page) - 4)) keylen = sizeof(randctx->page) - 8;
 
 		/*
 		 *	Endian-ness matters.
 		 */
 		to_network(p, seed);
+		p += 4;
+		to_network(p, discriminator);
+		p += 4;
 
-		memcpy(p + 4, key, keylen);
+		memcpy(p, key, keylen);
 	}
 
 	m = randctx->pool;
@@ -134,10 +137,9 @@ void bfd_isaac_init(bfd_isaac_ctx *ctx, uint32_t sequence, uint32_t seed, uint8_
 	randctx->index = 0;		/* prepare to use the first set of results */
 
 	/*
-	 *	Allow for sequences to start at something other than
-	 *	zero.
+	 *	All sequences start at zero.
 	 */
-	ctx->sequence = sequence;
+	ctx->sequence = 0;
 }
 
 /*
@@ -192,10 +194,11 @@ void bfd_isaac_sequence_next(bfd_isaac_ctx *ctx, uint8_t *sequence, uint8_t *aut
 	}
 
 	r = randctx->page[randctx->index++];
-	to_network(((uint8_t *) auth_key), r);
+
+	to_network(auth_key, r);
 	
 	r = ctx->sequence++;
-	to_network(((uint8_t *) sequence), r);
+	to_network(sequence, r);
 }
 
 #define FNV_MAGIC_INIT (0x811c9dc5)
@@ -419,3 +422,58 @@ int bfd_isaac_fnv1a_check(bfd_isaac_ctx *ctx, uint8_t const *sequence, uint8_t *
 
 	return swap_to_page(ctx, offset, next_page);
 }
+
+#ifdef NEVER
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <limits.h>
+
+int main(int argc, char const *argv[])
+{
+	int i;
+
+	bfd_isaac_ctx ctx;
+
+	uint32_t seed = 0x0bfd5eed; /* bfd seed */
+	uint32_t your_discriminator = 0x4002d15c;
+	char const *key = "RFC5880June";
+
+	uint32_t sequence, auth_key;
+	uint8_t nbo_sequence[4];
+	uint8_t nbo_auth_key[4];
+
+	if (argc >= 2) {
+		key = argv[1];
+	}
+
+	if (argc >= 3) {
+		seed = strtoul(argv[2], NULL, 16);
+	}
+
+	if (argc >= 4) {
+		your_discriminator = strtoul(argv[3], NULL, 16);
+	}
+
+	bfd_isaac_init(&ctx, seed, your_discriminator, (uint8_t const *) key, strlen(key));
+
+	memset(nbo_sequence, 0, sizeof(nbo_sequence));
+	memset(nbo_auth_key, 0, sizeof(nbo_auth_key));
+
+	printf("Seed\t0x%08x\n", seed);
+	printf("Y-Disc\t0x%08x\n", your_discriminator);
+	printf("Key\t%s\n\n", key);
+
+	for (i = 0; i < 8; i++) {
+		bfd_isaac_sequence_next(&ctx, nbo_sequence, nbo_auth_key);
+
+		sequence = from_network(nbo_sequence);
+		auth_key = from_network(nbo_auth_key);
+
+		printf("%08x %08x\n", sequence, auth_key);
+	}
+
+
+	return 0;
+}
+#endif
