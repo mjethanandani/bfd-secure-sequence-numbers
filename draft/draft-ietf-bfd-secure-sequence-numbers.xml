@@ -243,11 +243,13 @@
       <t>bfd.XmitAuthSeq</t>
 
       <ul empty="true">
-	<li>A 32-bit unsigned integer containing the next sequence
-	number for for the Authentication Section which will be
-	transmitted.  Where the Authentication Section includes a
-	Sequence Number, this variable MUST be initialized to a random
-	32-bit value.</li>
+	<li>Where the Authentication Section includes a Sequence
+	Number, this variable MUST be initialized to a 32-bit value
+	taken from a secure source.  In the case of ISAAC, the
+	derivation is given below in <xref
+	target="meticulous_keyed_issac" />.  For other methods, the
+	32-bit value is usually taken from a secure random number
+	generator.</li>
       </ul>
 
       <t>bfd.AuthSeqKnown</t>
@@ -264,7 +266,7 @@
       </ul>
     </section>
 
-    <section title="Meticulous Keyed ISAAC">
+    <section title="Meticulous Keyed ISAAC" anchor="meticulous_keyed_issac">
 
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
