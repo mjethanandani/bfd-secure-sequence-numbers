@@ -247,7 +247,7 @@
 	Number, this variable MUST be initialized to a 32-bit value
 	taken from a secure source.  In the case of ISAAC, the
 	derivation is given below in <xref
-	target="meticulous_keyed_issac" />.  For other methods, the
+	target="meticulous_keyed_isaac" />.  For other methods, the
 	32-bit value is usually taken from a secure random number
 	generator.</li>
       </ul>
@@ -266,7 +266,7 @@
       </ul>
     </section>
 
-    <section title="Meticulous Keyed ISAAC" anchor="meticulous_keyed_issac">
+    <section title="Meticulous Keyed ISAAC" anchor="meticulous_keyed_isaac">
 
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
