@@ -178,7 +178,7 @@
       down.  The goal of this specification is to use a simple method to prevent spoofing of the
       BFD session being "Up".
       We therefore define a fast Auth Type method which
-      allows parties securely signal that they are still in the Up state..</t>
+      allows parties securely signal that they are still in the Up state.</t>
 
       <t>This document proposes the use of an Authentication method
       which provides meticulous keying, but which has less impact on
@@ -195,7 +195,78 @@
       in <xref target="RFC2119">RFC 2119</xref>.</t>
     </section>
 
-    <section title="Meticulous Keyed ISAAC">
+    <section title="Updating RFC 5880">
+      <t>Some of the state variables in <xref target="RFC5880"
+      sectionFormat="parens" section="6.8.1">Bidirectional Forward
+      Detection</xref>, are related to the
+      authentication type being used for a particular session.
+      However, the definitions given in <xref
+      target="RFC5880">Bidirectional Forward Detection</xref> are
+      specific to Keyed MD5 or SHA1 Authentication, which limit their
+      utility for new authentication types. This specification updates
+      the definition of some of the state variables as given below.
+      </t>
+
+      <t>These updated definitions are entirely compatible with the
+      definitions given in <xref target="RFC5880"
+      sectionFormat="parens" section="6.8.1">Bidirectional Forward
+      Detection</xref>, and require no changes to existing
+      configurations or implementations. Instead, the updated
+      definitions clarify that the state variables apply to the
+      current authentication type, no matter what it is.</t>
+
+      <t>These updated definitions also mean that Authentication
+      Sections SHOULD include a Sequence Number field.  Where a
+      Sequence Number is not used (as with Simple Password) the
+      variables bfd.RcvAuthSeq and bfd.XmitAuthSeq MUST be set to
+      zero.</t>
+
+      <t>bfd.AuthType</t>
+
+      <ul empty="true">
+	<li>The authentication type in use for this session, as
+	defined in RFC5880 section 4.1, or zero if no authentication
+	is in use.  Once set. the value of this variable MUST NOT
+	change during a session.  That is, if either end of a
+	connection wishes to change the authentication type, it MUST
+	tear down the current session and start a new one.</li>
+      </ul>
+	
+      <t>bfd.RcvAuthSeq</t>
+
+      <ul empty="true">
+	<li>A 32-bit unsigned integer containing the last sequence
+	number for the current Authentication Section that was
+	received.  The initial value is unimportant.</li>
+      </ul>
+
+      <t>bfd.XmitAuthSeq</t>
+
+      <ul empty="true">
+	<li>Where the Authentication Section includes a Sequence
+	Number, this variable MUST be initialized to a 32-bit value
+	taken from a secure source.  In the case of ISAAC, the
+	derivation is given below in <xref
+	target="meticulous_keyed_isaac" />.  For other methods, the
+	32-bit value is usually taken from a secure random number
+	generator.</li>
+      </ul>
+
+      <t>bfd.AuthSeqKnown</t>
+
+      <ul empty="true">
+	<li>Set to 1 if the next expected Authentication Section has a
+	sequence number which is known, or 0 if it is not known.  This
+	variable MUST be initialized to zero.</li>
+
+	<li>This variable MUST be set to zero after no packets have
+	been received on this session for at least twice the Detection
+	Time.  This ensures that the sequence number can be
+	resynchronized if the remote system restarts.</li>
+      </ul>
+    </section>
+
+    <section title="Meticulous Keyed ISAAC" anchor="meticulous_keyed_isaac">
 
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
@@ -427,7 +498,8 @@ Seed	0x0bfd5eed
 Y-Disc	0x4002d15c
 Key	RFC5880June
             ]]></artwork>
-        </figure> 
+        </figure>
+ 
 
       <figure>
           <artwork><![CDATA[	  
@@ -441,7 +513,8 @@ Sequence Auth Key
 00000006 3a44db86
 00000007 7dda6e6a
             ]]></artwork>
-        </figure> 
+        </figure>
+ 
 
     <t>Note that this construct requires that the "Your Discriminator" field not change during a session.  However, it does allow the "My Discriminator" field to change as permitted by <xref target="RFC5880">RFC5880 Section 6.3</xref></t>
 
