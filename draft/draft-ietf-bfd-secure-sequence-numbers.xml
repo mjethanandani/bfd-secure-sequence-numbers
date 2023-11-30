@@ -98,7 +98,7 @@
     </author>
 
     <author fullname="Ashesh Mishra" initials="A" surname="Mishra">
-      <organization>O3b Networks</organization>
+      <organization>Aalyria Technologies</organization>
 
       <address>
         <postal>
@@ -117,7 +117,7 @@
 
         <facsimile/>
 
-        <email>mishra.ashesh@gmail.com</email>
+        <email>ashesh@aalyria.com</email>
 
         <uri/>
       </address>
@@ -153,10 +153,12 @@
 
     <abstract>
       <t>This document describes a new BFD Authentication mechanism,
-      Meticulous Keyed ISAAC.  This
-      mechanism can be used to authenticate BFD packets with less CPU time cost than using
-      MD5 or SHA1, with the tradeoff of decreased security.  This mechanism cannot be used to signal state changes, but it can be used as an authenticated signal to maintain a session in the the "Up" state. This
-      document updates RFC 5880.</t>
+      Meticulous Keyed ISAAC.  This mechanism can be used to
+      authenticate BFD packets with less CPU time cost than using MD5
+      or SHA1, with the tradeoff of decreased security.  This
+      mechanism cannot be used to signal state changes, but it can be
+      used as an authenticated signal to maintain a session in the the
+      "Up" state. This document updates RFC 5880.</t>
     </abstract>
   </front>
 
@@ -182,10 +184,14 @@
 
       <t>This document proposes the use of an Authentication method
       which provides meticulous keying, but which has less impact on
-      resource constrained systems.  The algorithm chosen is a seeded pseudo-random number generator named <xref
-      target="ISAAC">ISAAC</xref>.  ISAAC has been subject to significant
-      cryptanalysis in the past thirty years, and has not yet been
-      broken.  It requires only a few CPU operations per generated 32-bit number, can take a large secret key as a seed, and it has an extremely long period.  These properties make it ideal for use in BFD.</t>
+      resource constrained systems.  The algorithm chosen is a seeded
+      pseudo-random number generator named <xref
+      target="ISAAC">ISAAC</xref>.  ISAAC has been subject to
+      significant cryptanalysis in the past thirty years, and has not
+      yet been broken.  It requires only a few CPU operations per
+      generated 32-bit number, can take a large secret key as a seed,
+      and it has an extremely long period.  These properties make it
+      ideal for use in BFD.</t>
     </section>
 
     <section title="Requirements Language">
@@ -224,14 +230,21 @@
       <t>bfd.AuthType</t>
 
       <ul empty="true">
-	<li>The authentication type in use for this session, as
-	defined in RFC5880 section 4.1, or zero if no authentication
-	is in use.  Once set. the value of this variable MUST NOT
-	change during a session.  That is, if either end of a
-	connection wishes to change the authentication type, it MUST
-	tear down the current session and start a new one.</li>
+	<li>
+	  <t>The current authentication type in use for this session,
+	  as defined in RFC5880 section 4.1, or zero if no
+	  authentication is in use. Note that the session MAY change
+	  AuthType during a session. For example, where the session
+	  transitions from a more secure AuthType to a less secure
+	  one, or vice versa.</t>
+
+	  <t>Packets which indicate a state transition SHOULD use a
+	  secure AuthType.  Where the bfd.SessionState value is Up,
+	  packets MAY use a less secure AuthType, such as Meticulous
+	  Keyed Isaac.</t>
+	</li>
       </ul>
-	
+
       <t>bfd.RcvAuthSeq</t>
 
       <ul empty="true">
@@ -243,13 +256,11 @@
       <t>bfd.XmitAuthSeq</t>
 
       <ul empty="true">
-	<li>Where the Authentication Section includes a Sequence
-	Number, this variable MUST be initialized to a 32-bit value
-	taken from a secure source.  In the case of ISAAC, the
-	derivation is given below in <xref
-	target="meticulous_keyed_isaac" />.  For other methods, the
-	32-bit value is usually taken from a secure random number
-	generator.</li>
+	<li>A 32-bit unsigned integer containing the next sequence
+	number for for the Authentication Section which will be
+	transmitted.  This variable MUST be initialized to a random
+	32-bit value.
+	</li>
       </ul>
 
       <t>bfd.AuthSeqKnown</t>
@@ -274,7 +285,7 @@
       Authentication Section has the following format:</t>
 
       <figure>
-          <artwork><![CDATA[	  
+          <artwork><![CDATA[
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -295,7 +306,7 @@
      Keyed ISAAC).  If the State (Sta) field value is not 3 (Up), then
      Meticulous Keyed ISAAC MUST NOT be used.</t>
    </list>
-   
+
    <t>Auth Len</t>
 
    <list empty="true">
@@ -334,7 +345,7 @@
      and distinguish different "streams" of random numbers which are generated
      by ISAAC.</t>
    </list>
-   
+
    <t>Auth-Key</t>
 
    <list empty="true">
@@ -345,13 +356,14 @@
      <t>Note that the Auth-Key here does not include any summary or
      hash of the packet.  The packet itself is completely
      unauthenticated.</t>
-   </list>   
+   </list>
 
      <t>When the receiving party receives a BFD packet with an
      expected sequence number and the correct corresponding ISAAC
-     output in the Auth Key field, it knows that only the authentic sending party could have
-     sent that message.  The sending party is therefore "Up", and
-     is the only one who could have sent the message.</t>
+     output in the Auth Key field, it knows that only the authentic
+     sending party could have sent that message.  The sending party is
+     therefore "Up", and is the only one who could have sent the
+     message.</t>
 
      <t>While the rest of the contents of the BFD packet are
      unauthenticated and may be modified by an attacker, the same is
@@ -366,6 +378,19 @@
       messages which are exchanged.  Methods using MD5 or SHA1 are CPU
       intensive, and can negatively impact systems with limited CPU
       power.</t>
+
+      <t>The solution this document offers here is that state
+      transitions can be authenticated via a secure but expensive
+      AuthType method.  As these transitions are rare, the extra
+      expense here is acceptable.</t>
+
+      <t>However, once the session transitions into the Up state,
+      and the sequence number is secured, there is no need to
+      authenticate every packet, and the entire packet, while
+      maintaining a level of confidence that the packets have
+      not been tampered with. When combined with an occasional
+      packet with expensive AuthType a man-in-the-middle attack
+      can be prevented.</t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
       pseudo-random numbers.  With Meticulous Keyed ISAAC, these
@@ -389,12 +414,37 @@
       (Up).</t>
 
     <section title="Seeding and Operation of ISAAC">
-      <t>The ISAAC PRNG state is initialized using the 32-bit Seed
-      and the secret key, as defined below.</t>
+      <t>Once a session transitions to the Up state, the packet
+      MAY contain AuthType of Meticulous Keyed Isaac. A system
+      receiving such a packet will initialize the Isaac PRNG
+      state using the Seed from the packet. A system originating
+      such a packet will also generate a Seed, and place it into
+      the packet which is then sent.</t>
+
+      <t>Note that switch to a different AuthType method does not
+      affect the values of the bfd.RcvAuthSeq or bfd.XmitAuthSeq
+      variables. The variables MUST continue on from their previous
+      values which were using the previous AuthType method.</t>
+
+      <t>However, the operation of those variables MUST now satisfy
+      the requirements of the new AuthType method.  For example, the
+      AuthType could change from Keyed SHA1 (where the variables were
+      not updated on every packet) to Meticulous Keyed Isaac (where
+      the variables are updated on every packet).</t>
+
+      <t>That is, when changing AuthTypes in a session, the current
+      value of the bfd.RcvAuthSeq and bfd.XmitAuthSeq variables is
+      used as the initial value(s) for the new AuthType.</t>
+
+      <t>The ISAAC PRNG state is initialized using the 32-bit Seed and
+      the secret key, as defined below.</t>
 
       <t>The origin of the Seed field is discussed later in this
       document.  For now, we note that each time a new Seed is used,
-      the bfd.XmitAuthSeq value MUST be set to zero.  The Seed MUST be changed when a BFD session transitions into the "Up" state.  In order to prevent continuous rekeying, the Seed MUST NOT be changed while a session is in the "Up" state.</t>
+      the bfd.XmitAuthSeq value MUST be set to zero.  The Seed MUST be
+      changed when a BFD session transitions into the "Up" state.  In
+      order to prevent continuous rekeying, the Seed MUST NOT be
+      changed while a session is in the "Up" state.</t>
 
       <t>Once the state has been initialized, the standard ISAAC
       initial mixing function is run.  Once this operation has been
@@ -450,15 +500,18 @@
       supported.</t>
 
       <t>The secret Key is mixed with the Seed before being used in
-      ISAAC, as described below.  If instead ISAAC was initialized without a Seed, then an
-      attacker could pre-compute ISAAC states for many keys, and
-      perform an off-line dictionary attack.  The addition of the Seed
-      makes these attacks infeasable.</t>
+      ISAAC, as described below.  If instead ISAAC was initialized
+      without a Seed, then an attacker could pre-compute ISAAC states
+      for many keys, and perform an off-line dictionary attack.  The
+      addition of the Seed makes these attacks infeasable.</t>
 
-      <t>The Secret Key MUST be at least eight (8) octets in length, and SHOULD NOT be more than 128 octets in length.</t>
+      <t>The Secret Key MUST be at least eight (8) octets in length,
+      and SHOULD NOT be more than 128 octets in length.</t>
 
-      <t>As a result, it is believed to be safe to use the same secret Key for the
-      Auth Types defined here, and also for other Auth Types.  However, it is RECOMMENDED to use differnet secret Keys for each Auth Type.</t>
+      <t>As a result, it is believed to be safe to use the same secret
+      Key for the Auth Types defined here, and also for other Auth
+      Types.  However, it is RECOMMENDED to use differnet secret Keys
+      for each Auth Type.</t>
     </section>
 
     <section title="Seeding ISAAC">
@@ -470,10 +523,11 @@
       BFD session.  The Seed value MUST change when the BFD state
       changes.</t>
 
-      <t>The string used to initialize the ISAAC PRNG is taken from the following structure:</t>
+      <t>The string used to initialize the ISAAC PRNG is taken from
+      the following structure:</t>
 
       <figure>
-          <artwork><![CDATA[	  
+          <artwork><![CDATA[
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -481,28 +535,40 @@
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                       Your Discriminator                      |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                          Secret Key ...                         
+   |                          Secret Key ...                       |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             ]]></artwork>
         </figure>
 
-    <t>Where the "Your Discriminator" field is taken from the BFD packet defined in <xref target="RFC5880">RFC5880 Section 4.1</xref>.  This field is taken from the respective values used by a sending system.  For recieving systems, the field are taken from the received packet.  The length of the Secret Key MUST be 1016 octets or less.</t>
+    <t>Where the "Your Discriminator" field is taken from the BFD
+    packet defined in <xref target="RFC5880">RFC5880 Section
+    4.1</xref>.  This field is taken from the respective values used
+    by a sending system.  For recieving systems, the field are taken
+    from the received packet.  The length of the Secret Key MUST be
+    1016 octets or less.</t>
 
-    <t>The data is padded to 1024 octets using zeroes, and then is processed throught the "randinit()" function of ISAAC.  Pseudo-random numbers are then produced by calling the "isaac()" function.</t>
+    <t>The data is padded to 1024 octets using zeroes, and then is
+    processed throught the "randinit()" function of ISAAC.
+    Pseudo-random numbers are then produced by calling the "isaac()"
+    function.</t>
 
-    <t>The following figure give Seed and Your-Discriminator as 32-bit hex values, and the Secret Key as an eleven-character string.  The subsequent figure shows the first eight Sequence numbers and corresponding Auth Key values which were generated using the above initial values.</t>
+    <t>The following figure give Seed and Your-Discriminator as 32-bit
+    hex values, and the Secret Key as an eleven-character string.  The
+    subsequent figure shows the first eight Sequence numbers and
+    corresponding Auth Key values which were generated using the above
+    initial values.</t>
 
       <figure>
-          <artwork><![CDATA[	  
+          <artwork><![CDATA[
 Seed	0x0bfd5eed
 Y-Disc	0x4002d15c
 Key	RFC5880June
             ]]></artwork>
         </figure>
- 
+
 
       <figure>
-          <artwork><![CDATA[	  
+          <artwork><![CDATA[
 Sequence Auth Key
 00000000 739ba88a
 00000001 901e5075
@@ -514,11 +580,18 @@ Sequence Auth Key
 00000007 7dda6e6a
             ]]></artwork>
         </figure>
- 
 
-    <t>Note that this construct requires that the "Your Discriminator" field not change during a session.  However, it does allow the "My Discriminator" field to change as permitted by <xref target="RFC5880">RFC5880 Section 6.3</xref></t>
 
-     <t>This construct provides for 64 bits of entropy, of which 32 bits is controlled by each party in a BFD session.  For security, each implemention SHOULD randomize their discrimator fields at the start of a session, as discussed in <xref target="RFC5880">RFC5880 Section 10</xref>.</t>
+    <t>Note that this construct requires that the "Your Discriminator"
+    field not change during a session.  However, it does allow the "My
+    Discriminator" field to change as permitted by <xref
+    target="RFC5880">RFC5880 Section 6.3</xref></t>
+
+     <t>This construct provides for 64 bits of entropy, of which 32
+     bits is controlled by each party in a BFD session.  For security,
+     each implemention SHOULD randomize their discrimator fields at
+     the start of a session, as discussed in <xref
+     target="RFC5880">RFC5880 Section 10</xref>.</t>
 
       <t>There is no way to signal or negotiate Seed
       changes.  The receiving party MUST remember the current Seed
@@ -624,13 +697,21 @@ Sequence Auth Key
       of the Secret Key, and on its entropy.  It is RECOMMENDED
       that the key be 16 octets in length or more.</t>
 
-      <t>The dependency on the Secret Key for security is mitigated through the use of two 32-bit random numbers, with one generated by each party to a BFD session.  An attacker cannot simply perform an off-line brute-force dictionary attack to discover the key.  Instead, any analysis has to include the particular 64 bits of entropy used for a particular session.  As a result, dictionary attacks are more difficult than they would be if the PRNG generator depended on nothing more than the Secret Key.</t>
+      <t>The dependency on the Secret Key for security is mitigated
+      through the use of two 32-bit random numbers, with one generated
+      by each party to a BFD session.  An attacker cannot simply
+      perform an off-line brute-force dictionary attack to discover
+      the key.  Instead, any analysis has to include the particular 64
+      bits of entropy used for a particular session.  As a result,
+      dictionary attacks are more difficult than they would be if the
+      PRNG generator depended on nothing more than the Secret Key.</t>
 
       <t>The security of this proposal depends strongly on ISAAC.
-      This generator has been analyzed for almost three decades, and has not been broken.
-      Research shows that there are few other CSRNGs which are as simple and as fast
-      as ISAAC.  For example, many other generators are based on AES,
-      which is infeasibe for resource constrained systems.</t>
+      This generator has been analyzed for almost three decades, and
+      has not been broken.  Research shows that there are few other
+      CSRNGs which are as simple and as fast as ISAAC.  For example,
+      many other generators are based on AES, which is infeasibe for
+      resource constrained systems.</t>
 
       <t>In a keyed algorithm, the key is shared between the two
       systems. Distribution of this key to all the systems at the same
@@ -642,14 +723,16 @@ Sequence Auth Key
       administratively disable the BFD session before changing the
       keys.</t>
 
-      <t>That is, while the Auth Key ID field provides for the use of multiple keys simultaneously, there is no way for each party to signal which Key IDs are supported.</t>
+      <t>That is, while the Auth Key ID field provides for the use of
+      multiple keys simultaneously, there is no way for each party to
+      signal which Key IDs are supported.</t>
 
-      <t>The Auth Type method defined here allows the BFD end-points to detect a malicious
-      packet, as the calculated hash value will not match the value
-      found in the packet. The behavior of the session, when such a
-      packet is detected, is based on the implementation. A flood of
-      such malicious packets may cause a BFD session to be
-      operationally down.</t>
+      <t>The Auth Type method defined here allows the BFD end-points
+      to detect a malicious packet, as the calculated hash value will
+      not match the value found in the packet. The behavior of the
+      session, when such a packet is detected, is based on the
+      implementation. A flood of such malicious packets may cause a
+      BFD session to be operationally down.</t>
 
       <section title="Spoofing">
 	<t>When Meticulous Keyed ISAAC is used, it is possible for an
@@ -700,9 +783,10 @@ Sequence Auth Key
 	immediatly drop.</t>
 
 	<t>We believe that the use of the same key is acceptable, as
-	the Auth Type defined for ISAAC depend on 64 bits of random data.  The use
-	of this randomness increases the difficulty of breaking the key, and
-	makes off-line dictionary attacks infeasible.</t>
+	the Auth Type defined for ISAAC depend on 64 bits of random
+	data.  The use of this randomness increases the difficulty of
+	breaking the key, and makes off-line dictionary attacks
+	infeasible.</t>
       </section>
 
     </section>
