@@ -489,7 +489,7 @@
 
     <section title="New State variables for Meticulous Keyed ISAAC">
       <t>This document defines two new state variables for use with
-      Meticulous Keyed ISAAC.
+      Meticulous Keyed ISAAC.</t>
 
       <t>bfd.MetKeyIsaacRcvKeyKnown</t>
 
@@ -647,6 +647,8 @@
       <t>When there is a transition to using ISAAC, the initial state
       has to be seeded.  The next section describes this seeding
       process.</t>
+
+    </section>
 
     <section title="Seeding ISAAC">
       <t>The Seed field is used to is used to identify and secure
