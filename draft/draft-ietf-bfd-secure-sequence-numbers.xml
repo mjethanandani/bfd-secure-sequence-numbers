@@ -974,30 +974,25 @@ Sequence Auth Key
 
       <t>It is RECOMMENDED that implementations periodically use a
       strong Auth Type for packets which maintain the session in an Up
-      state.  We offer no advice here as to how often that signalling
-      should be done.  From a practical point of view, if both parties
-      are using Meticulous Keyed ISAAC and the stream of pseudo-random
-      numbers continues to be correct, then the link must be up, and
-      the other party must be authentic.  The rest of the BFD packet
-      contents then serve to maintain the BFD state machine, which is
-      external to the ISAAC authentication.</t>
-
-      <t>When a system switches from using Meticulous Keyed ISAAC to a
-      different Auth Type method during a session, it MUST do so only
-      for a small number of packets.  It is RECOMMENDED that only one
-      such packet is sent, and the system can then switch back to
-      using Meticulous Keyed ISAAC on the next packet which signals
-      that the session remains in the Up state.</t>
+      state.  See <xref
+      target="I-D.ietf-bfd-optimizing-authentication">BFD
+      Authentication</xref> for appropriate procedures.</t>
 
       <t>The nature of the Meticulous Keyed ISAAC method means that
-      there is no issue with this switch.  From the point of view of
-      the Meticulous Keyed ISAAC state machine, this switch can be
-      handled similarly to a lost packet.  The state machine simply
-      notices that instead of Sequence Number value being one more
-      than the last value used for ISAAC, it is larger by two.  The
-      ISAAC state machine then calculates the index into the current
-      "page", and uses the found number to validate (or send) the Auth
-      Key.</t>
+      there is no issue with this switch, so long as it is for a small
+      number of packets.  From the point of view of the Meticulous
+      Keyed ISAAC state machine, this switch can be handled similarly
+      to a lost packet.  The state machine simply notices that instead
+      of Sequence Number value being one more than the last value used
+      for ISAAC, it is larger by two.  The ISAAC state machine then
+      calculates the index into the current "page", and uses the found
+      number to validate (or send) the Auth Key.</t>
+
+      <t>If the non-ISAAC Auth Type instead runs for extended periods
+      of time, then the ISAAC process must continue "in the
+      background" in order to maintain synchronization.  This process
+      is needed because this method does not provide for a way to
+      reinitialize the ISAAC method with new Seed value.</t>
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
