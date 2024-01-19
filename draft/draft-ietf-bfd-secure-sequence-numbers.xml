@@ -324,7 +324,7 @@
 
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
-      Type field contains TB1 (Meticulous Keyed ISAAC), the
+      Type field contains TBD1 (Meticulous Keyed ISAAC), the
       Authentication Section has the following format:</t>
 
       <figure>
@@ -345,7 +345,7 @@
 
       <t>Auth Type</t>
       <list empty="true">
-	<t>The Authentication Type, which in this case is TB1 (Meticulous
+	<t>The Authentication Type, which in this case is TBD1 (Meticulous
 	Keyed ISAAC).  If the State (Sta) field value is not 3 (Up), then
 	Meticulous Keyed ISAAC MUST NOT be used.</t>
       </list>
@@ -367,7 +367,7 @@
       <t>Reserved</t>
 
       <list empty="true">
-	<t>This byte MUST be set to zero on transmit, and ignored on receipt.</t>
+	<t>This field MUST be set to zero on transmit, and ignored on receipt.</t>
       </list>
    
       <t>Sequence Number</t>
@@ -394,7 +394,8 @@
       <list empty="true">
 	<t>This field carries the 32-bit (4 octet) ISAAC output which is
 	associated with the Sequence Number.  The ISAAC PRNG MUST be
-	configured and initialized as given in section TBD, below.</t>
+	configured and initialized as given in 
+	<xref target="seeding-isaac"/>, below.</t>
 
 	<t>Note that the Auth-Key here does not include any summary or
 	hash of the packet.  The packet itself is completely
@@ -434,7 +435,7 @@
 	The Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
 
 	<t>The Seed field MUST be set to the value of the current seed
-	used for this sequence.</t>
+	used for this session.</t>
 
 	<t>The Auth-Key field MUST be set to the output of ISAAC, which
 	depends on the secret Key, the current Seed, and the Sequence
@@ -460,19 +461,25 @@
 	<t>If the Auth Len field is not equal to 16, the packet MUST be
 	discarded.</t>
 
-	<t>If the Seed field does not match the current Seed value, the
-	packet MUST be discarded.</t>
-
 	<t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
 	For Meticulous keyed ISAAC, if the sequence number lies outside of
 	the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
 	inclusive (when treated as an unsigned 32-bit circular number
 	space) the received packet MUST be discarded.</t>
 
+	<t>If bfd.MetKeyIsaacRcvKeyKnown is "true" and the Seed field does not
+	match the current Seed value, bfd.MetKeyIsaacRcvAuthSeed, the packet
+	MUST be discarded.</t>
+
 	<t>Calculate the current expected output of ISAAC, which
 	depends on the secret Key, the current Seed, and the Sequence
 	Number.  If the value does not matches the Auth-Key field,
 	then the packet MUST be discarded.</t>
+
+	<t>If bfd.MetKeyIsaacRcvKeyKnown is "false", the ISAAC related variables
+	are initialized as per 
+	<xref target="receiver-variable-initialization"/> using the contents of
+	the packet.</t>
 
 	<t>Note that in some cases, calculating the expected output of
 	ISAAC will result in the creation of a new "page" of 256
@@ -499,7 +506,7 @@
 	method.  The initial value is "false".  This value is changed
 	to "true" when a party verifies that the other party has
 	started to use the Meticulous Keyed ISAAC Auth Type method,
-	with a matching Auth Key.</li>
+	with an authenticated Auth Key.</li>
       </ul>
 
       <t>bfd.MetKeyIsaacRcvAuthBase</t>
@@ -573,7 +580,7 @@
     </section>
 
     <section title="Secret Key">
-      <t>The security of this Auth Type depends in the Secret Key.
+      <t>The security of this Auth Type depends on the Secret Key.
       The Secret Key is mixed with a per-session Seed as discussed
       below.  The result is used to initialize a stream of
       pseudo-random numbers using the ISAAC random number
@@ -615,8 +622,9 @@
       such a packet will initialize the Isaac PRNG state using the
       Seed from the packet. A system originating such a packet will
       generate a Seed, and place it into the packet which is then
-      sent.  Further discussion of initialization is below in Section
-      TBD.</t>
+      sent.  Further discussion of initialization is below in 
+      <xref target="sender-variable-initialization"/> and
+      <xref target="receiver-variable-initialization"/>.</t>
 
       <t>There is no negotiation when using this Auth Type method.  A
       sending system simply starts sending packets which contain Auth
@@ -631,7 +639,7 @@
 
       <t>Note that switch to a different AuthType method does not
       affect the values of the bfd.RcvAuthSeq or bfd.XmitAuthSeq
-      variables. The variables MUST continue on from their previous
+      variables. The variables MUST continue using their previous
       values which were using the previous AuthType method.</t>
 
       <t>However, the operation of those variables MUST now satisfy
@@ -644,13 +652,13 @@
       value of the bfd.RcvAuthSeq and bfd.XmitAuthSeq variables is
       used as the initial value(s) for the new AuthType.</t>
 
-      <t>When there is a transition to using ISAAC, the initial state
-      has to be seeded.  The next section describes this seeding
+      <t>When there is a transition to using ISAAC the first time, the initial
+      state has to be seeded.  The next section describes this seeding
       process.</t>
 
     </section>
 
-    <section title="Seeding ISAAC">
+    <section title="Seeding ISAAC" anchor="seeding-isaac">
       <t>The Seed field is used to is used to identify and secure
       different "streams" of random numbers which are generated by
       ISAAC.  Each session uses a different Seed, which is used along
@@ -749,7 +757,8 @@ Sequence Auth Key
      state change with a a packet that is authenticated using a more
      secure Auth Type method.</t>
 
-     <section title="Sender Variable Initialization">
+     <section title="Sender Variable Initialization"
+      anchor="sender-variable-initialization">
        <t>A system which sends packets initializes ISAAC as described
        above.  The ISAAC related variables are initialized as
        follows:</t>
@@ -791,10 +800,11 @@ Sequence Auth Key
       </ul>
      </section>
 
-     <section title="Receiver Variable Initialization">
-       <t>A system which sends packets initializes ISAAC as described
-       above.  The ISAAC related variables are initialized as
-       follows:</t>
+     <section title="Receiver Variable Initialization"
+      anchor="receiver-variable-initialization">
+       <t>When a system receives packets with the Meticulous Keyed ISAAC
+       authentication type and is able to authenticate such a packet the first
+       time, the ISAAC related variables are initialized as follows:</t>
 
       <t>bfd.MetKeyIsaacRcvKeyKnown</t>
 
@@ -840,7 +850,7 @@ Sequence Auth Key
       taken directly from the bfd.RcvAuthSeq variable, and the
       bfd.MetKeyIsaacRcvAuthIndex is set to zero</t>
 
-      <t>If, however, the packets Sequence Number differs from the
+      <t>If, however, the packet's Sequence Number differs from the
       expected value, then the the difference "N" indicates how many
       packets were lost.  The receive then has to search through the
       first "N" Auth Keys derived from its calculated ISAAC state in
@@ -850,7 +860,7 @@ Sequence Auth Key
 
       <t>If a calculated key at index "I" does match the Auth Key in
       the packet, then the bfd.MetKeyIsaacRcvAuthIndex field is
-      initialized to this value.  THe bfd.MetKeyIsaacRcvAuthBase field
+      initialized to this value.  The bfd.MetKeyIsaacRcvAuthBase field
       is then initialized to contain the value of bfd.RcvAuthSeq,
       minus the value of bfd.MetKeyIsaacRcvAuthIndex.  This process
       allows the pseudo-random stream to be re-synchronized in the
@@ -896,9 +906,9 @@ Sequence Auth Key
       <t>The receiving party can then look at the Sequence Number to
       determine which particular PRNG value is being used in the
       packet.  By subtracting the bfd.MetKeyIsaacAuthBase from the
-      Sequence Number, an expected "Index" can be derived, and a
-      corresponding Auth Key found.  This process thus permits the two
-      parties to synchronise if/when a packet or packets are lost.</t>
+      Sequence Number (with possible wrapping), an expected "Index" can be
+      derived, and a corresponding Auth Key found.  This process thus permits
+      the two parties to synchronize if/when a packet or packets are lost.</t>
 
       <t>Incrementing the Sequence Number for every packet also
       prevents the re-use of any individual pseudo-random number which
