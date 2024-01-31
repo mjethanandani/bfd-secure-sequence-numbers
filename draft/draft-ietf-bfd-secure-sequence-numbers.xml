@@ -18,8 +18,8 @@
     consensus="true">
 
   <front>
-    <title abbrev="Securing next sequence number">Secure BFD Sequence
-    Numbers</title>
+    <title abbrev="ISAAC Authentication">Meticulous Keyed ISAAC for
+    BFD Authentication</title>
 
     <author fullname="Alan DeKok" initials="A" surname="Dekok">
       <organization>Network RADIUS SARL</organization>
@@ -152,25 +152,32 @@
     <date/>
 
     <abstract>
-      <t>This document describes a new BFD Authentication mechanism,
-      Meticulous Keyed ISAAC.  This mechanism can be used to
-      authenticate BFD packets with less CPU time cost than using MD5
-      or SHA1, with the tradeoff of decreased security.  This
-      mechanism cannot be used to signal state changes, but it can be
-      used as an authenticated signal to maintain a session in the the
-      "Up" state. This document updates RFC 5880.</t>
+      <t>
+	This document describes a new BFD Authentication mechanism,
+	Meticulous Keyed ISAAC.  This mechanism can be used to
+	authenticate BFD packets with less CPU time cost than using
+	MD5 or SHA1, with the tradeoff of decreased security.  This
+	mechanism cannot be used to signal state changes, but it can
+	be used as an authenticated signal to maintain a session in
+	the the "Up" state.
+      </t>
+      <t>
+	This document updates RFC 5880.
+      </t>
     </abstract>
   </front>
 
   <middle>
     <section title="Introduction">
-      <t><xref target="RFC5880">BFD</xref> defines a number of
-      authentication mechanisms, including Simple Password (Section
-      6.7.2), and various other methods based on MD5 and SHA1 hashes.
-      The benefit of using cryptographic hashes is that they are
-      secure.  The downside to cryptographic hashes is that they are
-      expensive and time consuming on resource-constrained
-      hardware.</t>
+      <t>
+	<xref target="RFC5880" sectionFormat="parens"
+	section="6.7.2">BFD</xref> defines a number of authentication
+	mechanisms, including Simple Password, and various other
+	methods based on MD5 and SHA1 hashes.  The benefit of using
+	cryptographic hashes is that they are secure.  The downside to
+	cryptographic hashes is that they are expensive and time
+	consuming on resource-constrained hardware.
+      </t>
 
       <t>When BFD packets are unauthenticated, it is possible for an
       attacker to forge, modify, and/or replay packets on a link.
@@ -202,24 +209,26 @@
     </section>
 
     <section title="Updating RFC 5880">
-      <t>Some of the state variables in <xref target="RFC5880"
-      sectionFormat="parens" section="6.8.1">Bidirectional Forward
-      Detection</xref>, are related to the
-      authentication type being used for a particular session.
-      However, the definitions given in <xref
-      target="RFC5880">Bidirectional Forward Detection</xref> are
-      specific to Keyed MD5 or SHA1 Authentication, which limit their
-      utility for new authentication types. This specification updates
-      the definition of some of the state variables as given below.
+      <t>
+	Some of the state variables in <xref target="RFC5880"
+	sectionFormat="parens" section="6.8.1">BFD</xref>, are related
+	to the authentication type being used for a particular
+	session.  However, the definitions given in <xref
+	target="RFC5880">BFD</xref> are specific to Keyed MD5 or SHA1
+	Authentication, which limit their utility for new
+	authentication types. This specification updates the
+	definition of some of the state variables as given below.
       </t>
 
-      <t>These updated definitions are entirely compatible with the
-      definitions given in <xref target="RFC5880"
-      sectionFormat="parens" section="6.8.1">Bidirectional Forward
-      Detection</xref>, and require no changes to existing
-      configurations or implementations. Instead, the updated
-      definitions clarify that the state variables apply to the
-      current authentication type, no matter what it is.</t>
+      <t>
+	These updated definitions are entirely compatible with the
+	definitions given in <xref target="RFC5880"
+	sectionFormat="parens" section="6.8.1">BFD</xref>, and require
+	no changes to existing configurations or
+	implementations. Instead, the updated definitions clarify that
+	the state variables apply to the current authentication type,
+	no matter what it is.
+      </t>
 
       <t>These updated definitions also mean that Authentication
       Sections SHOULD include a Sequence Number field.  Where a
@@ -231,12 +240,14 @@
 
       <ul empty="true">
 	<li>
-	  <t>The current authentication type in use for this session,
-	  as defined in RFC5880 section 4.1, or zero if no
-	  authentication is in use. Note that the session MAY change
-	  AuthType during a session. For example, where the session
-	  transitions from a more secure AuthType to a less secure
-	  one, or vice versa.</t>
+	  <t>
+	    The current authentication type in use for this session,
+	    as defined in <xref target="RFC5880"
+	    sectionFormat="parens" section="4.1">BFD</xref>, or zero
+	    if no authentication is in use. Note that the session MAY
+	    change AuthType during a session. For example, where the
+	    session transitions from a more secure AuthType to a less
+	    secure one, or vice versa.</t>
 
 	  <t>Packets which indicate a state transition SHOULD use a
 	  secure AuthType.  Where the bfd.SessionState value is Up,
@@ -288,13 +299,17 @@
       AuthType method.  As these transitions are rare, the extra
       expense here is acceptable.</t>
 
-      <t>However, once the session transitions into the Up state,
-      and the sequence number is secured, there is no need to
-      authenticate every packet, and the entire packet, while
-      maintaining a level of confidence that the packets have
-      not been tampered with. When combined with an occasional
-      packet with expensive AuthType a man-in-the-middle attack
-      can be prevented.</t>
+      <t>
+	However, once the session transitions into the Up state, and
+	the sequence number is secured, there is no need to
+	authenticate every packet, and the entire packet, while
+	maintaining a level of confidence that the packets have not
+	been tampered with. When combined with an occasional packet
+	with expensive AuthType, as described in <xref
+	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
+	Authentication</xref>, a person-in-the-middle attack can be
+	prevented.
+      </t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth-Key"s.  With
@@ -361,7 +376,7 @@
 
       <list empty="true">
 	<t>The authentication key ID in use for this packet.  This allows
-	multiple secret skeys to be active simultaneously.</t>
+	multiple secret keys to be active simultaneously.</t>
       </list>
 
       <t>Reserved</t>
@@ -495,8 +510,10 @@
     </section>
 
     <section title="New State variables for Meticulous Keyed ISAAC">
-      <t>This document defines two new state variables for use with
-      Meticulous Keyed ISAAC.</t>
+      <t>
+	This document defines a few new state variables for use with
+	Meticulous Keyed ISAAC.
+      </t>
 
       <t>bfd.MetKeyIsaacRcvKeyKnown</t>
 
