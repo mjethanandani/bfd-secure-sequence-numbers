@@ -236,10 +236,11 @@
       variables bfd.RcvAuthSeq and bfd.XmitAuthSeq MUST be set to
       zero.</t>
 
-      <t>bfd.AuthType</t>
-
-      <ul empty="true">
-	<li>
+      <dl>
+	<dt>
+	  bfd.AuthType:
+	</dt>
+	<dd>
 	  <t>
 	    The current authentication type in use for this session,
 	    as defined in <xref target="RFC5880"
@@ -247,68 +248,73 @@
 	    if no authentication is in use. Note that the session MAY
 	    change AuthType during a session. For example, where the
 	    session transitions from a more secure AuthType to a less
-	    secure one, or vice versa.</t>
+	    secure one, or vice versa.
+	  </t>
 
-	  <t>Packets which indicate a state transition SHOULD use a
-	  secure AuthType.  Where the bfd.SessionState value is Up,
-	  packets MAY use a less secure AuthType, such as Meticulous
-	  Keyed Isaac.</t>
-	</li>
-      </ul>
+	  <t>
+	    Packets which indicate a state transition SHOULD use a
+	    secure AuthType.  Where the bfd.SessionState value is Up,
+	    packets MAY use a less secure AuthType, such as Meticulous
+	    Keyed Isaac.
+	  </t>
+	</dd>
 
-      <t>bfd.RcvAuthSeq</t>
+	<dt>
+	  bfd.RcvAuthSeq:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing the last sequence
+	  number for the current Authentication Section that was
+	  received.  The initial value is unimportant.
+	</dd>
 
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing the last sequence
-	number for the current Authentication Section that was
-	received.  The initial value is unimportant.</li>
-      </ul>
+	<dt>
+	  bfd.XmitAuthSeq:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing the next sequence
+	  number for for the Authentication Section which will be
+	  transmitted.  This variable MUST be initialized to a random
+	  32-bit value.
+	</dd>
 
-      <t>bfd.XmitAuthSeq</t>
+	<dt>
+	  bfd.AuthSeqKnown:
+	</dt>
+	<dd>
+	  <t>
+	    Set to 1 if the next expected Authentication Section has a
+	    sequence number which is known, or 0 if it is not known.
+	    This variable MUST be initialized to zero.
+	  </t>
 
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing the next sequence
-	number for for the Authentication Section which will be
-	transmitted.  This variable MUST be initialized to a random
-	32-bit value.
-	</li>
-      </ul>
-
-      <t>bfd.AuthSeqKnown</t>
-
-      <ul empty="true">
-	<li>Set to 1 if the next expected Authentication Section has a
-	sequence number which is known, or 0 if it is not known.  This
-	variable MUST be initialized to zero.</li>
-
-	<li>This variable MUST be set to zero after no packets have
-	been received on this session for at least twice the Detection
-	Time.  This ensures that the sequence number can be
-	resynchronized if the remote system restarts.</li>
-      </ul>
+	  <t>
+	    This variable MUST be set to zero after no packets have
+	    been received on this session for at least twice the
+	    Detection Time.  This ensures that the sequence number can
+	    be resynchronized if the remote system restarts.
+	  </t>
+	</dd>
+      </dl>
     </section>
 
     <section title="Architecture of the Auth Type Method">
-      <t>BFD requires fast and reasonably secure authentication of
-      messages which are exchanged.  Methods using MD5 or SHA1 are CPU
-      intensive, and can negatively impact systems with limited CPU
-      power.</t>
-
-      <t>The solution this document offers here is that state
-      transitions can be authenticated via a secure but expensive
-      AuthType method.  As these transitions are rare, the extra
-      expense here is acceptable.</t>
+      <t>
+	When BFD uses authentication, methods using MD5 or SHA1 are
+	CPU intensive, and can negatively impact systems with limited
+	computational power.
+      </t>
 
       <t>
-	However, once the session transitions into the Up state, and
-	the sequence number is secured, there is no need to
-	authenticate every packet, and the entire packet, while
-	maintaining a level of confidence that the packets have not
-	been tampered with. When combined with an occasional packet
-	with expensive AuthType, as described in <xref
+	However, once the session transitions into the Up state, there
+	is no need to authenticate every packet. An optimized
+	authentication mechanism as described in <xref
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>, a person-in-the-middle attack can be
-	prevented.
+	Authentication</xref>, permits BFD to use a relaxed
+	authentication, that satisfies the ability to provde a less
+	expenstive authentication, but strong enough that periodic
+	reauthentication is not strictly required to prevent a
+	person-in-the-middle attack.
       </t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
@@ -358,65 +364,78 @@
    ]]></artwork>
       </figure>
 
-      <t>Auth Type</t>
-      <list empty="true">
-	<t>The Authentication Type, which in this case is TBD1 (Meticulous
-	Keyed ISAAC).  If the State (Sta) field value is not 3 (Up), then
-	Meticulous Keyed ISAAC MUST NOT be used.</t>
-      </list>
+      <dl>
+	<dt>
+	    Auth Type:
+	</dt>
+	<dd>
+	  The Authentication Type, which in this case is TBD1
+	  (Meticulous Keyed ISAAC).  If the State (Sta) field value is
+	  not 3 (Up), then Meticulous Keyed ISAAC MUST NOT be used.
+	</dd>
 
-      <t>Auth Len</t>
+	<dt>
+	  Auth Len:
+	</dt>
+	<dd>
+	    The length of the Authentication Section, in bytes.  For
+	    Meticulous Keyed ISAAC authentication, the length is 16.
+	</dd>
 
-      <list empty="true">
-	<t>The length of the Authentication Section, in bytes.  For
-	Meticulous Keyed ISAAC authentication, the length is 16.</t>
-      </list>
+	<dt>
+	  Auth Key ID:
+	</dt>
+	<dd>
+          The authentication key ID in use for this packet.  This
+          allows multiple secret keys to be active simultaneously.
+	</dd>
 
-      <t>Auth Key ID</t>
-
-      <list empty="true">
-	<t>The authentication key ID in use for this packet.  This allows
-	multiple secret keys to be active simultaneously.</t>
-      </list>
-
-      <t>Reserved</t>
-
-      <list empty="true">
-	<t>This field MUST be set to zero on transmit, and ignored on receipt.</t>
-      </list>
+	<dt>
+	  Reserved:
+	</dt>
+	<dd>
+	  This field MUST be set to zero on transmit, and ignored on
+	  receipt.
+	</dd>
    
-      <t>Sequence Number</t>
+	<dt>
+	  Sequence Number:
+	</dt>
+	<dd>
+          The sequence number for this packet.  For Meticulous Keyed
+          ISAAC Authentication, this value is incremented once for
+          each successive packet transmitted for a session.  This
+          provides protection against replay attacks.
+	</dd>
 
-      <list empty="true">
-	<t>The sequence number for this packet.  For Meticulous Keyed
-	ISAAC Authentication, this value is incremented once for each
-	successive packet transmitted for a session.  This provides
-	protection against replay attacks.</t>
-      </list>
+	<dt>
+	  Seed:
+	</dt>
+	<dd>
+	  A 32-bit (4 octet) seed which is used in conjunction with
+	  the shared key in order to configure and initialize the
+	  ISAAC pseudo-random-number-generator (PRNG).  It is used to
+	  identify and secure different "streams" of random numbers
+	  which are generated by ISAAC.
+	</dd>
 
-      <t>Seed</t>
-
-      <list empty="true">
-	<t>A 32-bit (4 octet) seed which is used in conjunction with the
-	shared key in order to configure and initialize the ISAAC
-	pseudo-random-number-generator (PRNG).  It is used to identify
-	and secure different "streams" of random numbers which are
-	generated by ISAAC.</t>
-      </list>
-
-      <t>Auth-Key</t>
-
-      <list empty="true">
-	<t>This field carries the 32-bit (4 octet) ISAAC output which is
-	associated with the Sequence Number.  The ISAAC PRNG MUST be
-	configured and initialized as given in 
-	<xref target="seeding-isaac"/>, below.</t>
-
-	<t>Note that the Auth-Key here does not include any summary or
-	hash of the packet.  The packet itself is completely
-	unauthenticated.</t>
-      </list>
-
+	<dt>
+	  Auth-Key:
+	</dt>
+	<dd>
+	  <t>
+	    This field carries the 32-bit (4 octet) ISAAC output which
+	    is associated with the Sequence Number.  The ISAAC PRNG
+	    MUST be configured and initialized as given in <xref
+	    target="seeding-isaac"/>, below.
+	  </t>
+	  <t>
+	    Note that the Auth-Key here does not include any summary
+	    or hash of the packet.  The packet itself is completely
+	    unauthenticated.
+	  </t>
+	</dd>
+      </dl>
       <t>When the receiving party receives a BFD packet with an
       expected sequence number and the correct corresponding ISAAC
       output in the Auth Key field, it knows that only the authentic
@@ -441,71 +460,100 @@
       greater than the last sequence number received (modulo wrap at
       2^32)</t>
 
-      <t>Transmission Using Meticulous Keyed ISAAC Authentication</t>
-
+      <t>
+	Transmission Using Meticulous Keyed ISAAC Authentication
+      </t>
       <list empty="true">
-	<t>The Auth Type field MUST be set to TBD1 (Meticulous Keyed
-	ISAAC).  The Auth Len field MUST be set to 16.  The Auth Key ID
-	field MUST be set to the ID of the current authentication key.
-	The Sequence Number field MUST be set to bfd.XmitAuthSeq.</t>
+	<t>
+	  The Auth Type field MUST be set to TBD1 (Meticulous Keyed
+	  ISAAC).  The Auth Len field MUST be set to 16.  The Auth Key
+	  ID field MUST be set to the ID of the current authentication
+	  key.  The Sequence Number field MUST be set to
+	  bfd.XmitAuthSeq.
+	</t>
 
-	<t>The Seed field MUST be set to the value of the current seed
-	used for this session.</t>
+	<t>
+	  The Seed field MUST be set to the value of the current seed
+	  used for this session.
+	</t>
 
-	<t>The Auth-Key field MUST be set to the output of ISAAC, which
-	depends on the secret Key, the current Seed, and the Sequence
-	Number.</t>
+	<t>
+	  The Auth-Key field MUST be set to the output of ISAAC, which
+	  depends on the secret Key, the current Seed, and the
+	  Sequence Number.
+	</t>
 
-	<t>For Meticulous Keyed ISAAC, bfd.XmitAuthSeq MUST be
-	incremented on each packet, in a circular fashion (when treated
-	as an unsigned 32-bit value).  The bfd.XmitAuthSeq MUST NOT be
-	incremented by more than one for a packet.</t>
+	<t>
+	  For Meticulous Keyed ISAAC, bfd.XmitAuthSeq MUST be
+	  incremented on each packet, in a circular fashion (when
+	  treated as an unsigned 32-bit value).  The bfd.XmitAuthSeq
+	  MUST NOT be incremented by more than one for a packet.
+	</t>
       </list>
 
-      <t>Receipt using Meticulous Keyed ISAAC Authentication</t>
-
+      <t>
+	Receipt using Meticulous Keyed ISAAC Authentication
+      </t>
       <list empty="true">
-	<t>If the received BFD Control packet does not contain an
-	Authentication Section, or the Auth Type is not correct (TBD1 for
-	Meticulous Keyed ISAAC), then the received packet MUST be
-	discarded.</t>
+	<t>
+	  If the received BFD Control packet does not contain an
+	  Authentication Section, or the Auth Type is not correct
+	  (TBD1 for Meticulous Keyed ISAAC), then the received packet
+	  MUST be discarded.
+	</t>
 
-	<t>If the Auth Key ID field does not match the ID of a configured
-	authentication key, the received packet MUST be discarded.</t>
+	<t>
+	  If the Auth Key ID field does not match the ID of a
+	  configured authentication key, the received packet MUST be
+	  discarded.
+	</t>
 
-	<t>If the Auth Len field is not equal to 16, the packet MUST be
-	discarded.</t>
+	<t>
+	  If the Auth Len field is not equal to 16, the packet MUST be
+	  discarded.
+	</t>
 
-	<t>If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
-	For Meticulous keyed ISAAC, if the sequence number lies outside of
-	the range of bfd.RcvAuthSeq+1 to bfd.RcvAuthSeq+(3*Detect Mult)
-	inclusive (when treated as an unsigned 32-bit circular number
-	space) the received packet MUST be discarded.</t>
+	<t>
+	  If bfd.AuthSeqKnown is 1, examine the Sequence Number field.
+	  For Meticulous keyed ISAAC, if the sequence number lies
+	  outside of the range of bfd.RcvAuthSeq+1 to
+	  bfd.RcvAuthSeq+(3*Detect Mult) inclusive (when treated as an
+	  unsigned 32-bit circular number space) the received packet
+	  MUST be discarded.
+	</t>
 
-	<t>If bfd.MetKeyIsaacRcvKeyKnown is "true" and the Seed field does not
-	match the current Seed value, bfd.MetKeyIsaacRcvAuthSeed, the packet
-	MUST be discarded.</t>
+	<t>
+	  If bfd.MetKeyIsaacRcvKeyKnown is "true" and the Seed field
+	  does not match the current Seed value,
+	  bfd.MetKeyIsaacRcvAuthSeed, the packet MUST be discarded.
+	</t>
 
-	<t>Calculate the current expected output of ISAAC, which
-	depends on the secret Key, the current Seed, and the Sequence
-	Number.  If the value does not matches the Auth-Key field,
-	then the packet MUST be discarded.</t>
+	<t>
+	  Calculate the current expected output of ISAAC, which
+	  depends on the secret Key, the current Seed, and the
+	  Sequence Number.  If the value does not matches the Auth-Key
+	  field, then the packet MUST be discarded.
+	</t>
 
-	<t>If bfd.MetKeyIsaacRcvKeyKnown is "false", the ISAAC related variables
-	are initialized as per 
-	<xref target="receiver-variable-initialization"/> using the contents of
-	the packet.</t>
+	<t>
+	  If bfd.MetKeyIsaacRcvKeyKnown is "false", the ISAAC related
+	  variables are initialized as per <xref
+	  target="receiver-variable-initialization"/> using the
+	  contents of the packet.
+	</t>
 
-	<t>Note that in some cases, calculating the expected output of
-	ISAAC will result in the creation of a new "page" of 256
-	numbers.  This process will irreversible, and will destroy the
-	current "page".  As a result, if the generation of a new
-	output will create a new "page", the receiving party MUST save
-	a copy of the entire ISAAC state before proceeding with this
-	calculation.  If the outputs match, then the saved copy can be
-	discarded, and the new ISAAC state is used.  If the outputs do
-	not match, then the saved copy MUST be restored, and the
-	modified copy discarded, or cached for later use.</t>
+	<t>
+	  Note that in some cases, calculating the expected output of
+	  ISAAC will result in the creation of a new "page" of 256
+	  numbers.  This process will irreversible, and will destroy
+	  the current "page".  As a result, if the generation of a new
+	  output will create a new "page", the receiving party MUST
+	  save a copy of the entire ISAAC state before proceeding with
+	  this calculation.  If the outputs match, then the saved copy
+	  can be discarded, and the new ISAAC state is used.  If the
+	  outputs do not match, then the saved copy MUST be restored,
+	  and the modified copy discarded, or cached for later use.
+	</t>
       </list>
     </section>
 
@@ -515,85 +563,96 @@
 	Meticulous Keyed ISAAC.
       </t>
 
-      <t>bfd.MetKeyIsaacRcvKeyKnown</t>
+      <dl>
+	<dt>
+	  bfd.MetKeyIsaacRcvKeyKnown:
+	</dt>
+	<dd>
+	  A boolean value which indicates whether or not the system
+	  knows the receive key for the Meticulous Keyed ISAAC Auth
+	  Type method.  The initial value is "false".  This value is
+	  changed to "true" when a party verifies that the other party
+	  has started to use the Meticulous Keyed ISAAC Auth Type
+	  method, with an authenticated Auth Key.
+	</dd>
 
-      <ul empty="true">
-	<li>A boolean value which indicates whether or not the system
-	knows the receive key for the Meticulous Keyed ISAAC Auth Type
-	method.  The initial value is "false".  This value is changed
-	to "true" when a party verifies that the other party has
-	started to use the Meticulous Keyed ISAAC Auth Type method,
-	with an authenticated Auth Key.</li>
-      </ul>
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthBase:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the
+	  bfd.RcvAuthSeq number which is associated with the current
+	  ISAAC "page" for authenticating received packets.
+	</dd>
 
-      <t>bfd.MetKeyIsaacRcvAuthBase</t>
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthIndex:
+	</dt>
+	<dd>
+	  An 8-bit number used to index within a particular "page" of
+	  pseudo-random numbers.
+	</dd>
 
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing a copy of the
-	bfd.RcvAuthSeq number which is associated with the current
-	ISAAC "page" for authenticating received packets.</li>
-      </ul>
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthSeed:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the Seed
+	  associated with received packets.
+	</dd>
 
-      <t>bfd.MetKeyIsaacRcvAuthIndex</t>
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthData:
+	</dt>
+	<dd>
+	  A data structure which contains the ISAAC data for the
+	  received Auth Type method.
+	</dd>
 
-      <ul empty="true">
-	<li>An 8-bit number used to index within a particular "page"
-	of pseudo-random numbers.</li>
-      </ul>
+	<dt>
+	  bfd.MetKeyIsaacXmitKeyKnown:
+	</dt>
+	<dd>
+	  A boolean value which indicates whether or not the system
+	  knows the xmit key for the Meticulous Keyed ISAAC Auth Type
+	  method.  The initial value is "false".  This value is
+	  changed to "true" when a party starts to transmit using the
+	  Meticulous Keyed ISAAC Auth Type method.
+	</dd>
 
-      <t>bfd.MetKeyIsaacRcvAuthSeed</t>
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthBase:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the
+	  bfd.XmitAuthSeq number which is associated with the current
+	  ISAAC "page" for authenticating sent packets.
+	</dd>
 
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing a copy of the
-	Seed associated with received packets.</li>
-      </ul>
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthIndex:
+	</dt>
+	<dd>
+	  An 8-bit number used to index within a particular "page" of
+	  pseudo-random numbers.
+	</dd>
 
-      <t>bfd.MetKeyIsaacRcvAuthData</t>
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthSeed:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the Seed
+	  associated with sent packets.
+	</dd>
 
-      <ul empty="true">
-	<li>A data structure which contains the ISAAC
-	data for the received Auth Type method.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitKeyKnown</t>
-
-      <ul empty="true">
-	<li>A boolean value which indicates whether or not the system
-	knows the xmit key for the Meticulous Keyed ISAAC Auth Type
-	method.  The initial value is "false".  This value is changed
-	to "true" when a party starts to transmit using the Meticulous Keyed
-	ISAAC Auth Type method.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthBase</t>
-
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing a copy of the
-	bfd.XmitAuthSeq number which is associated with the current
-	ISAAC "page" for authenticating sent packets.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthIndex</t>
-
-      <ul empty="true">
-	<li>An 8-bit number used to index within a particular "page"
-	of pseudo-random numbers.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthSeed</t>
-
-      <ul empty="true">
-	<li>A 32-bit unsigned integer containing a copy of the
-	Seed associated with sent packets.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthData</t>
-
-      <ul empty="true">
-	<li>A data structure which contains the ISAAC
-	data for the sending Auth Type method.</li>
-      </ul>
-
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthData:
+	</dt>
+	<dd>
+	  A data structure which contains the ISAAC data for the
+	  sending Auth Type method.
+	</dd>
+      </dl>
     </section>
 
     <section title="Secret Key">
@@ -780,86 +839,102 @@ Sequence Auth Key
        above.  The ISAAC related variables are initialized as
        follows:</t>
 
-      <t>bfd.MetKeyIsaacXmitKeyKnown</t>
+       <dl>
+	 <dt>
+	   bfd.MetKeyIsaacXmitKeyKnown:
+	 </dt>
+	 <dd>
+	   This variable transitions from "false" to "true" when the
+	   sender decides to start using ISAAC.  The sender also
+	   initializes the other variables at the same time.
+	 </dd>
 
-      <ul empty="true">
-	<li>This variable transitions from "false" to "true" when the
-	sender decides to start using ISAAC.  The sender also
-	initializes the other variables at the same time.</li>
-      </ul>
+	 <dt>
+	   bfd.MetKeyIsaacXmitAuthBase:
+	 </dt>
+	 <dd>
+	   The sender copies the bfd.XmitAuthSeq number from the
+	   current packet to be sent into this variable.
+	 </dd>
 
-      <t>bfd.MetKeyIsaacXmitAuthBase</t>
+	 <dt>
+	   bfd.MetKeyIsaacXmitAuthIndex:
+	 </dt>
+	 <dd>
+	   The sender sets this variable to zero.
+	 </dd>
 
-      <ul empty="true">
-	<li>The sender copies the bfd.XmitAuthSeq number from the
-	current packet to be sent into this variable.</li>
-      </ul>
+	 <dt>
+	   bfd.MetKeyIsaacXmitAuthSeed:
+	 </dt>
+	 <dd>
+	   The sender copies the current Seed value into this
+	   variable.  This variable is then copied into the "Seed"
+	   field of each Auth Type packet.
+	 </dd>
 
-      <t>bfd.MetKeyIsaacXmitAuthIndex</t>
-
-      <ul empty="true">
-	<li>The sender sets this variable to zero.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthSeed</t>
-
-      <ul empty="true">
-	<li>The sender copies the current Seed value into this
-	variable.  This variable is then copied into the "Seed" field
-	of each Auth Type packet.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacXmitAuthData</t>
-
-      <ul empty="true">
-	<li>The ISAAC state for sending is encapsulated in this
-	variable.</li>
-      </ul>
+	 <dt>
+	   bfd.MetKeyIsaacXmitAuthData:
+	 </dt>
+	 <dd>
+	   The ISAAC state for sending is encapsulated in this
+	   variable.
+	 </dd>
+       </dl>
      </section>
 
      <section title="Receiver Variable Initialization"
       anchor="receiver-variable-initialization">
-       <t>When a system receives packets with the Meticulous Keyed ISAAC
-       authentication type and is able to authenticate such a packet the first
-       time, the ISAAC related variables are initialized as follows:</t>
+       <t>
+	 When a system receives packets with the Meticulous Keyed
+	 ISAAC authentication type and is able to authenticate such a
+	 packet the first time, the ISAAC related variables are
+	 initialized as follows:
+       </t>
+       <dl>
+	 <dt>
+	   bfd.MetKeyIsaacRcvKeyKnown:
+	 </dt>
+	 <dd>
+	   This variable transitions from "false" to "true" when the
+	   receiver sees that the sender has started using Meticulous
+	   Keyed ISAAC authentication.  The receiver also initializes
+	   the other variables at the same time.
+	 </dd>
 
-      <t>bfd.MetKeyIsaacRcvKeyKnown</t>
+	 <dt>
+	   bfd.MetKeyIsaacRcvAuthBase:
+	 </dt>
+	 <dd>
+	   The sender the bfd.RcvAuthSeq number from the current packet
+	   to be sent into this variable.
+	 </dd>
 
-      <ul empty="true">
-	<li>This variable transitions from "false" to "true" when the
-	receiver sees that the sender has started using Meticulous
-	Keyed ISAAC authentication.  The receiver also initializes the
-	other variables at the same time.</li>
-      </ul>
+	 <dt>
+	   bfd.MetKeyIsaacRcvAuthIndex:
+	 </dt>
+	 <dd>
+	   The receiver sets this value to zero
+	 </dd>
 
-      <t>bfd.MetKeyIsaacRcvAuthBase</t>
+	 <dt>
+	   bfd.MetKeyIsaacRcvAuthSeed:
+	 </dt>
+	 <dd>
+	   The receiver copies the Seed value from the received packet
+	   into this variable.  Note that this copy only occurs when the
+	   bfd.MetKeyIsaacXmitKeyKnown variable transitions from "false"
+	   to true"
+	 </dd>
 
-      <ul empty="true">
-	<li>The sender the bfd.RcvAuthSeq number from the current
-	packet to be sent into this variable.</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacRcvAuthIndex</t>
-
-      <ul empty="true">
-	<li>The receiver sets this value to zero</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacRcvAuthSeed</t>
-
-      <ul empty="true">
-	<li>The receiver copies the Seed value from the received
-	packet into this variable.  Note that this copy only occurs
-	when the bfd.MetKeyIsaacXmitKeyKnown variable transitions from
-	"false" to true"</li>
-      </ul>
-
-      <t>bfd.MetKeyIsaacRcvAuthData</t>
-
-      <ul empty="true">
-	<li>The ISAAC state for receiving is encapsulated in this
-	variable.</li>
-      </ul>
+	 <dt>
+	   bfd.MetKeyIsaacRcvAuthData:
+	 </dt>
+	 <dd>
+	   The ISAAC state for receiving is encapsulated in this
+	   variable.
+	 </dd>
+       </dl>
 
       <t>As there may be packet loss, the reciever has to take special
       care to initialize the bfd.MetKeyIsaacRcvAuthBase variable.  If
