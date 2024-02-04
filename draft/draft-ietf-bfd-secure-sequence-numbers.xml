@@ -681,12 +681,12 @@ Sequence Auth Key
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
-      <t>This document asks that IANA allocate a new entry in the "BFD
-      Authentication Types" registry.</t>
-
-      <t>Address - TBD1</t>
-      <t>BFD Authentication Type Name - Meticulous Keyed ISAAC</t>
-      <t>Reference - this document</t>
+      <t>
+	For IANA Consideration, please refer to the IANA
+	Considerations section of <xref
+	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
+	Authentication</xref>.
+      </t>
 
       <t>Note to RFC Editor: this section may be removed on
       publication as an RFC.</t>

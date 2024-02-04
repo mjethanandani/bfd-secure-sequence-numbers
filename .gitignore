@@ -1,0 +1,8 @@
+.DS_Store
+
+# Temp files
+*~
+
+# Build files
+draft/draft-ietf-bfd-secure-sequence-numbers-*
+bin
