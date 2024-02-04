@@ -5,4 +5,5 @@
 
 # Build files
 draft/draft-ietf-bfd-secure-sequence-numbers-*
+draft/Diff*
 bin
