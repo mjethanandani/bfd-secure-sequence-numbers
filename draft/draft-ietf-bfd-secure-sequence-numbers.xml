@@ -236,7 +236,7 @@
       variables bfd.RcvAuthSeq and bfd.XmitAuthSeq MUST be set to
       zero.</t>
 
-      <dl>
+      <dl newline="true">
 	<dt>
 	  bfd.AuthType:
 	</dt>
@@ -255,7 +255,7 @@
 	    Packets which indicate a state transition SHOULD use a
 	    secure AuthType.  Where the bfd.SessionState value is Up,
 	    packets MAY use a less secure AuthType, such as Meticulous
-	    Keyed Isaac.
+	    Keyed ISAAC.
 	  </t>
 	</dd>
 
@@ -312,7 +312,7 @@
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
 	Authentication</xref>, permits BFD to use a relaxed
 	authentication, that satisfies the ability to provde a less
-	expenstive authentication, but strong enough that periodic
+	expensive authentication, but strong enough that periodic
 	reauthentication is not strictly required to prevent a
 	person-in-the-middle attack.
       </t>
@@ -364,7 +364,7 @@
    ]]></artwork>
       </figure>
 
-      <dl>
+      <dl newline="true">
 	<dt>
 	    Auth Type:
 	</dt>
@@ -563,7 +563,7 @@
 	Meticulous Keyed ISAAC.
       </t>
 
-      <dl>
+      <dl newline="true">
 	<dt>
 	  bfd.MetKeyIsaacRcvKeyKnown:
 	</dt>
@@ -694,8 +694,8 @@
 
     <section title="Transition to using ISAAC">
       <t>Once a session transitions to the Up state, the packets MAY
-      contain AuthType of Meticulous Keyed Isaac. A system receiving
-      such a packet will initialize the Isaac PRNG state using the
+      contain AuthType of Meticulous Keyed ISAAC. A system receiving
+      such a packet will initialize the ISAAC PRNG state using the
       Seed from the packet. A system originating such a packet will
       generate a Seed, and place it into the packet which is then
       sent.  Further discussion of initialization is below in 
@@ -704,10 +704,10 @@
 
       <t>There is no negotiation when using this Auth Type method.  A
       sending system simply starts sending packets which contain Auth
-      Type of Meticulous Keyed Isaac.</t>
+      Type of Meticulous Keyed ISAAC.</t>
 
       <t>Similarly, a receiving system sees that it has received a
-      packet contains AuthType of Meticulous Keyed Isaac when
+      packet contains AuthType of Meticulous Keyed ISAAC when
       bfd.MetKeyIsaacRcvKeyKnown variable is "false".  The receiving
       system then initializes its variables, and authenticates the
       received packet, by comparing the Auth Key in the packet with
@@ -721,7 +721,7 @@
       <t>However, the operation of those variables MUST now satisfy
       the requirements of the new AuthType method.  For example, the
       AuthType could change from Keyed SHA1 (where the variables were
-      not updated on every packet) to Meticulous Keyed Isaac (where
+      not updated on every packet) to Meticulous Keyed ISAAC (where
       the variables are updated on every packet).</t>
 
       <t>That is, when changing AuthTypes in a session, the current
@@ -839,7 +839,7 @@ Sequence Auth Key
        above.  The ISAAC related variables are initialized as
        follows:</t>
 
-       <dl>
+       <dl newline="true">
 	 <dt>
 	   bfd.MetKeyIsaacXmitKeyKnown:
 	 </dt>
@@ -891,7 +891,7 @@ Sequence Auth Key
 	 packet the first time, the ISAAC related variables are
 	 initialized as follows:
        </t>
-       <dl>
+       <dl newline="true">
 	 <dt>
 	   bfd.MetKeyIsaacRcvKeyKnown:
 	 </dt>
