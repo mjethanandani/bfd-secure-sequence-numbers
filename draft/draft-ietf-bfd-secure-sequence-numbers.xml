@@ -682,10 +682,10 @@ Sequence Auth Key
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-	For IANA Consideration, please refer to <xref
-	target="I-D.ietf-bfd-optimizing-authentication"
-	sectionFormat="parens" section="iana-consideration">IANA
-	Consideration</xref>.
+	For IANA Consideration, please refer to the IANA
+	Considerations section of <xref
+	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
+	Authentication</xref>.
       </t>
 
       <t>Note to RFC Editor: this section may be removed on
