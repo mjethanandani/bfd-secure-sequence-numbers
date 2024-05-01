@@ -8,7 +8,11 @@ The Makefile in the repository uses `git tag` to determine the version of the dr
 
 and look for the latest version of the tag.
 
-If the repository does not have all the latest tags uploaded, one can create a local tag by using the following command
+If the repository does not have all the latest tags downloaded, one can pull the tags down using the following command:
+
+`git pull --tags`
+
+If the list of tags is not the latest, one can create a local tag by using the following command
 
 `git tag draft-ietf-bfd-secure-sequence-numbers-<version>`
 
@@ -17,6 +21,10 @@ where the `version` field is the current published version of the draft. For exa
 `git tag draft-ietf-bfd-secure-sequence-numbers-12`
 
 This tag will cause `draft-ietf-bfd-secure-sequence-numbers-13` to be built.
+
+After the build, remember to push the tags to the remote using the following command
+
+`git push --tags`
 
 ## Native Build
 
