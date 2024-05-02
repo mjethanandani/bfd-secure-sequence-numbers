@@ -694,7 +694,7 @@
 
     <section title="Transition to using ISAAC">
       <t>Once a session transitions to the Up state, the packets MAY
-      contain AuthType of Meticulous Keyed ISAAC. A system receiving
+      contain AuthType supporting Meticulous Keyed ISAAC. A system receiving
       such a packet will initialize the ISAAC PRNG state using the
       Seed from the packet. A system originating such a packet will
       generate a Seed, and place it into the packet which is then
@@ -704,7 +704,7 @@
 
       <t>There is no negotiation when using this Auth Type method.  A
       sending system simply starts sending packets which contain Auth
-      Type of Meticulous Keyed ISAAC.</t>
+      Type supporting Meticulous Keyed ISAAC.</t>
 
       <t>Similarly, a receiving system sees that it has received a
       packet contains AuthType of Meticulous Keyed ISAAC when
@@ -713,6 +713,7 @@
       received packet, by comparing the Auth Key in the packet with
       the key it generated itself.</t>
 
+<!-- XXX JMH - I believe this section has lost relevance with the new paired authtypes.
       <t>Note that switch to a different AuthType method does not
       affect the values of the bfd.RcvAuthSeq or bfd.XmitAuthSeq
       variables. The variables MUST continue using their previous
@@ -727,6 +728,7 @@
       <t>That is, when changing AuthTypes in a session, the current
       value of the bfd.RcvAuthSeq and bfd.XmitAuthSeq variables is
       used as the initial value(s) for the new AuthType.</t>
+-->
 
       <t>When there is a transition to using ISAAC the first time, the initial
       state has to be seeded.  The next section describes this seeding
@@ -1155,7 +1157,7 @@ Sequence Auth Key
 	<t>When Meticulous Keyed ISAAC is used, it is possible for an
 	attacker who can see the packets to observe a particular Auth
 	Key value, and then copy it to a different packet as a
-	"man-in-the-middle" attack.  However, the usefulness of such
+	on-path attacker attack.  However, the usefulness of such
 	an attack is limited by the requirements that these packets
 	must not signal state changes in the BFD session, and that the
 	Auth Key changes on every packet.</t>
