@@ -782,12 +782,14 @@
     initial seeding of ISAAC avoids the seeding issues discussed in
     <xref target="ISAAC+">ISAAC+</xref>.</t>
 
-    <t>The ISAAC "page" is initialized by filling it with repeated
-    copies of the above structure.  For each complete copy of the
-    structure, the Counter field is incremented, starting from zero
-    (0).  This process may finish with a partial copy of the above
-    structure, in which case only a prefix of the structure is
-    copied.</p>
+    <t>
+      The ISAAC "page" is initialized by filling it with repeated
+      copies of the above structure.  For each complete copy of the
+      structure, the Counter field is incremented, starting from zero
+      (0).  This process may finish with a partial copy of the above
+      structure, in which case only a prefix of the structure is
+      copied.
+    </t>
 
     <t>Once the ISAAC "page" is initialized, the data is processed
     throught the "randinit()" function of ISAAC.  Pseudo-random
@@ -1247,10 +1249,6 @@ Sequence Auth Key
 	</front>
 	<refcontent>http://www.burtleburtle.net/bob/rand/isaac.html</refcontent>
       </reference>
-
-
-    <references title="Informative References">
-      <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
 
       <reference anchor="ISAAC+">
 	<front>
