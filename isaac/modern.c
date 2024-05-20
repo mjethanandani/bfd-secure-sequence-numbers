@@ -24,6 +24,7 @@ Mask on use of >32 bits, not on assignment: from Paul Eggert
 #define RANDSIZL   (8)
 #define RANDSIZ    (1 << RANDSIZL)
 
+#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -103,9 +104,33 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 	memset(ctx, 0, sizeof(*ctx));
 
 	if (seed && (seedlen > 0)) {
-		if (seedlen > sizeof(ctx->page)) seedlen = sizeof(ctx->page);
+		uint8_t *ptr, *end;
 
-		memcpy(ctx->page, seed, seedlen);
+		j = 0;
+		ptr = (uint8_t *) &ctx->page[0];
+		end = ptr + sizeof(ctx->page);
+
+		/*
+		 *	We need to fill the entire buffer for seeding,
+		 *	while at the same time not having repeated
+		 *	patterns.  So we fill the buffer with the
+		 *	repeated seed, BUT also append a counter for
+		 *	how many times we've used the seed.
+		 *
+		 *	https://eprint.iacr.org/2006/438.pdf
+		 */
+		while ((size_t) (end - ptr) > seedlen) {
+			memcpy(ptr, seed, seedlen);
+			ptr += seedlen;
+			*ptr = j;
+
+			ptr++;
+			j++;
+		}
+
+		if ((size_t) (end - ptr) > 0) {
+			memcpy(ptr, seed, (size_t) (end - ptr));
+		}
 	}
 
 	m = ctx->pool;
@@ -161,9 +186,27 @@ int main(int argc, char const *argv[])
 	randctx ctx;
 	
 	if (argc == 1) {
-		isaac_randinit(&ctx, NULL, 0);
+		uint8_t seed[19];
+
+		seed[0] = 0x0b;
+		seed[1] = 0xfd;
+		seed[2] = 0x5e;
+		seed[3] = 0xed;
+
+		seed[4] = 0x40;
+		seed[5] = 0x02;
+		seed[6] = 0xd1;
+		seed[7] = 0x5c;
+
+		memcpy(seed + 8, "RFC5880June", 11);
+
+		isaac_randinit(&ctx, seed, sizeof(seed));
 	} else {
 		isaac_randinit(&ctx, argv[1], strlen(argv[1]));
+	}
+
+	for (i = 0; i < 8; i++) {
+		printf("%d\t%08x\n", i, isaac_rand(&ctx));
 	}
 
 	for (i = 0; i < 2; ++i) {
