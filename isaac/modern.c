@@ -105,8 +105,9 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 
 	if (seed && (seedlen > 0)) {
 		uint8_t *ptr, *end;
+		uint8_t counter;
 
-		j = 0;
+		counter = 0;
 		ptr = (uint8_t *) &ctx->page[0];
 		end = ptr + sizeof(ctx->page);
 
@@ -122,10 +123,7 @@ void isaac_randinit(randctx *ctx, void const *seed, int seedlen)
 		while ((size_t) (end - ptr) > seedlen) {
 			memcpy(ptr, seed, seedlen);
 			ptr += seedlen;
-			*ptr = j;
-
-			ptr++;
-			j++;
+			*(ptr++) = counter++;
 		}
 
 		if ((size_t) (end - ptr) > 0) {
