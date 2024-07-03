@@ -470,12 +470,12 @@
       </t>
       <list empty="true">
 	<t>
-	  The Auth Type field MUST be set to TBD1 (One of Optimized
-	  MD5 Meticulous Keyed ISAAC Authentication or Optimized SHA-1
-	  Meticulous Keyed ISAAC Authentication).  The Auth Len field
-	  MUST be set to 16.  The Auth Key ID field MUST be set to the
-	  ID of the current authentication key.  The Sequence Number
-	  field MUST be set to bfd.XmitAuthSeq.
+	  The Auth Type field MUST be set to one of two TBDs
+	  (Optimized MD5 Meticulous Keyed ISAAC Authentication or
+	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication).  The
+	  Auth Len field MUST be set to 16.  The Auth Key ID field
+	  MUST be set to the ID of the current authentication key.
+	  The Sequence Number field MUST be set to bfd.XmitAuthSeq.
 	</t>
 
 	<t>
@@ -503,8 +503,8 @@
       <list empty="true">
 	<t>
 	  If the received BFD Control packet does not contain an
-	  Authentication Section, or the Auth Type is not correct
-	  (TBD1 for one of Optimized MD5 Meticulous Keyed ISAAC
+	  Authentication Section, or the Auth Type is not correct (one
+	  of two possible TBDs, Optimized MD5 Meticulous Keyed ISAAC
 	  Authentication or Optimized SHA-1 Meticulous Keyed ISAAC
 	  Authentication), then the received packet MUST be discarded.
 	</t>
