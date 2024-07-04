@@ -179,15 +179,17 @@
 	consuming on resource-constrained hardware.
       </t>
 
-      <t>When BFD packets are unauthenticated, it is possible for an
-      attacker to forge, modify, and/or replay packets on a link.
-      These attacks have a number of side effects.  They can cause
-      parties to believe that a link is down, or they can cause
-      parties to believe that the link is up when it is, in fact,
-      down.  The goal of this specification is to use a simple method to prevent spoofing of the
-      BFD session being "Up".
-      We therefore define a fast Auth Type method which
-      allows parties securely signal that they are still in the Up state.</t>
+      <t>
+	When BFD packets are unauthenticated, it is possible for an
+	attacker to forge, modify, and/or replay packets on a link.
+	These attacks have a number of side effects.  They can cause
+	parties to believe that a link is down, or they can cause
+	parties to believe that the link is up when it is, in fact,
+	down.  The goal of this specification is to use a simple
+	method to prevent spoofing of the BFD session being "Up".  We
+	therefore define a fast Auth Type method which allows parties
+	to securely signal that they are still in the Up state.
+      </t>
 
       <t>This document proposes the use of an Authentication method
       which provides meticulous keying, but which has less impact on
@@ -249,15 +251,16 @@
 	    sectionFormat="parens" section="4.1">BFD</xref>, or zero
 	    if no authentication is in use. Note that the session MAY
 	    change AuthType during a session. For example, where the
-	    session transitions from a more secure AuthType to a less
-	    secure one, or vice versa.
+	    session transitions from one with strong authentication
+	    to a less strong one, or vice versa.
 	  </t>
 
 	  <t>
-	    Packets which indicate a state transition SHOULD use a
-	    secure AuthType.  Where the bfd.SessionState value is Up,
-	    packets MAY use a less secure AuthType, such as Meticulous
-	    Keyed ISAAC.
+	    Packets which indicate a state transition MUST use a
+	    stronger authentication method.  When the
+	    bfd.SessionState value is Up, packets MAY use a less
+	    strong authentication method, such as Meticulous Keyed
+	    ISAAC.
 	  </t>
 	</dd>
 
@@ -338,7 +341,7 @@
       Authentication</xref>. Instead, the packets containing
       Meticulous Keyed ISAAC are only a signal that the sending party
       is still alive, and that the sending party is authentic.  That
-      is, this Auth Type method must only be used when
+      is, this Auth Type method MUST only be used when
       bfd.SessionState=Up, and the State (Sta) field equals 3
       (Up).</t>
     </section>
@@ -467,11 +470,12 @@
       </t>
       <list empty="true">
 	<t>
-	  The Auth Type field MUST be set to TBD1 (Meticulous Keyed
-	  ISAAC).  The Auth Len field MUST be set to 16.  The Auth Key
-	  ID field MUST be set to the ID of the current authentication
-	  key.  The Sequence Number field MUST be set to
-	  bfd.XmitAuthSeq.
+	  The Auth Type field MUST be set to one of two TBDs
+	  (Optimized MD5 Meticulous Keyed ISAAC Authentication or
+	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication).  The
+	  Auth Len field MUST be set to 16.  The Auth Key ID field
+	  MUST be set to the ID of the current authentication key.
+	  The Sequence Number field MUST be set to bfd.XmitAuthSeq.
 	</t>
 
 	<t>
@@ -499,9 +503,10 @@
       <list empty="true">
 	<t>
 	  If the received BFD Control packet does not contain an
-	  Authentication Section, or the Auth Type is not correct
-	  (TBD1 for Meticulous Keyed ISAAC), then the received packet
-	  MUST be discarded.
+	  Authentication Section, or the Auth Type is not correct (one
+	  of two possible TBDs, Optimized MD5 Meticulous Keyed ISAAC
+	  Authentication or Optimized SHA-1 Meticulous Keyed ISAAC
+	  Authentication), then the received packet MUST be discarded.
 	</t>
 
 	<t>
@@ -547,14 +552,15 @@
 	<t>
 	  Note that in some cases, calculating the expected output of
 	  ISAAC will result in the creation of a new "page" of 256
-	  numbers.  This process will irreversible, and will destroy
-	  the current "page".  As a result, if the generation of a new
-	  output will create a new "page", the receiving party MUST
-	  save a copy of the entire ISAAC state before proceeding with
-	  this calculation.  If the outputs match, then the saved copy
-	  can be discarded, and the new ISAAC state is used.  If the
-	  outputs do not match, then the saved copy MUST be restored,
-	  and the modified copy discarded, or cached for later use.
+	  numbers.  This process will be irreversible, and will
+	  destroy the current "page".  As a result, if the generation
+	  of a new output will create a new "page", the receiving
+	  party MUST save a copy of the entire ISAAC state before
+	  proceeding with this calculation.  If the outputs match,
+	  then the saved copy can be discarded, and the new ISAAC
+	  state is used.  If the outputs do not match, then the saved
+	  copy MUST be restored, and the modified copy discarded, or
+	  cached for later use.
 	</t>
       </list>
     </section>
@@ -675,10 +681,13 @@
       ongoing session with a different Auth Key ID and correspondingly
       different Secret Key</t>
 
-      <t>If this Auth Type method was defined as being initialized without a
-      per-session Seed, then an attacker could pre-compute the ISAAC
-      states for many keys, and perform an off-line dictionary attack.
-      The use of the Seed makes these attacks infeasable.</t>
+      <t>
+	If this Auth Type method was defined as being initialized
+	without a per-session Seed, then an attacker could pre-compute
+	the ISAAC states for many keys, and perform an off-line
+	dictionary attack.  The use of the Seed makes these attacks
+	unfeasable.
+      </t>
 
       <t>For interoperability, the management interface by which the
       key is configured MUST accept ASCII strings, and SHOULD also
@@ -802,11 +811,13 @@
     is received from the sender, and therefore needs to be done in the
     BFD "fast path".</t>
 
-    <t>The following figure give Seed and Your-Discriminator as 32-bit
-    hex values, and the Secret Key as an eleven-character string.  The
-    subsequent figure shows the first eight Sequence numbers and
-    corresponding Auth Key values which were generated using the above
-    initial values.</t>
+    <t>
+      The following figure gives Seed and Your-Discriminator as 32-bit
+      hex values, and the Secret Key as an eleven-character string.
+      The subsequent figure shows the first eight Sequence numbers and
+      corresponding Auth Key values which were generated using the
+      above initial values.
+    </t>
 
       <figure>
           <artwork><![CDATA[
@@ -842,12 +853,14 @@ Sequence Auth Key
      the start of a session, as discussed in <xref
      target="RFC5880">RFC5880 Section 10</xref>.</t>
 
-     <t>There is no way to signal or negotiate Seed
-     changes.  The receiving party MUST remember the current Seed
-     value, and then detect if the Seed changes.  Note that the Seed
-     value MUST NOT change unless sending party has signalled a BFD
-     state change with a a packet that is authenticated using a more
-     secure Auth Type method.</t>
+     <t>
+       There is no way to signal or negotiate Seed changes.  The
+       receiving party MUST remember the current Seed value, and then
+       detect if the Seed changes.  Note that the Seed value MUST NOT
+       change unless sending party has signalled a BFD state change
+       with a packet that is authenticated using a stronger
+       authentication method.
+     </t>
 
      <section title="Sender Variable Initialization"
       anchor="sender-variable-initialization">
@@ -940,7 +953,7 @@ Sequence Auth Key
 	   The receiver copies the Seed value from the received packet
 	   into this variable.  Note that this copy only occurs when the
 	   bfd.MetKeyIsaacXmitKeyKnown variable transitions from "false"
-	   to true"
+	   to true."
 	 </dd>
 
 	 <dt>
@@ -952,19 +965,24 @@ Sequence Auth Key
 	 </dd>
        </dl>
 
-      <t>As there may be packet loss, the reciever has to take special
-      care to initialize the bfd.MetKeyIsaacRcvAuthBase variable.  If
-      there has been no packet loss, the bfd.MetKeyIsaacRcvAuthBase is
-      taken directly from the bfd.RcvAuthSeq variable, and the
-      bfd.MetKeyIsaacRcvAuthIndex is set to zero</t>
+       <t>
+	 As there may be packet loss, the receiver has to take special
+	 care to initialize the bfd.MetKeyIsaacRcvAuthBase variable.
+	 If there has been no packet loss, the
+	 bfd.MetKeyIsaacRcvAuthBase is taken directly from the
+	 bfd.RcvAuthSeq variable, and the bfd.MetKeyIsaacRcvAuthIndex
+	 is set to zero.
+       </t>
 
-      <t>If, however, the packet's Sequence Number differs from the
-      expected value, then the the difference "N" indicates how many
-      packets were lost.  The receive then has to search through the
-      first "N" Auth Keys derived from its calculated ISAAC state in
-      order to find one which matches.  If no key matches the Auth Key
-      in the packets, the packet is deemed to be inauthentic, and is
-      discarded.</t>
+       <t>
+	 If, however, the packet's Sequence Number differs from the
+	 expected value, then the difference "N" indicates how many
+	 packets were lost.  The receiver then has to search through
+	 the first "N" Auth Keys derived from its calculated ISAAC
+	 state in order to find one which matches.  If no key matches
+	 the Auth Key in the packets, the packet is deemed to be
+	 inauthentic, and is discarded.
+       </t>
 
       <t>If a calculated key at index "I" does match the Auth Key in
       the packet, then the bfd.MetKeyIsaacRcvAuthIndex field is
@@ -1236,11 +1254,10 @@ Sequence Auth Key
       <?rfc include="reference.RFC.2119.xml"?>
 
       <?rfc include='reference.RFC.5880.xml'?>
+      <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
     </references>
 
     <references title="Informative References">
-      <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
-
       <reference anchor="ISAAC">
 	<front>
 	  <title>ISAAC</title>
