@@ -252,12 +252,12 @@
 	    if no authentication is in use. Note that the session MAY
 	    change AuthType during a session. For example, where the
 	    session transitions from one with strong authentication
-	    to a less secure one, or vice versa.
+	    to a less strong one, or vice versa.
 	  </t>
 
 	  <t>
 	    Packets which indicate a state transition MUST use a
-	    stronger authentication method.  Where the
+	    stronger authentication method.  When the
 	    bfd.SessionState value is Up, packets MAY use a less
 	    strong authentication method, such as Meticulous Keyed
 	    ISAAC.
