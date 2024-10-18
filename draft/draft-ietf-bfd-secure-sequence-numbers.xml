@@ -14,7 +14,6 @@
     docName="draft-ietf-bfd-secure-sequence-numbers-latest"
     ipr="trust200902"
     submissionType="IETF"
-    updates="5880"
     consensus="true">
 
   <front>
@@ -161,9 +160,6 @@
 	be used as an authenticated signal to maintain a session in
 	the the "Up" state.
       </t>
-      <t>
-	This document updates RFC 5880.
-      </t>
     </abstract>
   </front>
 
@@ -212,7 +208,23 @@
       in <xref target="RFC2119">RFC 2119</xref>.</t>
     </section>
 
-    <section title="Updating RFC 5880">
+    <section title="Experimental updates to RFC 5880">
+      <t>
+	This document describes an experimental updates to <xref
+	target="RFC5880">BFD</xref>. This experiment is intended to
+	provide additional insights into what happens when the
+	authentication method defined in this document is used.
+      </t>
+
+      <t>
+	This document is classified as Experimental and is not part of
+	the IETF Standards Track. Implementations based on this
+	document should not be considered as compliant with <xref
+	target="RFC5880">BFD</xref> and should not assume
+	interoperability with other implementations that conform to
+	the existing document.
+      </t>
+
       <t>
 	Some of the state variables in <xref target="RFC5880"
 	sectionFormat="parens" section="6.8.1">BFD</xref>, are related
@@ -220,8 +232,9 @@
 	session.  However, the definitions given in <xref
 	target="RFC5880">BFD</xref> are specific to Keyed MD5 or SHA1
 	Authentication, which limit their utility for new
-	authentication types. This specification updates the
-	definition of some of the state variables as given below.
+	authentication types. For the purpose of the experiment, this
+	specification updates the definition of some of the state
+	variables as given below.
       </t>
 
       <t>
@@ -1133,10 +1146,10 @@ Sequence Auth Key
 
     <section anchor="IANA" title="IANA Considerations">
       <t>
-	       For IANA Consideration, please refer to the IANA
-	       Considerations section of <xref
-	       target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	       Authentication</xref>.
+	For IANA Consideration, please refer to the IANA
+	Considerations section of <xref
+	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
+	Authentication</xref>.
       </t>
 
       <t>Note to RFC Editor: this section may be removed on
