@@ -18,10 +18,10 @@
 
   <front>
     <title abbrev="ISAAC Authentication">Meticulous Keyed ISAAC for
-    BFD Authentication</title>
+    BFD Optimized Authentication</title>
 
     <author fullname="Alan DeKok" initials="A" surname="Dekok">
-      <organization>Network RADIUS SARL</organization>
+      <organization>InkBridge Networks</organization>
 
       <address>
         <postal>
@@ -40,7 +40,7 @@
 
         <facsimile/>
 
-        <email>aland@freeradius.org</email>
+        <email>alan.dekok@inkbridge.io</email>
 
         <uri/>
       </address>
@@ -152,8 +152,8 @@
 
     <abstract>
       <t>
-	This document describes a new BFD Authentication mechanism,
-	Meticulous Keyed ISAAC.  This mechanism can be used to
+	This document describes a new BFD Optimized Authentication Mode,
+	Meticulous Keyed ISAAC Authentication.  This mode  can be used to
 	authenticate BFD packets with less CPU time cost than using
 	MD5 or SHA1, with the tradeoff of decreased security.  This
 	mechanism cannot be used to signal state changes, but it can
@@ -273,7 +273,7 @@
 	    Packets which indicate a state transition MUST use a
 	    stronger authentication method.  When the
 	    bfd.SessionState value is Up, packets MAY use a less
-	    strong authentication method, such as Meticulous Keyed
+	    strong Optmized Authentication Mode, such as Meticulous Keyed
 	    ISAAC.
 	  </t>
 	</dd>
@@ -338,7 +338,7 @@
 
       <t>We use ISAAC here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth-Key"s.  With
-      Meticulous Keyed ISAAC, these Auth Keys are used as a signal
+      Meticulous Keyed ISAAC Authentication, these Auth Keys are used as a signal
       that the sending party is authentic.  That is, only the sending
       party can generate the correct Auth-Keys.  Therefore if the
       receiving party sees a correct Auth-Key, then only the sending
@@ -347,13 +347,13 @@
       modified in transit.</t>
 
       <t>Note that with this Auth Type method, the full packet
-      contents are not signed or authenticated.  Therefore, the
-      Meticulous Keyed ISAAC method MUST NOT be used to signal BFD
+      contents are not signed or authenticated.  Therefore,
+      Meticulous Keyed ISAAC Authentication MUST NOT be used to signal BFD
       state changes. For BFD state changes, and a more optimized way
       to authenticate packets, please refer to <xref
       target="I-D.ietf-bfd-optimizing-authentication">BFD
       Authentication</xref>. Instead, the packets containing
-      Meticulous Keyed ISAAC are only a signal that the sending party
+      Meticulous Keyed ISAAC Authentiction are only a signal that the sending party
       is still alive, and that the sending party is authentic.  That
       is, this Auth Type method MUST only be used when
       bfd.SessionState=Up, and the State (Sta) field equals 3
@@ -364,15 +364,15 @@
 
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
-      Type field contains TBD1 (Meticulous Keyed ISAAC), the
-      Authentication Section has the following format:</t>
+      Type field contains TBD1, the Authentication Section has the
+      following format:</t>
 
       <figure>
         <artwork><![CDATA[
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |   Auth Type   |   Auth Len    |  Auth Key ID  |   Reserved    |
+   |   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                        Sequence Number                        |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -388,9 +388,10 @@
 	    Auth Type:
 	</dt>
 	<dd>
-	  The Authentication Type, which in this case is TBD1
-	  (Meticulous Keyed ISAAC).  If the State (Sta) field value is
-	  not 3 (Up), then Meticulous Keyed ISAAC MUST NOT be used.
+	  The current Auth Type.  It MUST provide for meticulous
+	  keying.  That is, an authentication type where each packet
+	  is authenticated, and also where the Sequence Number field
+	  is incremented by one (1) for every packet which is sent.
 	</dd>
 
 	<dt>
@@ -398,7 +399,7 @@
 	</dt>
 	<dd>
 	    The length of the Authentication Section, in bytes.  For
-	    Meticulous Keyed ISAAC authentication, the length is 16.
+	    Meticulous Keyed ISAAC Authentication, the length is 16.
 	</dd>
 
 	<dt>
@@ -410,11 +411,13 @@
 	</dd>
 
 	<dt>
-	  Reserved:
+	  Opt Mode:
 	</dt>
 	<dd>
-	  This field MUST be set to zero on transmit, and ignored on
-	  receipt.
+	  The Optimized Authentication Mode.  Optimized Authentication
+	  allows for systems temporarily switch to a less
+	  computationally intensive authentication method, without
+	  changing the main bdf.AuthType.
 	</dd>
    
 	<dt>
@@ -464,13 +467,13 @@
     </section>
 
     <section title="Meticulous Keyed ISAAC Authentication">
-      <t>In this method of authentication, one or more secret keys
-      (with corresponding key IDs) are configured in each system.  One
-      of the keys is used to seed the ISAAC PRNG.  The output of ISAAC
-      is used to signal that the sender is authentic.  To help avoid
-      replay attacks, a sequence number is also carried in each packet.
-      For Meticulous Keyed ISAAC, the sequence number is incremented on
-      every packet.</t>
+      <t>In this mode of optimized authentication, one or more secret
+      keys (with corresponding key IDs) are configured in each system.
+      One of the keys is used to seed the ISAAC PRNG.  The output of
+      ISAAC is used to signal that the sender is authentic.  To help
+      avoid replay attacks, a sequence number is also carried in each
+      packet.  For Meticulous Keyed ISAAC Authentication, the sequence number MUST be
+      incremented by one on every packet.</t>
 
       <t>The receiving system accepts the packet if the key ID matches
       one of the configured Keys, and the Auth-Key derived from the
@@ -504,8 +507,14 @@
 	</t>
 
 	<t>
-	  For Meticulous Keyed ISAAC, bfd.XmitAuthSeq MUST be
-	  incremented on each packet, in a circular fashion (when
+	  The Opt. Mode field MUST be set to Meticulous Keyed ISAAC
+	  Authentication (TBD3), which depends on the secret Key, the
+	  current Seed, and the Sequence Number.
+	</t>
+
+	<t>
+	  For Meticulous Keyed ISAAC Authentication, bfd.XmitAuthSeq MUST be
+	  incremented by one on each packet, in a circular fashion (when
 	  treated as an unsigned 32-bit value).  The bfd.XmitAuthSeq
 	  MUST NOT be incremented by more than one for a packet.
 	</t>
@@ -527,6 +536,11 @@
 	  If the Auth Key ID field does not match the ID of a
 	  configured authentication key, the received packet MUST be
 	  discarded.
+	</t>
+
+	<t>
+	  If the Opt. Mode field does not match Meticulous Keyed ISAAC Authentication
+	  (TBD3), the received packet MUST be discarded.
 	</t>
 
 	<t>
@@ -579,10 +593,10 @@
       </list>
     </section>
 
-    <section title="New State variables for Meticulous Keyed ISAAC">
+    <section title="New State variables for Meticulous Keyed ISAAC Authentications">
       <t>
 	This document defines a few new state variables for use with
-	Meticulous Keyed ISAAC.
+	Meticulous Keyed ISAAC Authentication.
       </t>
 
       <dl newline="true">
@@ -591,11 +605,11 @@
 	</dt>
 	<dd>
 	  A boolean value which indicates whether or not the system
-	  knows the receive key for the Meticulous Keyed ISAAC Auth
-	  Type method.  The initial value is "false".  This value is
-	  changed to "true" when a party verifies that the other party
-	  has started to use the Meticulous Keyed ISAAC Auth Type
-	  method, with an authenticated Auth Key.
+	  knows the receive key for the Meticulous Keyed ISAAC
+	  Authentication.  The initial value is "false".  This value
+	  is changed to "true" when a party verifies that the other
+	  party has started to use the Meticulous Keyed ISAAC
+	  Authentication, with an authenticated Auth Key.
 	</dd>
 
 	<dt>
@@ -636,10 +650,10 @@
 	</dt>
 	<dd>
 	  A boolean value which indicates whether or not the system
-	  knows the xmit key for the Meticulous Keyed ISAAC Auth Type
-	  method.  The initial value is "false".  This value is
-	  changed to "true" when a party starts to transmit using the
-	  Meticulous Keyed ISAAC Auth Type method.
+	  knows the xmit key for Meticulous Keyed ISAAC Authentication.
+	  The initial value is "false".  This value is
+	  changed to "true" when a party starts to transmit using
+	  Meticulous Keyed ISAAC Authentication.
 	</dd>
 
 	<dt>
@@ -686,11 +700,11 @@
 
       <t>A particular Secret Key is identified via the Auth Key ID
       field.  This Auth Key ID is either placed in the packet by the
-      sender, or verified by the receiver.  The Meticulous Keyed ISAAC
-      authentication method permits systems to have multiple Secret
+      sender, or verified by the receiver.  Meticulous Keyed ISAAC
+      Authentication permits systems to have multiple Secret
       Keys configured, but we do not discuss how those keys are
       managed or used.  We do, however, require that a session MUST
-      NOT change the Auth Key ID for Meticulous Keyed ISAAC, during a
+      NOT change the Auth Key ID for Meticulous Keyed ISAAC Authentication, during a
       session.  There is no defined way to re-sync or re-initialize an
       ongoing session with a different Auth Key ID and correspondingly
       different Secret Key</t>
@@ -719,7 +733,7 @@
 
     <section title="Transition to using ISAAC">
       <t>Once a session transitions to the Up state, the packets MAY
-      contain AuthType supporting Meticulous Keyed ISAAC. A system receiving
+      use Meticulous Keyed ISAAC Authentication. A system receiving
       such a packet will initialize the ISAAC PRNG state using the
       Seed from the packet. A system originating such a packet will
       generate a Seed, and place it into the packet which is then
@@ -727,33 +741,29 @@
       <xref target="sender-variable-initialization"/> and
       <xref target="receiver-variable-initialization"/>.</t>
 
-      <t>There is no negotiation when using this Auth Type method.  A
-      sending system simply starts sending packets which contain Auth
-      Type supporting Meticulous Keyed ISAAC.</t>
+      <t>There is no negotiation as to when authentication switches
+      from the original type, to using Meticulous Keyed ISAAC.  The
+      sender simply begins authentication with a relevant Auth-Type,
+      and with the Optimized Authentication Mode field set to 1.  When
+      the sender switches to using using Meticulous Keyed ISAAC
+      Authentication, it sets the Optimized Authentication Mode field
+      to 2, and starts performing the ISAAC calculations as described
+      here.</t>
 
-      <t>Similarly, a receiving system sees that it has received a
-      packet contains AuthType of Meticulous Keyed ISAAC when
+      <t>Similarly, a receiving system switches to using this method
+      when it sees that it has received a packet contains Optimized
+      Authentication Mode field set to 2 when
       bfd.MetKeyIsaacRcvKeyKnown variable is "false".  The receiving
       system then initializes its variables, and authenticates the
       received packet, by comparing the Auth Key in the packet with
       the key it generated itself.</t>
 
-<!-- XXX JMH - I believe this section has lost relevance with the new paired authtypes.
-      <t>Note that switch to a different AuthType method does not
-      affect the values of the bfd.RcvAuthSeq or bfd.XmitAuthSeq
-      variables. The variables MUST continue using their previous
-      values which were using the previous AuthType method.</t>
-
       <t>However, the operation of those variables MUST now satisfy
-      the requirements of the new AuthType method.  For example, the
-      AuthType could change from Keyed SHA1 (where the variables were
-      not updated on every packet) to Meticulous Keyed ISAAC (where
-      the variables are updated on every packet).</t>
+      the requirements of the new Optimized Authentication Mode.</t>
 
-      <t>That is, when changing AuthTypes in a session, the current
+      <t>That is, when changing Optimized Authentication mode in a session, the current
       value of the bfd.RcvAuthSeq and bfd.XmitAuthSeq variables is
-      used as the initial value(s) for the new AuthType.</t>
--->
+      used as the initial value(s) for the new mode.</t>
 
       <t>When there is a transition to using ISAAC the first time, the initial
       state has to be seeded.  The next section describes this seeding
@@ -929,8 +939,8 @@ Sequence Auth Key
      <section title="Receiver Variable Initialization"
       anchor="receiver-variable-initialization">
        <t>
-	 When a system receives packets with the Meticulous Keyed
-	 ISAAC authentication type and is able to authenticate such a
+	 When a system receives packets with Meticulous Keyed
+	 ISAAC Authentication and is able to authenticate such a
 	 packet the first time, the ISAAC related variables are
 	 initialized as follows:
        </t>
@@ -941,7 +951,7 @@ Sequence Auth Key
 	 <dd>
 	   This variable transitions from "false" to "true" when the
 	   receiver sees that the sender has started using Meticulous
-	   Keyed ISAAC authentication.  The receiver also initializes
+	   Keyed ISAAC Authentication.  The receiver also initializes
 	   the other variables at the same time.
 	 </dd>
 
@@ -1084,7 +1094,7 @@ Sequence Auth Key
 	and then calling the isaac() function.c.</t>
 
 	<t>The system needs to maintain the "current" page at all
-	times when Meticulous Keyed ISAAC authentication is used.  The
+	times when Meticulous Keyed ISAAC Authentication is used.  The
 	"next" page does not need to be maintained at all times, and
 	can be calculated on demand.  However, in order to avoid
 	impacting the fast path, the "next" should be calculated in
@@ -1117,11 +1127,11 @@ Sequence Auth Key
       <t>There are two ways to transition away from using ISAAC.  One
       way is via state changes: the link either goes down due to an
       fault, or one party signals a state change via a packet signed
-      with a strong Auth Type.  The second situation is where one
+      with a strong authentication.  The second situation is where one
       party wishes to temporarily signal that it is still Up, using a
       strong Auth Type.</t>
 
-      <t>Since the Meticulous Keyed ISAAC authentication method does
+      <t>Since Meticulous Keyed ISAAC Authentication does
       not provide for full packet integrity checks, it may be
       desirable for a party to periodically use a strong Auth Type.
       The switch to a different Auth Type can be done at any time
@@ -1134,7 +1144,7 @@ Sequence Auth Key
       target="I-D.ietf-bfd-optimizing-authentication">BFD
       Authentication</xref> for appropriate procedures.</t>
 
-      <t>The nature of the Meticulous Keyed ISAAC method means that
+      <t>The nature of Meticulous Keyed ISAAC Authentication means that
       there is no issue with this switch, so long as it is for a small
       number of packets.  From the point of view of the Meticulous
       Keyed ISAAC state machine, this switch can be handled similarly
@@ -1206,24 +1216,31 @@ Sequence Auth Key
       BFD session to be operationally down.</t>
 
       <section title="Spoofing">
-	<t>When Meticulous Keyed ISAAC is used, it is possible for an
-	attacker who can see the packets to observe a particular Auth
-	Key value, and then copy it to a different packet as a
-	on-path attacker attack.  However, the usefulness of such
-	an attack is limited by the requirements that these packets
-	must not signal state changes in the BFD session, and that the
-	Auth Key changes on every packet.</t>
+	<t>When Meticulous Keyed ISAAC Authentication is used, it is
+	possible for an attacker who can see the packets to observe a
+	particular Auth Key value, and then copy it to a different
+	packet as a on-path attacker attack.  However, the usefulness
+	of such an attack is limited by the correlation between the
+	Sequence Number and the Auth Key.  That is, each Sequence
+	Number has a unique Auth Key associated with it</t>
+
+	<t>The <xref target="RFC5880">BFD state machine</xref> checks
+	ensure that only packets with a correct Sequence Number are
+	accepted.  The Meticulous Keyed ISAAC Authentication checks
+	ensure that the Auth Key matches the expected value.  If
+	either check fails, the packet MUST be silently discarded.</t>
 
 	<t>Performing such an attack would require an attacker to have
 	the following information and capabilities:</t>
 
 	<list>
-	  <t>This is man-in-the-middle active attack.</t>
+	  <t>Be on-path active attack.</t>
 
-	  <t>The attacker has the contents of a stable packet</t>
+	  <t>The attacker has the contents of one or more packets</t>
 
-	  <t>The attacker has managed to deduce the ISAAC key and
-	  knows which per-packet key is being used.</t>
+	  <t>The attacker has managed to deduce the ISAAC key is able
+	  to correlate the Sequence Number to the current ISAAC
+	  state.</t>
 	</list>
 
 	<t>The attack is therefore limited to keeping the BFD session
@@ -1255,10 +1272,11 @@ Sequence Auth Key
 	such misconfiguration is possible.</t>
 
 	<t>We believe that the use of the same key is acceptable, as
-	the Auth Type defined for ISAAC depends on 64 bits of random
-	data.  The use of this randomness increases the difficulty of
-	breaking the key, and makes off-line dictionary attacks
-	infeasible.</t>
+	ISAAC is keyed not only with the authentication key, but also
+	depends on 32 bits of random data, along with 32 bits of a
+	Sequence Number.  The use of this added randomness increases
+	the difficulty of breaking the key, and makes off-line
+	dictionary attacks infeasible.</t>
       </section>
 
     </section>
