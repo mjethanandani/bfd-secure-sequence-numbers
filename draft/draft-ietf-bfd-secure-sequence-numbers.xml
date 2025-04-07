@@ -211,7 +211,7 @@
 
     <section title="Experimental updates to RFC 5880">
       <t>
-	This document describes an experimental updates to <xref
+	This document describes an experimental update to <xref
 	target="RFC5880">BFD</xref>. This experiment is intended to
 	provide additional insights into what happens when the
 	authentication method defined in this document is used.
@@ -292,7 +292,7 @@
 	</dt>
 	<dd>
 	  A 32-bit unsigned integer containing the next sequence
-	  number for for the Authentication Section which will be
+	  number for the Authentication Section which will be
 	  transmitted.  This variable MUST be initialized to a random
 	  32-bit value.
 	</dd>
@@ -714,7 +714,7 @@
 
       <t>There are no known issues with using the same secret Key for
       multiple Auth Type methods.  However, it is RECOMMENDED that
-      adminsitrators different Secret Keys for each Auth Type.</t>
+      adminsitrators use different Secret Keys for each Auth Type.</t>
     </section>
 
     <section title="Transition to using ISAAC">
