@@ -157,8 +157,7 @@
 	authenticate BFD packets with less CPU time cost than using
 	MD5 or SHA1, with the tradeoff of decreased security.  This
 	mechanism cannot be used to signal state changes, but it can
-	be used as an authenticated signal to maintain a session in
-	the the "Up" state.
+	be used to maintain a session in the the "Up" state.
       </t>
     </abstract>
   </front>
@@ -167,7 +166,7 @@
     <section title="Introduction">
       <t>
 	<xref target="RFC5880" sectionFormat="parens"
-	section="6.7.2">BFD</xref> defines a number of authentication
+	section="6.7">BFD</xref> defines a number of authentication
 	mechanisms, including Simple Password, and various other
 	methods based on MD5 and SHA1 hashes.  The benefit of using
 	cryptographic hashes is that they are secure.  The downside to
@@ -183,7 +182,7 @@
 	parties to believe that the link is up when it is, in fact,
 	down.  The goal of this specification is to use a simple
 	method to prevent spoofing of the BFD session being "Up".  We
-	therefore define a fast Auth Type method which allows parties
+	therefore define a Optimized Auth Type that allows parties
 	to securely signal that they are still in the Up state.
       </t>
 
@@ -198,7 +197,7 @@
       with initial seeding, and the method proposed here is safe from
       that attack.  ISAAC requires only a few CPU operations per
       generated 32-bit number, can take a large secret key as a seed,
-      and it has an extremely long period.  These properties make it
+      and it has an extremely long cycle length.  These properties make it
       ideal for use in BFD.</t>
     </section>
 
@@ -414,12 +413,14 @@
 	  Opt Mode:
 	</dt>
 	<dd>
-	  The Optimized Authentication Mode.  Optimized Authentication
+	  The Optimized Authentication Mode, as defined in
+          <xref target="I-D.ietf-bfd-optimizing-authentication"/>.
+          Optimized Authentication
 	  allows for systems temporarily switch to a less
 	  computationally intensive authentication method, without
 	  changing the main bdf.AuthType.
 	</dd>
-   
+
 	<dt>
 	  Sequence Number:
 	</dt>
@@ -489,8 +490,13 @@
 	<t>
 	  The Auth Type field MUST be set to one of two TBDs
 	  (Optimized MD5 Meticulous Keyed ISAAC Authentication or
-	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication).  The
-	  Auth Len field MUST be set to 16.  The Auth Key ID field
+	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication).
+	</t>
+	<t>
+          The Auth Len field MUST be set to 16.
+	</t>
+	<t>
+          The Auth Key ID field
 	  MUST be set to the ID of the current authentication key.
 	  The Sequence Number field MUST be set to bfd.XmitAuthSeq.
 	</t>
@@ -507,9 +513,9 @@
 	</t>
 
 	<t>
-	  The Opt. Mode field MUST be set to Meticulous Keyed ISAAC
-	  Authentication (TBD3), which depends on the secret Key, the
-	  current Seed, and the Sequence Number.
+          The Opt. Mode field MUST be 2, the "less computationally intensive
+          authentication type". See
+          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>.
 	</t>
 
 	<t>
@@ -539,8 +545,9 @@
 	</t>
 
 	<t>
-	  If the Opt. Mode field does not match Meticulous Keyed ISAAC Authentication
-	  (TBD3), the received packet MUST be discarded.
+	  If the Opt. Mode is not 2,
+          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>,
+	  the received packet MUST be discarded.
 	</t>
 
 	<t>
@@ -595,7 +602,7 @@
 
     <section title="New State variables for Meticulous Keyed ISAAC Authentications">
       <t>
-	This document defines a few new state variables for use with
+	This document defines new state variables for use with
 	Meticulous Keyed ISAAC Authentication.
       </t>
 
@@ -692,7 +699,7 @@
     </section>
 
     <section title="Secret Key">
-      <t>The security of this Auth Type depends on the Secret Key.
+      <t>The security of the Meticulous Keyed ISAAC Auth Type depends on the Secret Key.
       The Secret Key is mixed with a per-session Seed as discussed
       below.  The result is used to initialize a stream of
       pseudo-random numbers using the ISAAC random number
@@ -732,12 +739,12 @@
     </section>
 
     <section title="Transition to using ISAAC">
-      <t>Once a session transitions to the Up state, the packets MAY
+      <t>Once a BFD session transitions to the Up state, the packets MAY
       use Meticulous Keyed ISAAC Authentication. A system receiving
       such a packet will initialize the ISAAC PRNG state using the
       Seed from the packet. A system originating such a packet will
       generate a Seed, and place it into the packet which is then
-      sent.  Further discussion of initialization is below in 
+      sent.  Further discussion of initialization is below in
       <xref target="sender-variable-initialization"/> and
       <xref target="receiver-variable-initialization"/>.</t>
 
@@ -959,8 +966,8 @@ Sequence Auth Key
 	   bfd.MetKeyIsaacRcvAuthBase:
 	 </dt>
 	 <dd>
-	   The sender the bfd.RcvAuthSeq number from the current packet
-	   to be sent into this variable.
+	   The bfd.RcvAuthSeq number from the current packet
+	   is copied into this variable.
 	 </dd>
 
 	 <dt>
@@ -1044,7 +1051,7 @@ Sequence Auth Key
       variable is then incremented by 256, to indicate that 256 Auth
       Keys have been consumed.  This process then continues until a
       BFD state change.</t>
-     
+
       <t>ISAAC can be thought of here as producing an infinite stream
       of numbers, based on a secret key, where the numbers are
       produced in "pages" of 256 32-bit values.  This property of
