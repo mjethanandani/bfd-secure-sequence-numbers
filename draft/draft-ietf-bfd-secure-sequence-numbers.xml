@@ -196,7 +196,7 @@
       significant cryptanalysis in the past thirty years, most notably
       <xref target="ISAAC+">ISAAC+</xref>.  The only issue found was
       with initial seeding, and the method proposed here is safe from
-      known attacks.  ISAAC requires only a few CPU operations per
+      that attack.  ISAAC requires only a few CPU operations per
       generated 32-bit number, can take a large secret key as a seed,
       and it has an extremely long period.  These properties make it
       ideal for use in BFD.</t>
@@ -332,8 +332,8 @@
 	Authentication</xref>, permits BFD to use a relaxed
 	authentication, that satisfies the ability to provde a less
 	expensive authentication, but strong enough that periodic
-	reauthentication is not strictly required to prevent a
-	person-in-the-middle attack.
+	reauthentication is not strictly required to prevent an
+	on-path attack.
       </t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
@@ -1222,7 +1222,7 @@ Sequence Auth Key
 	packet as a on-path attacker attack.  However, the usefulness
 	of such an attack is limited by the correlation between the
 	Sequence Number and the Auth Key.  That is, each Sequence
-	Number has a unique Auth Key associated with it</t>
+	Number has a unique Auth Key associated with it.</t>
 
 	<t>The <xref target="RFC5880">BFD state machine</xref> checks
 	ensure that only packets with a correct Sequence Number are
@@ -1230,13 +1230,12 @@ Sequence Auth Key
 	ensure that the Auth Key matches the expected value.  If
 	either check fails, the packet MUST be silently discarded.</t>
 
-	<t>Performing such an attack would require an attacker to have
-	the following information and capabilities:</t>
+	<t>Performing such an attack would require:</t>
 
 	<list>
-	  <t>Be on-path active attack.</t>
+	  <t>An onn-path active attack.</t>
 
-	  <t>The attacker has the contents of one or more packets</t>
+	  <t>The attacker has the contents of one or more packets.</t>
 
 	  <t>The attacker has managed to deduce the ISAAC key is able
 	  to correlate the Sequence Number to the current ISAAC
