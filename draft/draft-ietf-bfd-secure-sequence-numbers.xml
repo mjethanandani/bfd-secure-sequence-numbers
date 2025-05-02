@@ -265,15 +265,14 @@
 	    if no authentication is in use. Note that the session MAY
 	    change AuthType during a session. For example, where the
 	    session transitions from one with strong authentication
-	    to a less strong one, or vice versa.
+	    to a less computationally intensive one, or vice versa.
 	  </t>
 
 	  <t>
 	    Packets which indicate a state transition MUST use a
-	    stronger authentication method.  When the
-	    bfd.SessionState value is Up, packets MAY use a less
-	    strong Optmized Authentication Mode, such as Meticulous Keyed
-	    ISAAC.
+	    stronger authentication method.  When the bfd.SessionState
+	    value is Up, packets MAY use a less computationally
+	    intensive one, such as Meticulous Keyed ISAAC.
 	  </t>
 	</dd>
 
@@ -337,25 +336,25 @@
 
       <t>We use ISAAC here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth-Key"s.  With
-      Meticulous Keyed ISAAC Authentication, these Auth Keys are used as a signal
-      that the sending party is authentic.  That is, only the sending
-      party can generate the correct Auth-Keys.  Therefore if the
-      receiving party sees a correct Auth-Key, then only the sending
-      party could have generated it.  The sender is therefore
+      Meticulous Keyed ISAAC Authentication, these Auth Keys are used
+      as a signal that the sending party is authentic.  That is, only
+      the sending party can generate the correct Auth-Keys.  Therefore
+      if the receiving party sees a correct Auth-Key, then only the
+      sending party could have generated it.  The sender is therefore
       authentic, even if the packet contents have potentially been
       modified in transit.</t>
 
       <t>Note that with this Auth Type method, the full packet
-      contents are not signed or authenticated.  Therefore,
-      Meticulous Keyed ISAAC Authentication MUST NOT be used to signal BFD
-      state changes. For BFD state changes, and a more optimized way
-      to authenticate packets, please refer to <xref
+      contents are not signed or authenticated.  Therefore, Meticulous
+      Keyed ISAAC Authentication MUST NOT be used to signal BFD state
+      changes. For BFD state changes, and a more optimized way to
+      authenticate packets, please refer to <xref
       target="I-D.ietf-bfd-optimizing-authentication">BFD
       Authentication</xref>. Instead, the packets containing
-      Meticulous Keyed ISAAC Authentiction are only a signal that the sending party
-      is still alive, and that the sending party is authentic.  That
-      is, this Auth Type method MUST only be used when
-      bfd.SessionState=Up, and the State (Sta) field equals 3
+      Meticulous Keyed ISAAC Authentication are only a signal that the
+      sending party is still alive, and that the sending party is
+      authentic.  That is, this Auth Type method MUST only be used
+      when bfd.SessionState=Up, and the State (Sta) field equals 3
       (Up).</t>
     </section>
 
@@ -413,12 +412,11 @@
 	  Opt Mode:
 	</dt>
 	<dd>
-	  The Optimized Authentication Mode, as defined in
-          <xref target="I-D.ietf-bfd-optimizing-authentication"/>.
-          Optimized Authentication
-	  allows for systems temporarily switch to a less
-	  computationally intensive authentication method, without
-	  changing the main bdf.AuthType.
+	  The Optimized Authentication Mode, as defined in <xref
+	  target="I-D.ietf-bfd-optimizing-authentication"/>.  allows
+	  for systems to switch to a less computationally intensive
+	  authentication method, without changing the main
+	  bdf.AuthType.
 	</dd>
 
 	<dt>
@@ -513,9 +511,10 @@
 	</t>
 
 	<t>
-          The Opt. Mode field MUST be 2, the "less computationally intensive
-          authentication type". See
-          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>.
+          The Optimized Authentication Mode field MUST be 2, the "less
+          computationally intensive authentication type". See <xref
+          target="I-D.ietf-bfd-optimizing-authentication"
+          section="3.0"/>.
 	</t>
 
 	<t>
@@ -545,9 +544,9 @@
 	</t>
 
 	<t>
-	  If the Opt. Mode is not 2,
-          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>,
-	  the received packet MUST be discarded.
+	  If the Optimized Authenticaiton Mode is not 2, <xref
+	  target="I-D.ietf-bfd-optimizing-authentication"
+	  section="3.0"/>, the received packet MUST be discarded.
 	</t>
 
 	<t>
@@ -1240,7 +1239,7 @@ Sequence Auth Key
 	<t>Performing such an attack would require:</t>
 
 	<list>
-	  <t>An onn-path active attack.</t>
+	  <t>An on-path active attack.</t>
 
 	  <t>The attacker has the contents of one or more packets.</t>
 
