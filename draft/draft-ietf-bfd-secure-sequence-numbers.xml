@@ -265,15 +265,14 @@
 	    if no authentication is in use. Note that the session MAY
 	    change AuthType during a session. For example, where the
 	    session transitions from one with strong authentication
-	    to a less strong one, or vice versa.
+	    to a less computationally intensive one, or vice versa.
 	  </t>
 
 	  <t>
 	    Packets which indicate a state transition MUST use a
-	    stronger authentication method.  When the
-	    bfd.SessionState value is Up, packets MAY use a less
-	    strong authentication method, such as Meticulous Keyed
-	    ISAAC.
+	    stronger authentication method.  When the bfd.SessionState
+	    value is Up, packets MAY use a less computationally
+	    intensive one, such as Meticulous Keyed ISAAC.
 	  </t>
 	</dd>
 
@@ -330,9 +329,9 @@
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
 	Authentication</xref>, permits BFD to use a relaxed
 	authentication, that satisfies the ability to provde a less
-	expensive authentication, but strong enough that periodic
-	reauthentication is not strictly required to prevent a
-	person-in-the-middle attack.
+	computationally expensive authentication, but strong enough
+	that periodic reauthentication is not strictly required to
+	prevent a person-in-the-middle attack.
       </t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
@@ -352,10 +351,10 @@
       to authenticate packets, please refer to <xref
       target="I-D.ietf-bfd-optimizing-authentication">BFD
       Authentication</xref>. Instead, the packets containing
-      Meticulous Keyed ISAAC are only a signal that the sending party
-      is still alive, and that the sending party is authentic.  That
-      is, this Auth Type method MUST only be used when
-      bfd.SessionState=Up, and the State (Sta) field equals 3
+      Meticulous Keyed ISAAC Authentication are only a signal that the
+      sending party is still alive, and that the sending party is
+      authentic.  That is, this Auth Type method MUST only be used
+      when bfd.SessionState=Up, and the State (Sta) field equals 3
       (Up).</t>
     </section>
 
@@ -1211,7 +1210,7 @@ Sequence Auth Key
 	the following information and capabilities:</t>
 
 	<list>
-	  <t>This is man-in-the-middle active attack.</t>
+	  <t>An on-path active attack.</t>
 
 	  <t>The attacker has the contents of a stable packet</t>
 
