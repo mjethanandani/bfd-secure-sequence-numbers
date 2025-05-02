@@ -412,12 +412,11 @@
 	  Opt Mode:
 	</dt>
 	<dd>
-	  The Optimized Authentication Mode, as defined in
-          <xref target="I-D.ietf-bfd-optimizing-authentication"/>.
-          Optimized Authentication
-	  allows for systems temporarily switch to a less
-	  computationally intensive authentication method, without
-	  changing the main bdf.AuthType.
+	  The Optimized Authentication Mode, as defined in <xref
+	  target="I-D.ietf-bfd-optimizing-authentication"/>.  allows
+	  for systems to switch to a less computationally intensive
+	  authentication method, without changing the main
+	  bdf.AuthType.
 	</dd>
 
 	<dt>
@@ -512,9 +511,10 @@
 	</t>
 
 	<t>
-          The Opt. Mode field MUST be 2, the "less computationally intensive
-          authentication type". See
-          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>.
+          The Optimized Authentication Mode field MUST be 2, the "less
+          computationally intensive authentication type". See <xref
+          target="I-D.ietf-bfd-optimizing-authentication"
+          section="3.0"/>.
 	</t>
 
 	<t>
@@ -544,9 +544,9 @@
 	</t>
 
 	<t>
-	  If the Opt. Mode is not 2,
-          <xref target="I-D.ietf-bfd-optimizing-authentication" section="3.0"/>,
-	  the received packet MUST be discarded.
+	  If the Optimized Authenticaiton Mode is not 2, <xref
+	  target="I-D.ietf-bfd-optimizing-authentication"
+	  section="3.0"/>, the received packet MUST be discarded.
 	</t>
 
 	<t>
