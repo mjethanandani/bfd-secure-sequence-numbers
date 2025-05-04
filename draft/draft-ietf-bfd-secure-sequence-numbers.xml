@@ -262,13 +262,7 @@
 	    The current authentication type in use for this session,
 	    as defined in <xref target="RFC5880"
 	    sectionFormat="parens" section="4.1">BFD</xref>, or zero
-	    if no authentication is in use. Note that the session MAY
-	    change Optimized Authentication Mode during a session as
-	    described in <xref
-	    target="I-D.ietf-bfd-optimizing-authentication">Optimizing
-	    BFD Authentication</xref>. For example, where the session
-	    transitions from one with strong authentication to a less
-	    computationally intensive one, or vice versa.
+	    if no authentication is in use.
 	  </t>
 
 	  <t>
