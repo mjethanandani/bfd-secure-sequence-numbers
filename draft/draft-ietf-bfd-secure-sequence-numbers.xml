@@ -262,10 +262,7 @@
 	    The current authentication type in use for this session,
 	    as defined in <xref target="RFC5880"
 	    sectionFormat="parens" section="4.1">BFD</xref>, or zero
-	    if no authentication is in use. Note that the session MAY
-	    change AuthType during a session. For example, where the
-	    session transitions from one with strong authentication
-	    to a less computationally intensive one, or vice versa.
+	    if no authentication is in use.
 	  </t>
 
 	  <t>
@@ -544,7 +541,7 @@
 	</t>
 
 	<t>
-	  If the Optimized Authenticaiton Mode is not 2, <xref
+	  If the Optimized Authentication Mode is not 2, <xref
 	  target="I-D.ietf-bfd-optimizing-authentication"
 	  section="3.0"/>, the received packet MUST be discarded.
 	</t>
