@@ -1164,6 +1164,21 @@ Sequence Auth Key
       reinitialize the ISAAC method with new Seed value.</t>
     </section>
 
+    <section anchor="the-yang-model" title="The YANG Model">
+      <t>
+        Blah blah TOOD.
+      </t>
+      <t>
+	<figure>
+	  <artwork><![CDATA[
+	  <CODE BEGINS> file "ietf-bfd-met-keyed-isaac-auth@YYYY-MM-DD.yang"
+          INSERT_TEXT_FROM_FILE(../bin/ietf-bfd-met-keyed-isaac-auth@YYYY-MM-DD.yang,69)
+	  <CODE ENDS>
+	  ]]></artwork>
+	</figure>
+      </t>
+    </section>
+
     <section anchor="IANA" title="IANA Considerations">
       <t>
 	For IANA Consideration, please refer to the IANA

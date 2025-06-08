@@ -47,7 +47,12 @@ ifeq (org,$(draft_type))
 endif
 
 $(next).xml: $(draft).xml
+	-mkdir -p ../bin
 	sed -e"s/$(basename $<)-latest/$(basename $@)/" -e"s/YYYY-MM-DD/$(shell date +%Y-%m-%d)/" $< > $@
+	cd ../src; ./sed.sh; cd ..;
+	cd ../src; python ./download-dependent-models.py; ./validate-and-gen-trees.sh; cd ..;
+	cd ../src; ./validate-and-gen-trees.sh; cd ..;
+	../src/insert-figures.sh $@ > tmp; mv tmp $@
 
 .INTERMEDIATE: $(draft).xml
 %.xml: %.md
