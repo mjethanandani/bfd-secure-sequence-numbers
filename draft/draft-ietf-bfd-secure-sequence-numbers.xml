@@ -199,6 +199,7 @@
       generated 32-bit number, can take a large secret key as a seed,
       and it has an extremely long cycle length.  These properties make it
       ideal for use in BFD.</t>
+
     </section>
 
     <section title="Requirements Language">
@@ -340,11 +341,8 @@
 	  Instead, an optimized authentication mechanism
 	as described in <xref
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>, permits BFD to use a relaxed
-	authentication, that satisfies the ability to provde a less
-	expensive authentication, but strong enough that periodic
-	reauthentication is not strictly required to prevent an
-	on-path attack.
+	Authentication</xref>, which permits BFD to use an authentication method which is less computationally expensive than MD5 or SHA1, but is still strong enough that to prevent an
+	on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it serves as an authenticed signal that the session remains in the Up state.
       </t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
@@ -369,6 +367,130 @@
       authentic.  That is, this Auth Type method MUST only be used
       when bfd.SessionState=Up, and the State (Sta) field equals 3
       (Up).</t>
+
+      <section title="Rationale for ISAAC and Operational Overview">
+	<t>
+	  There are many CSPRNGs available, so we explain why ISAAC was chosen.
+	</t>
+
+	<t>
+	  The goal for this optimized authentication was to provide a
+	  strong signal that the session was in the Up state, in the
+	  form of a 32-bit number which is difficult for an attacker
+	  to guess.  The number should be generated from a CSPRNG
+	  which produces results based on a seed composed of both
+	  public and private data.  Since BFD can have packet loss,
+	  the generator should also be "seekable", in that the BFD
+	  state machine should be able to query the generator (within
+	  a small window) for new numbers.
+	</t>
+
+	<t>
+	  This last property rules out most CSPRNGs, as their they are
+	  not seekable by design.  That is, most CSRNGs maintain
+	  minimal state, and are designed to produce a long sequence
+	  of pseudo-random numbers from a few simple calculations.  In
+	  general, every call to the CSPRNG function modifies the
+	  internal state un an irreversible fashion, and then produces
+	  a new random number as the result.
+	</t>
+
+	<t>
+	   It could be possible to use such a generator, and then to
+	   manually save many results in a buffer.  This buffer could
+	   then enable "seeking" within a short window.  In contrast,
+	   ISAAC produces large sets of numbers of design, making it
+	   an integrated solution.
+	</t>
+
+	<t>
+	  Further, most CSPRNGs are designed to have small seeds.
+	  This limitation means that any secret key defined by an
+	  administrator is not directly usable as a seed for the
+	  generator.  Instead, any secret key (including any
+	  per-session data) would have to be hashed before being used
+	  to see the generator.  Again, ISAAC is the answer here.  It
+	  can accept keys up to 8192 octets in length, which is more
+	  than sufficient for BFD.
+	</t>
+
+	<t>
+	  Finally, ISAAC has been subject to significant cryptanalysis
+	  in the past thirty years, most notably <xref
+	  target="ISAAC+">ISAAC+</xref>.  There are no known
+	  vulnerabilities.  In contrast, other CSPRNGs may be newer,
+	  but have generally been subject to less analysis.  ISAAC is
+	  therefore also a good choice here.
+	</t>
+
+	<t>
+	  The process for using ISAAC with BFD is then as follows:
+
+	  <ul>
+	    <li>
+	      The administrator provides a secret key which is used to
+	      authenticate each party in the BFD sessions.
+	    </li>
+	    <li>
+	      When the session transitions into the Up state, the
+	      secret key is combined with per-session data to seed ISAAC.
+	    </li>
+	    <li>
+	      The ISAAC process produces a "page" of 256 32-bit random
+	      numbers.
+	    </li>
+	    <li>
+	      The BFD state machine also records a Sequence Number
+	      which is associated with the first entry of that page.
+	      The combination of 256 entries and the Sequence number
+	      allows the BFD state machine to "seek" within a
+	      256-packet window with zero cost, through simple
+	      addition or subtraction of Sequence Numbers.
+	    </li>
+	    <li>
+	      If / when there is a lost packet, the BFD state machine
+	      simply "seeks" to the entry which is associated with the
+	      received packet, and checks if the received packet
+	      contains the expected number.
+	    </li>
+	    <li>
+	      At 60 packets per second, these page provides for
+	      approximately four (4) seconds of BFD operation before
+	      the "next" page has to be calculated.
+	    </li>
+	    <li>
+	      As the "next" page calculation is complex, and there is
+	      a long period of time available before the "next" page
+	      is needed, this calculation can be done as a background task.
+	    </li>
+	  </ul>
+
+	  <t>
+	    In summary, the ISAAC seed depends on both a secret key
+	    and per-session data, so it is difficult for an attacker
+	    to guess or attack via an off-line dictionary attack.
+	    ISAAC has been subject to cryptographic analysis, and the
+	    numbers produced by it are secure.  The generated numbers
+	    are saved in an array, where the BFD "fast path" can
+	    consume them at essentially zero cost.
+	  </t>
+	  <t>
+	    The only downside to this method is that it does not
+	    provide for per-packet integrity checks.  This limitation
+	    is addressed by mandating that Meticulous Keyed ISAAC
+	    Authentication is only used to signal that the session
+	    remains in the Up state. The ISAAC numbers then signal
+	    that the originator of the packet is authentic, and the
+	    BFD state machine verifies that the rest of the packet
+	    is well formed, and matches the expected state.
+	  </t>
+
+	  <t>
+	    The result is an authentication method which satisfies
+	    both the needs of the BFD state machine, and is secure.
+	  </t>
+	</section>
+
     </section>
 
     <section title="Meticulous Keyed ISAAC Authentication Format" anchor="meticulous_keyed_isaac">
