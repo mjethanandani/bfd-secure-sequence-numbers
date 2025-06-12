@@ -760,6 +760,12 @@
       <xref target="sender-variable-initialization"/> and
       <xref target="receiver-variable-initialization"/>.</t>
 
+      <t>The transition to the Up state is the only time when the
+      ISAAC random number generator is initialized.  In contrast, a
+      temporary transition away from using Meticulous Keyed ISAAC
+      Authentication (<xref target="transition-away"/>) and back, does
+      not cause ISAAC to be re-keyed.</t>
+
       <t>There is no negotiation as to when authentication switches
       from the original type, to using Meticulous Keyed ISAAC.  The
       sender simply begins sending packets with a relevant Auth-Type,
@@ -1142,26 +1148,31 @@ Sequence Auth Key
 
     </section>
 
-    <section title="Transition away from using ISAAC">
+    <section title="Transition away from using ISAAC"
+	     anchor="transition-away">
       <t>There are two ways to transition away from using ISAAC.  One
       way is via state changes: the link either goes down due to an
       fault, or one party signals a state change via a packet signed
       with a strong authentication.  The second situation is where one
-      party wishes to temporarily signal that it is still Up, using a
-      strong Auth Type.</t>
+      party wishes to temporarily stronger signal that it is still Up,
+      by setting the Optimized Authentication Mode field away from
+      value "2" (Meticulous Keyed ISAAC) to value "1" (the strong
+      authentication type).</t>
 
-      <t>Since Meticulous Keyed ISAAC Authentication does
-      not provide for full packet integrity checks, it may be
-      desirable for a party to periodically use a strong Auth Type.
-      The switch to a different Auth Type can be done at any time
-      during a session.  The different Auth Type can signal that the
-      session is still in the Up state.</t>
+      <t>The switch to the strong authentication type also provides
+      for full packet integrity checks, which may be desirable.  This
+      switch can be done at any time during a session</t>
 
-      <t>It is RECOMMENDED that implementations periodically use a
-      strong Auth Type for packets which maintain the session in an Up
-      state.  See <xref
+      <t>It is RECOMMENDED that implementations periodically switch to
+      the strong authentication type for packets which maintain the
+      session in an Up state.  The interval between these switches
+      SHOULD be long enough that the system still gains significant
+      benefit from using Meticulous Keyed ISAAC Authentication.  That
+      is, multiple ISAAC pages SHOULD be used in between any switch to
+      the strong authentication type.  See <xref
       target="I-D.ietf-bfd-optimizing-authentication">BFD
-      Authentication</xref> for appropriate procedures.</t>
+      Authentication</xref> for appropriate procedure on switching
+      Optimized Authentication Mode.</t>
 
       <t>The nature of Meticulous Keyed ISAAC Authentication means that
       there is no issue with this switch, so long as it is for a small
@@ -1172,6 +1183,19 @@ Sequence Auth Key
       for ISAAC, it is larger by two.  The ISAAC state machine then
       calculates the index into the current "page", and uses the found
       number to validate (or send) the Auth Key.</t>
+
+      <t>That is, the switch away from, back to Meticulous Keyed ISAAC
+      Authentication MUST NOT cause the Meticulous Keyed ISAAC
+      Authentication mode to be re-seeded.  ISAAC is only re-seeded
+      when the session transitions to the Up state, and the session
+      remains in the Up state during this process.  As a result, no
+      re-seeding is performed.</t>
+
+      <t>It is RECOMMENDED that the session use the strong
+      authentication type only for one packet, before moving back to
+      using Meticulous Keyed ISAAC Authentication.  There are few
+      benefits to continuing the strong authentication type for
+      extended periods of time.</t>
 
       <t>If the non-ISAAC Auth Type instead runs for extended periods
       of time, then the ISAAC process must continue "in the
