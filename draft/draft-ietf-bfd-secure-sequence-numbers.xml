@@ -1019,7 +1019,7 @@
       variables and data structures to zero (0).  The PRNG is then
       seeded by using the the following structure:</t>
 
-      <figure>
+      <figure title="ISAAC Initialization Structure" name="isaac-seed">
           <artwork><![CDATA[
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1070,26 +1070,30 @@
       above initial values.
     </t>
 
-      <figure>
+      <figure title="Test Inputs for seeding ISAAC" name="isaac-test-inputs">
           <artwork><![CDATA[
-Seed	0x0bfd5eed
-Y-Disc	0x4002d15c
-Key	RFC5880June
+Field       Value(s)
+----------  ------------
+Seed        0x0bfd5eed
+Y-Disc      0x4002d15c
+Secret Key  RFC5880June
+Counter     0...50
             ]]></artwork>
         </figure>
 
 
-      <figure>
+      <figure title="Expected Outputs" name="isaac-test-outputs">
           <artwork><![CDATA[
 Sequence Auth Key
-0        4e13bbfc
-1        8f80176a
-2        56ea9eeb
-3        6950dc88
-4        46e6ada6
-5        5a823dc9
-6        221d032d
-7        d1beedf3
+-------- --------
+0        9af65d83
+1        44355d56
+2        9334074e
+3        b643ef59
+4        74d659f1
+5        8966dc56
+6        a1f6f9bc
+7        21895a46
             ]]></artwork>
         </figure>
 
