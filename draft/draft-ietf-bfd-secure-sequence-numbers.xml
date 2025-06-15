@@ -331,10 +331,10 @@
       </t>
 
       <t>
-	However, once the session transitions into the Up state, there
-	may not be a need to authenticate every packet. However,
-	removing authentication entirely poses issues where an
-	attacker could spoof packets, causing a session to erroneously
+	However, once the session transitions into the Up state, the
+	packet integrity checks may not be needed. The continued reception of correctly formed packets in the Up state serve as a good indication that the sender is operational.  However,
+	removing all security poses issues where an
+	attacker could spoof Up packets, causing a session to erroneously
 	remain in the Up state.</t>
 
 	<t>
@@ -342,8 +342,18 @@
 	as described in <xref
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
 	Authentication</xref>, which permits BFD to use an authentication method which is less computationally expensive than MD5 or SHA1, but is still strong enough that to prevent an
-	on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it serves as an authenticed signal that the session remains in the Up state.
-      </t>
+	on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it provides a difficult to forge indication that the session remains in the Up state.</t>
+
+	<t>
+	  This indication is a 32-bit number taken from a CSPRNG.  The
+	  number changes for every packet, and has a 1-1 correlation
+	  with the Sequence Number.  Changing the Sequence Number for
+	  every packet means that the receiving party knows the packet
+	  is timely, and was not replayed.  The associated 32-bit
+	  number indicates that the packet was from the correct
+	  sender.  The combination of the two prevents on-path
+	  attackers from forging packets.
+	</t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth-Key"s.  With
