@@ -565,6 +565,38 @@
 	  bdf.AuthType.
 	</dd>
 
+	<dd>
+	  This document uses two values for the Opt Mode field.
+	  These values are used for both of the Meticulous Keyed MD5
+	  and Meticulous Keyed SHA1 authentication methods.
+
+	  <dl newline="true">
+	    <dt>
+	      (0) Reserved
+	    </dt>
+
+	    <dd>
+	      Reserved for compatibility with  <xref target="RFC5880">RFC5880</xref>.
+	    </dd>
+
+	    <dt>
+	      (1) Strong
+	    </dt>
+
+	    <dd>
+	      The strong authentication type for optimized BFD Auth Types.
+	    </dd>
+
+	    <dt>
+	      (2) Optimized
+	    </dt>
+
+	    <dd>
+	      The optimized authentication type for optimized BFD Auth Types.
+	    </dd>
+	  </dl>
+	</dd>
+
 	<dt>
 	  Sequence Number:
 	</dt>
@@ -883,20 +915,58 @@
     </section>
 
     <section title="Transition to using ISAAC">
-      <t>Once a BFD session transitions to the Up state, the packets MAY
-      use Meticulous Keyed ISAAC Authentication. A system receiving
-      such a packet will initialize the ISAAC PRNG state using the
-      Seed from the first packet which is seen to use Meticulous Keyed ISAAC Authentication. A system originating a packet using Meticulous Keyed ISAAC Authentication will
-      generate a Seed, and place it into the packet which is then
-      sent.  Further discussion of initialization is below in
-      <xref target="sender-variable-initialization"/> and
+      <t>A BFD session which uses Meticulous Keyed MD5 and Meticulous
+      Keyed SHA1 MAY signal its intent to later switch to ISAAC by
+      sending packets with the Optimized Authentication Mode field set
+      to 1 (Strong).  This field was previously reserved.  <xref
+      target="RFC5880">RFC5880</xref> mandated that it be set to zero
+      on transmit and ignored in receipt.  Setting this field to value
+      1 indicates therefore that the sender later intends to use ISAAC.
+      </t>
+
+      <t>
+	It is possible to have mis-matched configuration, where one
+	party supports Optimized Authentication Mode and the other
+	does not.  This configuration can be detected by a party which
+	sends packets where the Optimized Authentication Mode field
+	contains value 1 (Strong), but which receives packets where
+	the Optimized Authentication Mode field contains value 0
+	(Reserved).  In that case, the sending party MUST NOT switch
+	to using Optimized Authentication Mode with value 2
+	(Optimized), as the receiving party is likely to not support
+	it.
+      </t>
+
+      <t>
+	When a BFD session using strong authentication transitions to
+	the Up state, the first Up packet MUST contain an Optimized
+	Authentication Mode field with value 0 (Reserved) or value 1
+	(Strong).  Since state transitions require full packet
+	integrity checks, an Optimized Authentication Mode field with
+	value 2 (Optimized) is not permitted for state changes.
+      </t>
+
+      <t>
+	Once the BFD session has transitioned to the Up state, the
+	sender MAY send the second and subsequent packets for the Up
+	start with the Optimized Authentication Mode field containing value
+	2 (Optimized).
+      </t>
+
+      <t>When a system first receives a packet containing Optimized
+      Authentication Mode field with value 2 (Optimized), it
+      initialize the ISAAC PRNG state using the Seed from that packet.
+      A system originating a packet using Meticulous Keyed ISAAC
+      Authentication will generate a Seed, and place it into the
+      packet which is then sent.  Further discussion of initialization
+      is below in <xref target="sender-variable-initialization"/> and
       <xref target="receiver-variable-initialization"/>.</t>
 
-      <t>The transition to the Up state is the only time when the
-      ISAAC random number generator is initialized.  In contrast, a
-      temporary transition away from using Meticulous Keyed ISAAC
-      Authentication (<xref target="transition-away"/>) and back, does
-      not cause ISAAC to be re-keyed.</t>
+      <t>The first packet after the transition to the Up state is the
+      only time when the ISAAC random number generator is initialized.
+      In contrast, a temporary transition away from using Meticulous
+      Keyed ISAAC Authentication (<xref target="transition-away"/>)
+      and back, does not cause ISAAC to be re-keyed.</t>
 
       <t>There is no negotiation as to when authentication switches
       from the original type, to using Meticulous Keyed ISAAC.  The
