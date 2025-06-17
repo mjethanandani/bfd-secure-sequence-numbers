@@ -181,9 +181,10 @@
 	parties to believe that a link is down, or they can cause
 	parties to believe that the link is up when it is, in fact,
 	down.  The goal of this specification is to use a simple
-	method to prevent spoofing of the BFD session being "Up".  We
-	therefore define a Optimized Auth Type that allows parties
-	to securely signal that they are still in the Up state.
+	method to prevent spoofing of the BFD session being "Up".
+	This specification therefore define a Optimized Auth Type that
+	allows parties to securely signal that they are still in the
+	Up state.
       </t>
 
       <t>This document proposes the use of an Authentication method
@@ -204,8 +205,7 @@
 	<t>
 	  <xref target="RFC5880">RFC5880</xref> uses the term
 	  "meticulous keyed" and "meticulous keying" without defining
-	  those terms.  We clarify that term here in the context of
-	  BFD authentication, by first examining the definition of the Sequence Number from <xref
+	  those terms.  That meaning of that term is found by examining the definition of the Sequence Number from <xref
     target="RFC5880" sectionFormat="parens" section="4.2">BFD</xref>:
 	</t>
 
@@ -281,7 +281,7 @@
       </t>
 
       <t>
-	We first update the <xref target="RFC5880">RFC5080</xref>
+	The text first updates the <xref target="RFC5880">RFC5080</xref>
 	definitions, and then define a new authentication type which
 	uses these updated definitions.
       </t>
@@ -388,7 +388,7 @@
 	  attackers from forging packets.
 	</t>
 
-      <t>We use ISAAC here as a way to generate an infinite stream of
+      <t>ISAAC is used here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth Key"s.  With
       Meticulous Keyed ISAAC Authentication, these Auth Keys are used
       as a signal that the sending party is authentic.  That is, only
@@ -921,8 +921,8 @@
       sender, or verified by the receiver.  Meticulous Keyed ISAAC
       Authentication permits systems to have multiple Secret
       Keys configured, but we do not discuss how those keys are
-      managed or used.  We do, however, require that a session MUST
-      NOT change the Auth Key ID for Meticulous Keyed ISAAC Authentication, during a
+      managed or used.  A session MUST NOT, however,
+      change the Auth Key ID for Meticulous Keyed ISAAC Authentication, during a
       session.  There is no defined way to re-sync or re-initialize an
       ongoing session with a different Auth Key ID and correspondingly
       different Secret Key.</t>
@@ -1534,16 +1534,16 @@
 	link.  For example, a correctly configured key could allow to
 	the BFD state machine to advance to Up.  Then when the session
 	switches to using to weaker Auth Type with a different key,
-	that key may not match, and the session would immediatly drop.
-	Requiring instead that the keys be identical means that no
+	that key may not match, and the session would immediatley drop.
+	Suggesting instead that the keys be identical means that no
 	such misconfiguration is possible.</t>
 
-	<t>We believe that the use of the same key is acceptable, as
-	ISAAC is keyed not only with the authentication key, but also
-	depends on 32 bits of random data, along with 32 bits of a
-	Sequence Number.  The use of this added randomness increases
-	the difficulty of breaking the key, and makes off-line
-	dictionary attacks infeasible.</t>
+	<t>  Implementations are therefore free to use the same key, or different keys.  The use of the same key for for both strong and optimized
+	authentication is acceptable, as ISAAC is keyed not only with
+	the authentication key, but also depends on 32 bits of random
+	data, along with 32 bits of a Sequence Number.  The use of
+	this added randomness increases the difficulty of breaking the
+	key, and makes off-line dictionary attacks infeasible.</t>
       </section>
 
     </section>
