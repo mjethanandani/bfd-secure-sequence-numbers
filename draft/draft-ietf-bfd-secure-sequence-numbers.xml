@@ -389,11 +389,11 @@
 	</t>
 
       <t>We use ISAAC here as a way to generate an infinite stream of
-      pseudo-random numbers, referred to here as "Auth-Key"s.  With
+      pseudo-random numbers, referred to here as "Auth Key"s.  With
       Meticulous Keyed ISAAC Authentication, these Auth Keys are used
       as a signal that the sending party is authentic.  That is, only
-      the sending party can generate the correct Auth-Keys.  Therefore
-      if the receiving party sees a correct Auth-Key, then only the
+      the sending party can generate the correct Auth Keys.  Therefore
+      if the receiving party sees a correct Auth Key, then only the
       sending party could have generated it.  The sender is therefore
       authentic, even if the packet contents have potentially been
       modified in transit.</t>
@@ -555,7 +555,7 @@
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                             Seed                              |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                            Auth-Key                           |
+   |                            Auth Key                           |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    ]]></artwork>
       </figure>
@@ -652,7 +652,7 @@
 	</dd>
 
 	<dt>
-	  Auth-Key:
+	  Auth Key:
 	</dt>
 	<dd>
 	  <t>
@@ -662,7 +662,7 @@
 	    target="seeding-isaac"/>, below.
 	  </t>
 	  <t>
-	    Note that the Auth-Key here does not include any summary
+	    Note that the Auth Key here does not include any summary
 	    or hash of the packet.  The packet itself is completely
 	    unauthenticated.
 	  </t>
@@ -686,8 +686,8 @@
       incremented by one on every packet.</t>
 
       <t>The receiving system accepts the packet if the key ID matches
-      one of the configured Keys, and the Auth-Key derived from the
-      selected Key, Seed, and Sequence Number matches the Auth-Key
+      one of the configured Keys, and the Auth Key derived from the
+      selected Key, Seed, and Sequence Number matches the Auth Key
       carried in the packet, and the sequence number is strictly
       greater than the last sequence number received (modulo wrap at
       2^32).  If any of these criteria do not match, the packet is
@@ -717,7 +717,7 @@
 	</t>
 
 	<t>
-	  The Auth-Key field MUST be set to the output of ISAAC, which
+	  The Auth Key field MUST be set to the output of ISAAC, which
 	  depends on the secret Key, the current Seed, and the
 	  Sequence Number.
 	</t>
@@ -782,7 +782,7 @@
 	<t>
 	  Calculate the current expected output of ISAAC, which
 	  depends on the secret Key, the current Seed, and the
-	  Sequence Number.  If the value does not matches the Auth-Key
+	  Sequence Number.  If the value does not matches the Auth Key
 	  field, then the packet MUST be discarded.
 	</t>
 
