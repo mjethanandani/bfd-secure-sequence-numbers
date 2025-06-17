@@ -225,7 +225,7 @@
 	  In this context, the term "meticulous" means that the
 	  Sequence number is incremented on every new packet which is
 	  sent.  The term "keyed" means that the packets are
-	  authenticated via the use of a secret key known to both
+	  authenticated via the use of a secret key or keys which are known to both
 	  sender and receiver.  The term "meticulous keyed" therefore
 	  refers to BFD authentication type where each packet is
 	  unique, and can be authenticated.
@@ -368,7 +368,7 @@
 	packet integrity checks may not be needed. The continued reception of correctly formed packets in the Up state serve as a good indication that the sender is operational.  However,
 	removing all security poses issues where an
 	attacker could spoof Up packets, causing a session to erroneously
-	remain in the Up state.</t>
+	remain in the Up state.  Or an attack could spoof a single Down packet, causing the session to erroneously go down.</t>
 
 	<t>
 	  Instead, an optimized authentication mechanism
@@ -429,7 +429,7 @@
 	</t>
 
 	<t>
-	  This last property rules out most CSPRNGs, as their they are
+	  This last property rules out most CSPRNGs, as they are
 	  not seekable by design.  That is, most CSRNGs maintain
 	  minimal state, and are designed to produce a long sequence
 	  of pseudo-random numbers from a few simple calculations.  In
@@ -452,7 +452,7 @@
 	  administrator is not directly usable as a seed for the
 	  generator.  Instead, any secret key (including any
 	  per-session data) would have to be hashed before being used
-	  to see the generator.  Again, ISAAC is the answer here.  It
+	  to see the generator.  Again, we choose ISAAC as the answer here.  It
 	  can accept keys up to 8192 octets in length, which is more
 	  than sufficient for BFD.
 	</t>
@@ -462,8 +462,7 @@
 	  in the past thirty years, most notably <xref
 	  target="ISAAC+">ISAAC+</xref>.  There are no known
 	  vulnerabilities.  In contrast, other CSPRNGs may be newer,
-	  but have generally been subject to less analysis.  ISAAC is
-	  therefore also a good choice here.
+	  but have generally been subject to less analysis.
 	</t>
 
 	<t>
@@ -497,14 +496,21 @@
 	      contains the expected number.
 	    </li>
 	    <li>
-	      At 60 packets per second, these page provides for
-	      approximately four (4) seconds of BFD operation before
-	      the "next" page has to be calculated.
+	      BFD supports packet rates of hundred of packets per
+	      second.  Even at those rates, 256 entries per ISAAC
+	      "page" provides for about a second of BFD operation
+	      before the "next" page has to be calculated.
 	    </li>
 	    <li>
 	      As the "next" page calculation is complex, and there is
 	      a long period of time available before the "next" page
-	      is needed, this calculation can be done as a background task.
+	      is needed, this calculation can be done in the background.
+	    </li>
+	    <li>
+	      If the "next page" calculation is started immediately
+	      after the current page is fully use, there should be
+	      sufficient time to calculate the "next page" as a
+	      background task, no matter what the packet rate.
 	    </li>
 	  </ul>
 
@@ -605,14 +611,6 @@
 
 	  <dl newline="true">
 	    <dt>
-	      (0) Reserved
-	    </dt>
-
-	    <dd>
-	      Reserved for compatibility with  <xref target="RFC5880">RFC5880</xref>.
-	    </dd>
-
-	    <dt>
 	      (1) Strong
 	    </dt>
 
@@ -690,8 +688,8 @@
       selected Key, Seed, and Sequence Number matches the Auth Key
       carried in the packet, and the sequence number is strictly
       greater than the last sequence number received (modulo wrap at
-      2^32).  If any of these criteria do not match, the packet is
-      considered to be inauthentic, and is discarded.</t>
+      2^32).  If any of these criteria do not match, the packet fails
+      validation, and is discarded.</t>
 
       <t>
 	Transmission Using Meticulous Keyed ISAAC Authentication
@@ -952,34 +950,21 @@
 
     <section title="Transition to using ISAAC">
       <t>A BFD session which uses Meticulous Keyed MD5 and Meticulous
-      Keyed SHA1 MAY signal its intent to later switch to ISAAC by
-      sending packets with the Optimized Authentication Mode field set
-      to 1 (Strong).  This field was previously reserved.  <xref
-      target="RFC5880">RFC5880</xref> mandated that it be set to zero
-      on transmit and ignored in receipt.  Setting this field to value
-      1 indicates therefore that the sender later intends to use ISAAC.
-      </t>
-
-      <t>
-	It is possible to have mis-matched configuration, where one
-	party supports Optimized Authentication Mode and the other
-	does not.  This configuration can be detected by a party which
-	sends packets where the Optimized Authentication Mode field
-	contains value 1 (Strong), but which receives packets where
-	the Optimized Authentication Mode field contains value 0
-	(Reserved).  In that case, the sending party MUST NOT switch
-	to using Optimized Authentication Mode with value 2
-	(Optimized), as the receiving party is likely to not support
-	it.
+      Keyed SHA1 MUST begin a session with Auth Type set to the
+      relevant authentication type, and the the Optimized
+      Authentication Mode field set to 1 (Strong).
       </t>
 
       <t>
 	When a BFD session using strong authentication transitions to
 	the Up state, the first Up packet MUST contain an Optimized
-	Authentication Mode field with value 0 (Reserved) or value 1
-	(Strong).  Since state transitions require full packet
-	integrity checks, an Optimized Authentication Mode field with
-	value 2 (Optimized) is not permitted for state changes.
+	Authentication Mode field with value 1 (Strong).  Since state
+	transitions require full packet integrity checks, an Optimized
+	Authentication Mode field with value 2 (Optimized) is not
+	permitted for state changes.  Each party MUST continue to use
+	the strong authentication mode until the other side has
+	confirmed the switch to the Up state, with a packet that also
+	uses strong authentication.
       </t>
 
       <t>
@@ -1274,9 +1259,8 @@
        <t>
 	 If, however, the packet's Sequence Number differs from the
 	 expected value, then the difference "N" indicates how many
-	 packets were lost.  The receiver then can use this difference to index into the ISAAC page to find the corresponding Aith Key.  If the key in the ISAAC page does not match
-	 the Auth Key in the packets, the packet is deemed to be
-	 inauthentic, and is discarded.
+	 packets were lost.  The receiver then can use this difference to index into the ISAAC page to find the corresponding Auth Key.  If the key in the ISAAC page does not match
+	 the corresponding Auth Key in the packets, the packet fails validation, and is discarded.
        </t>
 
       <t>If a found key does match the Auth Key in
@@ -1387,7 +1371,7 @@
 
       <t>This document does not make provisions for dealing with the
       case of losing more than 512 packets.  Implementors MUST limit
-      the value of "Detect Multi" to a small number in order to keep
+      the value of "Detect Multi" to a small enough number in order to keep
       the number of lost packets within an acceptable limit.</t>
       </section>
 
@@ -1456,7 +1440,7 @@
       re-seeding is performed.</t>
 
       <t>It is RECOMMENDED that the session use the strong
-      authentication type only for a small number of packets,before
+      authentication type only for a small number of packets, before
       moving back to using Meticulous Keyed ISAAC Authentication.
       There are few benefits to continuing the strong authentication
       type for extended periods of time.</t>
