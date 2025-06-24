@@ -1432,22 +1432,55 @@
       calculates the index into the current "page", and uses the found
       number to validate (or send) the Auth Key.</t>
 
-      <t>That is, the switch away from, back to Meticulous Keyed ISAAC
-      Authentication MUST NOT cause the Meticulous Keyed ISAAC
+      <t>That is, the switch away from, and back to Meticulous Keyed
+      ISAAC Authentication MUST NOT cause the Meticulous Keyed ISAAC
       Authentication mode to be re-seeded.  ISAAC is only re-seeded
       when the session transitions to the Up state, and the session
       remains in the Up state during this process.  As a result, no
       re-seeding is performed.</t>
 
+      <t>A party who wishes to use strong authentication simply
+      switches to that method without negotiating that switch with
+      the other party.  After a small amount of packets, it switches
+      back to using optimized authentication.  The number of packets
+      using strong authentication is determined by a few factors.</t>
+
       <t>It is RECOMMENDED that the session use the strong
       authentication type only for a small number of packets, before
       moving back to using Meticulous Keyed ISAAC Authentication.
       There are few benefits to continuing the strong authentication
-      type for extended periods of time.</t>
+      type for extended periods of time.  If the party would send
+      hundreds of packets with strong authentication authentication,
+      that would both negate the benefit of using optimized
+      authentication, and also have the potential to desynchronize the
+      ISAAC state machine.</t>
 
-      <t>If the strong authentication mode would instead run for
-      hundreds or thousands of packets, then the ISAAC state machine
-      would not be able to resynchronize.  It is RECOMMENDED that the number of packets using the strong authentication mode be no more than the value of bfd.DetectMult.  That number is large enough to ensure that the receiving party sees at least one packet which uses the strong authentication mode, but small enough to avoid causing problems with ISAAC.</t>
+      <t>It is therefore RECOMMENDED that the number of packets using the strong authentication mode be no more than the value of bfd.DetectMult.  That number is large enough to ensure that the receiving party sees at least one packet which uses the strong authentication mode, but small enough to avoid causing problems with ISAAC.</t>
+
+      <t>The switch away from strong authentication can also be done
+      via implicit signaling between the two parties.  When a sender
+      switches to strong authentication, the receiver SHOULD also
+      switch to using strong authentication.  The sender can then see
+      that the receiver has "echoed" its use of strong authentication,
+      and then immediately switch back to using optimized
+      authentication.  The receiver in turn sees this switch, and in
+      turn reverts back to using optimized authentication.</t>
+
+      <t>Where there are no issues with the network, this exchange
+      will usually require strong authentication for no more than one
+      packet from each party.  There will therefore be minimal impact
+      on each party, as the expensive strong authentication method is
+      run for the minimum possible time.</t>
+
+      <t>Since each party controls when it sends a strong
+      authentication packet, it could even "predict" that it will send
+      a strong authentication packet after some number of packets, and
+      often know the exact contents of the packet which would be sent.
+      It could then build and sign the packet as a background task,
+      which limits the impact to the fast path.  This process is not
+      always possible, of course, but it is suggested here as one
+      possible optimization.</t>
+
     </section>
 
     <section anchor="IANA" title="IANA Considerations">
