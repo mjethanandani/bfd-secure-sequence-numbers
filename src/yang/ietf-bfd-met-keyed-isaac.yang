@@ -1,6 +1,6 @@
-module ietf-bfd-met-keyed-isaac-auth {
+module ietf-bfd-met-keyed-isaac {
   yang-version 1.1;
-  namespace "urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac-auth";
+  namespace "urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac";
   prefix "bfdmia";
 
   import ietf-key-chain {
@@ -13,7 +13,7 @@ module ietf-bfd-met-keyed-isaac-auth {
     "IETF BFD Working Group";
 
   contact
-    "WG Web:   <http://tools.ietf.org/wg/bfd>
+    "WG Web:   <https://datatracker.ietf.org/wg/bfd>
      WG List:  <rtg-bfd@ietf.org>
 
      Authors: Mahesh Jethanandani (mjethanandani@gmail.com)
@@ -43,16 +43,16 @@ module ietf-bfd-met-keyed-isaac-auth {
      for full legal notices.
 
      The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
-     NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
-     'MAY', and 'OPTIONAL' in this document are to be interpreted as
-     described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
+     NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and
+     'OPTIONAL' in this document are to be interpreted as described
+     in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
      they appear in all capitals, as shown here.";
 
   revision "YYYY-MM-DD" {
     description
       "Initial Version.";
     reference
-      "RFC XXXX: BFD Meticulous Keyed ISAAC for BFD Authentication.";
+      "RFC XXXX: Meticulous Keyed ISAAC for BFD Authentication.";
   }
 
   identity optimized-md5-meticulous-keyed-isaac {

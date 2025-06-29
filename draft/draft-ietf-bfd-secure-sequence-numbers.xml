@@ -208,6 +208,24 @@
       in <xref target="RFC2119">RFC 2119</xref>.</t>
     </section>
 
+    <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
+      <t>
+	This document uses several placeholder values throughout the
+	document. Please replace them as follows and remove this
+	note before publication.
+      </t>
+
+      <t>
+	RFC XXXX, where XXXX is the number assigned to this document
+	at the time of publication.
+      </t>
+
+      <t>
+	YYYY-MM-DD with the actual date of the publication of this
+	document.
+      </t>
+    </section>
+
     <section title="Experimental updates to RFC 5880">
       <t>
 	This document describes an experimental update to <xref
@@ -1166,29 +1184,69 @@ Sequence Auth Key
 
     <section anchor="the-yang-model" title="The YANG Model">
       <t>
-        Blah blah TOOD.
+        This YANG module adds two identities defined in this
+        document. One of them uses the Meticulous Keyed MD5 as the
+        strong authentication and Meticulous Keyed ISAAC Keyed as the
+        less computationally intensive authentication. The other uses
+        the Meticulous Keyed SHA-1 as the strong authentication and
+        Meticulous Keyed ISAAC Keyed as the less computationally
+        intensive authentication.
       </t>
       <t>
 	<figure>
 	  <artwork><![CDATA[
-	  <CODE BEGINS> file "ietf-bfd-met-keyed-isaac-auth@YYYY-MM-DD.yang"
-          INSERT_TEXT_FROM_FILE(../bin/ietf-bfd-met-keyed-isaac-auth@YYYY-MM-DD.yang,69)
+	  <CODE BEGINS> file "ietf-bfd-met-keyed-isaac@YYYY-MM-DD.yang"
+          INSERT_TEXT_FROM_FILE(../bin/ietf-bfd-met-keyed-isaac@YYYY-MM-DD.yang,69)
 	  <CODE ENDS>
 	  ]]></artwork>
 	</figure>
       </t>
     </section>
 
-    <section anchor="IANA" title="IANA Considerations">
+    <section anchor="iana-considerations" title="IANA Considerations">
       <t>
-	For IANA Consideration, please refer to the IANA
-	Considerations section of <xref
-	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>.
+	This documents requests the assignment of one URI and one YANG
+	model.
       </t>
-
-      <t>Note to RFC Editor: this section may be removed on
-      publication as an RFC.</t>
+      <section anchor="ietf-xml-registry" title="IETF XML Registry">
+	<t>
+	  This document registers one URIs in the "ns"
+	  subregistry of the "IETF XML" registry <xref
+	  target="RFC3688"/>. Following the format in <xref
+	  target="RFC3688"/>, the following registration is requested:
+	</t>
+        <t>
+	  <figure>
+            <artwork>
+	      <![CDATA[
+URI: urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
+Registrant Contact: The IESG
+XML: N/A, the requested URI is an XML namespace.
+	      ]]>
+	    </artwork>
+          </figure>
+	</t>
+      </section>
+      <section anchor="yang-module-names" title="The YANG Module Names Registry">
+        <t>
+	  This document registers one YANG modules in the "YANG Module
+	  Names" registry <xref target="RFC6020"/>. Following the
+	  format in <xref target="RFC6020"/>, the following
+	  registrations are requested:
+	</t>
+        <t>
+	  <figure>
+	    <artwork>
+	      <![CDATA[
+name:         ietf-bfd-met-keyed-isaac
+namespace:    urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
+prefix:       bfdmia
+reference:    RFC XXXX
+	      ]]>
+	    </artwork>
+          </figure>
+	</t>
+      </section>
     </section>
 
     <section anchor="Security" title="Security Considerations">
@@ -1218,7 +1276,7 @@ Sequence Auth Key
       rate may require these keys to be refreshed often, which poses
       a further challenge. Therefore, it is difficult to change the
       keys during the operation of a BFD session without affecting the
-      stability of the BFD session. Therefore, it is recommended to
+      stability of the BFD session. Therefore, it is RECOMMENDED to
       administratively disable the BFD session before changing the
       keys.</t>
 
@@ -1307,8 +1365,9 @@ Sequence Auth Key
   <back>
     <references title="Normative References">
       <?rfc include="reference.RFC.2119.xml"?>
-
+      <?rfc include='reference.RFC.3688.xml'?>
       <?rfc include='reference.RFC.5880.xml'?>
+      <?rfc include='reference.RFC.6020.xml'?>
       <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
     </references>
 

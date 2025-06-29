@@ -1,4 +1,4 @@
-#!/bin/sh  
+#!/bin/sh
 
-rm ietf-https-notif\@*.yang 
+rm ietf-bfd-met-keyed-isaac\@*.yang
 

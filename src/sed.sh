@@ -9,4 +9,4 @@ sed_nc_yang_file() {
    sed -e"s/YYYY-MM-DD/$DATE/" $1/$3.yang > $2/$3\@$DATE.yang
 }
 
-sed_nc_yang_file yang     ../bin      ietf-bfd-met-keyed-isaac-auth
+sed_nc_yang_file yang     ../bin      ietf-bfd-met-keyed-isaac
