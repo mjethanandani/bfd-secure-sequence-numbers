@@ -18,14 +18,14 @@ module ietf-bfd-met-keyed-isaac {
 
      Authors: Mahesh Jethanandani (mjethanandani@gmail.com)
               Ashesh Mishra (ashesh@aalyria.com)
-              Ankur Saxena (ankurpsaxena@gmail.com)
-              Manav Bhatia (mnvbhatia@google.com)
-              Jeffrey Haas (jhaas@juniper.net).";
+              Jeffrey Haas (jhaas@juniper.net)
+              Alan Dekok (alan.dekok@inkbridge.io)
+              Sonal Agarwal (sonal@arrcus.com).";
               
 
   description
-    "This YANG module provides identities derived from the
-     ietf-key-chain model for the BFD Meticulous Keyed ISAAC
+    "This experimental YANG module provides identities derived from
+     the ietf-key-chain model for the BFD Meticulous Keyed ISAAC
      authentication mechanism.
 
      Copyright (c) 2025 IETF Trust and the persons identified as
@@ -69,8 +69,8 @@ module ietf-bfd-met-keyed-isaac {
     base key-chain:crypto-algorithm;
     description
       "BFD Optimized Authentication using Meticulous Keyed SHA-1 as
-      the strong authentication and Meticulous Keyed ISAAC Keyed as
-      the less computationally intensive authentication.";
+       the strong authentication and Meticulous Keyed ISAAC Keyed as
+       the less computationally intensive authentication.";
     reference
       "RFC XXXX: Meticulous Keyed ISAAC for BFD Authentication.";
   }
