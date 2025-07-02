@@ -12,6 +12,7 @@ Mask on use of >32 bits, not on assignment: from Paul Eggert
  *	Modified for BFD by Alan DeKok.  Modification placed in the public domain.
  */
 #include "sequence.h"
+#include <stdio.h>
 
 #define ind(x)  (start[(x >> 2) & (RANDSIZ - 1)])
 #define rngstep(mix,a,b,m,m2,r) \
@@ -91,8 +92,12 @@ void bfd_isaac_init(bfd_isaac_ctx *ctx,  uint32_t seed, uint32_t discriminator, 
 
 	if (key && (keylen > 0)) {
 		uint8_t *p = (uint8_t *) &randctx->page[0];
+		uint8_t *start = (uint8_t *) &randctx->page[0];
+		uint8_t *end = p + sizeof(randctx->page);
+		size_t size;
+		uint8_t count = 0;
 
-		if (keylen > (sizeof(randctx->page) - 4)) keylen = sizeof(randctx->page) - 8;
+		if (keylen > (sizeof(randctx->page) - 9)) keylen = sizeof(randctx->page) - 9;
 
 		/*
 		 *	Endian-ness matters.
@@ -101,10 +106,37 @@ void bfd_isaac_init(bfd_isaac_ctx *ctx,  uint32_t seed, uint32_t discriminator, 
 		p += 4;
 		to_network(p, discriminator);
 		p += 4;
-
 		memcpy(p, key, keylen);
+		p += keylen;
+
+		*p = count;
+		count++;
+
+		size = p - (uint8_t *) &randctx->page[0]; /* doesn't include the counter */
+		p++;		/* now skip the counter */
+
+		while (p < end) {
+			size_t to_copy;
+
+			to_copy = (end - p);
+			if (to_copy > size) to_copy = size;
+
+			fprintf(stderr, "count %u copy %zu\n", count, to_copy);
+
+			memcpy(p, start, to_copy);
+			p += to_copy;
+			if (p >= end) break;
+
+			*p = count;
+			p++;
+			count++;
+		}
+
 	}
 
+	/*
+	 *	The rest of this file is the normal ISAAC seeding method.
+	 */
 	m = randctx->pool;
 	r = randctx->page;
 
@@ -470,7 +502,7 @@ int main(int argc, char const *argv[])
 		sequence = from_network(nbo_sequence);
 		auth_key = from_network(nbo_auth_key);
 
-		printf("%08x %08x\n", sequence, auth_key);
+		printf("%d %08x\n", sequence, auth_key);
 	}
 
 
