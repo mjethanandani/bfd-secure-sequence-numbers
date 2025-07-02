@@ -122,29 +122,10 @@
       </address>
     </author>
 
-    <author fullname="Ankur Saxena" initials="A" surname="Saxena">
-      <organization>Ciena Corporation</organization>
-
+    <author fullname="Jeffrey Haas" initials="J." surname="Haas">
+      <organization>Juniper Networks</organization>
       <address>
-        <postal>
-          <street>3939 North First Street</street>
-
-          <city>San Jose</city>
-
-          <region>CA</region>
-
-          <code>95134</code>
-
-          <country>USA</country>
-        </postal>
-
-        <phone/>
-
-        <facsimile/>
-
-        <email>ankurpsaxena@gmail.com</email>
-
-        <uri/>
+        <email>jhaas@juniper.net</email>
       </address>
     </author>
 
@@ -1283,9 +1264,18 @@ Sequence Auth Key
 
     </section>
 
+    <section title="Contributors" anchor="contributors">
+      <t>
+	The authors of this document want to acknowledge Ankur Saxena
+	and Reshad Rahman as contributors to this document.
+      </t>
+    </section>
+
     <section anchor="Acknowledgements" title="Acknowledgements">
-      <t>The authors would like to thank Jeff Haas and Reshad Rahman
-      for their reviews of and suggestions for the document.</t>
+      <t>
+	The authors want to thank Ketan Talaulikar for his reviews and
+	suggestions that have improved the document.
+      </t>
     </section>
   </middle>
 
