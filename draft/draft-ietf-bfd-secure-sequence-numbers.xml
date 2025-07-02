@@ -125,7 +125,7 @@
     <author fullname="Jeffrey Haas" initials="J." surname="Haas">
       <organization>Juniper Networks</organization>
       <address>
-        <email>jhaas@pfrc.org</email>
+        <email>jhaas@juniper.net</email>
       </address>
     </author>
 
@@ -1267,7 +1267,7 @@ Sequence Auth Key
     <section title="Contributors" anchor="contributors">
       <t>
 	The authors of this document want to acknowledge Ankur Saxena
-	and Reshad Rahman as a contributor to this document.
+	and Reshad Rahman as contributors to this document.
       </t>
     </section>
 
