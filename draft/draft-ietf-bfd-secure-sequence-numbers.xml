@@ -219,31 +219,34 @@
 	  authenticated.
 	</t>
       </section>
-    </section>
+      <section title="Requirements Language">
+	<t>
+	  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+	  "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+	  RECOMMENDED", "MAY", and "OPTIONAL" in this document are to
+	  be interpreted as described in BCP 14 <xref
+	  target="RFC2119"/> <xref target="RFC8174"/> [RFC8174] when,
+	  and only when, they appear in all capitals, as shown here.
+	</t>
+      </section>
 
-    <section title="Requirements Language">
-      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
-      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
-      "OPTIONAL" in this document are to be interpreted as described
-      in <xref target="RFC2119">RFC 2119</xref>.</t>
-    </section>
+      <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
+	<t>
+	  This document uses several placeholder values throughout the
+	  document. Please replace them as follows and remove this
+	  note before publication.
+	</t>
 
-    <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
-      <t>
-	This document uses several placeholder values throughout the
-	document. Please replace them as follows and remove this
-	note before publication.
-      </t>
+	<t>
+	  RFC XXXX, where XXXX is the number assigned to this document
+	  at the time of publication.
+	</t>
 
-      <t>
-	RFC XXXX, where XXXX is the number assigned to this document
-	at the time of publication.
-      </t>
-
-      <t>
-	YYYY-MM-DD with the actual date of the publication of this
-	document.
-      </t>
+	<t>
+	  YYYY-MM-DD with the actual date of the publication of this
+	  document.
+	</t>
+      </section>
     </section>
 
     <section title="Experimental updates to RFC 5880">
@@ -555,19 +558,19 @@
       Optimized SHA-1 Meticulous Keyed ISAAC Authentication (TBD2), the Authentication Section has the
       following format:</t>
 
-      <figure>
+      <figure title="Meticulous Keyed ISAAC Authentication Format" align="center">
         <artwork><![CDATA[
-	0                   1                   2                   3
-	0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	|   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
-	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	|                        Sequence Number                        |
-	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	|                             Seed                              |
-	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	|                            Auth Key                           |
-	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        Sequence Number                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Seed                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                            Auth Key                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	]]></artwork>
       </figure>
 
@@ -1038,17 +1041,17 @@
       seeded by using the the following structure:</t>
 
       <t>
-	<figure title="ISAAC Initialization Structure">
+	<figure title="ISAAC Initialization Structure" align="center">
           <artwork><![CDATA[
-	  0                   1                   2                   3
-	  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-	  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	  |                             Seed                              |
-	  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	  |                       Your Discriminator                      |
-	  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	  |                          Secret Key ...            |  Counter |
-	  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Seed                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Your Discriminator                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                          Secret Key ...            |  Counter |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	  ]]></artwork>
         </figure>
       </t>
@@ -1529,9 +1532,9 @@
 	  <figure>
             <artwork>
 	      <![CDATA[
-		       URI: urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
-		       Registrant Contact: The IESG
-		       XML: N/A, the requested URI is an XML namespace.
+URI: urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
+Registrant Contact: The IESG
+XML: N/A, the requested URI is an XML namespace.
 	      ]]>
 	    </artwork>
           </figure>
@@ -1548,10 +1551,10 @@
 	  <figure>
 	    <artwork>
 	      <![CDATA[
-		       name:         ietf-bfd-met-keyed-isaac
-		       namespace:    urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
-		       prefix:       bfdmia
-		       reference:    RFC XXXX
+name:         ietf-bfd-met-keyed-isaac
+namespace:    urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
+prefix:       bfdmia
+reference:    RFC XXXX
 	      ]]>
 	    </artwork>
           </figure>
@@ -1666,6 +1669,7 @@
       <?rfc include='reference.RFC.3688.xml'?>
       <?rfc include='reference.RFC.5880.xml'?>
       <?rfc include='reference.RFC.6020.xml'?>
+      <?rfc include='reference.RFC.8174.xml'?>
       <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
 
       <reference anchor="ISAAC">
