@@ -219,7 +219,6 @@
 	  protection against replay attacks.
 	  </dd>
       </dl>
-	</t>
 
 	<t>
 	  In this context, the term "meticulous" means that the
@@ -467,6 +466,7 @@
 
 	<t>
 	  The process for using ISAAC with BFD is then as follows:
+	</t>
 
 	  <ul>
 	    <li>
@@ -597,17 +597,19 @@
 	  Opt Mode:
 	</dt>
 	<dd>
+	  <t>
 	  The Optimized Authentication Mode, as defined in <xref
 	  target="I-D.ietf-bfd-optimizing-authentication"/>.  allows
 	  for systems to switch to a less computationally intensive
 	  authentication method, without changing the main
 	  bdf.AuthType.
-	</dd>
+	  </t>
 
-	<dd>
+	  <t>
 	  This document uses two values for the Opt Mode field.
 	  These values are used for both of the Meticulous Keyed MD5
 	  and Meticulous Keyed SHA1 authentication methods.
+	  </t>
 
 	  <dl newline="true">
 	    <dt>
@@ -1040,7 +1042,7 @@
       variables and data structures to zero (0).  The PRNG is then
       seeded by using the the following structure:</t>
 
-      <figure title="ISAAC Initialization Structure" name="isaac-seed">
+      <figure title="ISAAC Initialization Structure">
           <artwork><![CDATA[
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1097,7 +1099,7 @@
       above initial values.
     </t>
 
-      <figure title="Test Inputs for seeding ISAAC" name="isaac-test-inputs">
+      <figure title="Test Inputs for seeding ISAAC">
           <artwork><![CDATA[
     Field       Value(s)
     ----------  ------------
@@ -1109,7 +1111,7 @@
         </figure>
 
 
-      <figure title="Expected Outputs" name="isaac-test-outputs">
+      <figure title="Expected Outputs">
           <artwork><![CDATA[
    Sequence Auth Key
     -------- --------
@@ -1501,7 +1503,7 @@
 	BFD end-points to detect a malicious packet via a number of
 	different methods.  Packets which are malformed are discarded.
 	Packets which do not pass the <xref target="RFC5880"
-	sectionFormat="parens" section="6.2">BFD state machine</cref>
+	sectionFormat="parens" section="6.2">BFD state machine</xref>
 	checks are discarded.  Packets which do not have the correct
 	Sequence Number, Seed and Auth Key are discarded.  These
 	discarded packets have no effect on the BFD state machine.</t>
