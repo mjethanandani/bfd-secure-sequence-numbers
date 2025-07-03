@@ -147,7 +147,7 @@
     <section title="Introduction">
       <t>
 	<xref target="RFC5880" sectionFormat="parens"
-	section="6.7">BFD</xref> defines a number of authentication
+	      section="6.7">BFD</xref> defines a number of authentication
 	mechanisms, including Simple Password, and various other
 	methods based on MD5 and SHA1 hashes.  The benefit of using
 	cryptographic hashes is that they are secure.  The downside to
@@ -168,76 +168,85 @@
 	Up state.
       </t>
 
-      <t>This document proposes the use of an Authentication method
-      which provides per-packet authentication using methods similar to that defined in  <xref
-	target="RFC5880">BFD</xref> for Meticulous Keyed MD5 and Meticulous Keyed SHA1.  The method defined here has the benefit that it has less impact on
-      resource constrained systems than either MD5 or SHA1.  The algorithm chosen is a seeded
-      pseudo-random number generator named <xref
-      target="ISAAC">ISAAC</xref>.  ISAAC has been subject to
-      significant cryptanalysis in the past thirty years, most notably
-      <xref target="ISAAC+">ISAAC+</xref>.  The only issue found was
-      with initial seeding, and the method proposed here is safe from
-      that attack.  ISAAC requires only a few CPU operations per
-      generated 32-bit number, can take a large secret key as a seed,
-      and it has an extremely long cycle length.  These properties make it
-      ideal for use in BFD.</t>
+      <t>
+	This document proposes the use of an Authentication method
+	which provides per-packet authentication using methods similar
+	to that defined in <xref target="RFC5880">BFD</xref> for
+	Meticulous Keyed MD5 and Meticulous Keyed SHA1.  The method
+	defined here has the benefit that it has less impact on
+	resource constrained systems than either MD5 or SHA1.  The
+	algorithm chosen is a seeded pseudo-random number generator
+	named <xref target="ISAAC">ISAAC</xref>.  ISAAC has been
+	subject to significant cryptanalysis in the past thirty years,
+	most notably <xref target="ISAAC+">ISAAC+</xref>.  The only
+	issue found was with initial seeding, and the method proposed
+	here is safe from that attack.  ISAAC requires only a few CPU
+	operations per generated 32-bit number, can take a large
+	secret key as a seed, and it has an extremely long cycle
+      length.  These properties make it ideal for use in BFD.</t>
 
       <section title="Meticulous Keying">
 	<t>
 	  <xref target="RFC5880">RFC5880</xref> uses the term
-	  "meticulous keyed" and "meticulous keying" without defining
-	  those terms.  That meaning of that term is found by examining the definition of the Sequence Number from <xref
-    target="RFC5880" sectionFormat="parens" section="4.2">BFD</xref>:
+	  "meticulous keyed" and "meticulous keying" without
+	  defining those terms.  That meaning of that term is found
+	  by examining the definition of the Sequence Number from
+	  <xref target="RFC5880" sectionFormat="parens"
+		section="4.2">BFD</xref>:
 	</t>
 
-      <dl newline="true">
+	<dl newline="true">
 	  <dt>Sequence Number</dt>
 
-	  <dd>The sequence number for this packet.  For Keyed MD5
-	  Authentication, this value is incremented occasionally.  For
-	  Meticulous Keyed MD5 Authentication, this value is incremented for
-	  each successive packet transmitted for a session.  This provides
-	  protection against replay attacks.
+	  <dd>
+	    The sequence number for this packet.  For Keyed MD5
+	    Authentication, this value is incremented occasionally.
+	    For Meticulous Keyed MD5 Authentication, this value is
+	    incremented for each successive packet transmitted for a
+	    session.  This provides protection against replay
+	    attacks.
 	  </dd>
-      </dl>
-	</t>
+	</dl>
 
 	<t>
 	  In this context, the term "meticulous" means that the
-	  Sequence number is incremented on every new packet which is
-	  sent.  The term "keyed" means that the packets are
-	  authenticated via the use of a secret key or keys which are known to both
-	  sender and receiver.  The term "meticulous keyed" therefore
-	  refers to BFD authentication type where each packet is
-	  unique, and can be authenticated.
+	  Sequence number is incremented on every new packet which
+	  is sent.  The term "keyed" means that the packets are
+	  authenticated via the use of a secret key or keys which
+	  are known to both sender and receiver.  The term
+	  "meticulous keyed" therefore refers to BFD authentication
+	  type where each packet is unique, and can be
+	  authenticated.
+	</t>
+      </section>
+      <section title="Requirements Language">
+	<t>
+	  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+	  "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
+	  RECOMMENDED", "MAY", and "OPTIONAL" in this document are to
+	  be interpreted as described in BCP 14 <xref
+	  target="RFC2119"/> <xref target="RFC8174"/> [RFC8174] when,
+	  and only when, they appear in all capitals, as shown here.
 	</t>
       </section>
 
-    </section>
+      <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
+	<t>
+	  This document uses several placeholder values throughout the
+	  document. Please replace them as follows and remove this
+	  note before publication.
+	</t>
 
-    <section title="Requirements Language">
-      <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
-      NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and
-      "OPTIONAL" in this document are to be interpreted as described
-      in <xref target="RFC2119">RFC 2119</xref>.</t>
-    </section>
+	<t>
+	  RFC XXXX, where XXXX is the number assigned to this document
+	  at the time of publication.
+	</t>
 
-    <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
-      <t>
-	This document uses several placeholder values throughout the
-	document. Please replace them as follows and remove this
-	note before publication.
-      </t>
-
-      <t>
-	RFC XXXX, where XXXX is the number assigned to this document
-	at the time of publication.
-      </t>
-
-      <t>
-	YYYY-MM-DD with the actual date of the publication of this
-	document.
-      </t>
+	<t>
+	  YYYY-MM-DD with the actual date of the publication of this
+	  document.
+	</t>
+      </section>
     </section>
 
     <section title="Experimental updates to RFC 5880">
@@ -309,8 +318,8 @@
 	    Packets which indicate a state transition MUST use an authentication
 	    method which provides for full packet integrity checks.
 	    When the bfd.SessionState value is Up, packets MAY use an optimized authentication method (<xref
-	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>) such as Meticulous Keyed ISAAC.
+	    target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
+	    Authentication</xref>) such as Meticulous Keyed ISAAC.
 	  </t>
 	</dd>
 
@@ -367,25 +376,25 @@
 	packet integrity checks may not be needed. The continued reception of correctly formed packets in the Up state serve as a good indication that the sender is operational.  However,
 	removing all security poses issues where an
 	attacker could spoof Up packets, causing a session to erroneously
-	remain in the Up state.  Or an attack could spoof a single Down packet, causing the session to erroneously go down.</t>
+      remain in the Up state.  Or an attack could spoof a single Down packet, causing the session to erroneously go down.</t>
 
-	<t>
-	  Instead, an optimized authentication mechanism
+      <t>
+	Instead, an optimized authentication mechanism
 	as described in <xref
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
 	Authentication</xref>, which permits BFD to use an authentication method which is less computationally expensive than MD5 or SHA1, but is still strong enough that to prevent an
-	on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it provides a difficult to forge indication that the session remains in the Up state.</t>
+      on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it provides a difficult to forge indication that the session remains in the Up state.</t>
 
-	<t>
-	  This indication is a 32-bit number taken from a CSPRNG.  The
-	  number changes for every packet, and has a 1-1 correlation
-	  with the Sequence Number.  Changing the Sequence Number for
-	  every packet means that the receiving party knows the packet
-	  is timely, and was not replayed.  The associated 32-bit
-	  number indicates that the packet was from the correct
-	  sender.  The combination of the two prevents on-path
-	  attackers from forging packets.
-	</t>
+      <t>
+	This indication is a 32-bit number taken from a CSPRNG.  The
+	number changes for every packet, and has a 1-1 correlation
+	with the Sequence Number.  Changing the Sequence Number for
+	every packet means that the receiving party knows the packet
+	is timely, and was not replayed.  The associated 32-bit
+	number indicates that the packet was from the correct
+	sender.  The combination of the two prevents on-path
+	attackers from forging packets.
+      </t>
 
       <t>ISAAC is used here as a way to generate an infinite stream of
       pseudo-random numbers, referred to here as "Auth Key"s.  With
@@ -438,11 +447,11 @@
 	</t>
 
 	<t>
-	   It could be possible to use such a generator, and then to
-	   manually save many results in a buffer.  This buffer could
-	   then enable "seeking" within a short window.  In contrast,
-	   ISAAC produces large sets of numbers of design, making it
-	   an integrated solution.
+	  It could be possible to use such a generator, and then to
+	  manually save many results in a buffer.  This buffer could
+	  then enable "seeking" within a short window.  In contrast,
+	  ISAAC produces large sets of numbers of design, making it
+	  an integrated solution.
 	</t>
 
 	<t>
@@ -537,8 +546,8 @@
 	    The result is an authentication method which satisfies
 	    both the needs of the BFD state machine, and is secure.
 	  </t>
-	</section>
-
+	</t>
+      </section>
     </section>
 
     <section title="Meticulous Keyed ISAAC Authentication Format" anchor="meticulous_keyed_isaac">
@@ -546,28 +555,28 @@
       <t>If the Authentication Present (A) bit is set in the header,
       and the State (Sta) field equals 3 (Up), and the Authentication
       Type field contains Optimized MD5 Meticulous Keyed ISAAC Authentication (TBD1); or
-	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication (TBD2), the Authentication Section has the
+      Optimized SHA-1 Meticulous Keyed ISAAC Authentication (TBD2), the Authentication Section has the
       following format:</t>
 
-      <figure>
+      <figure title="Meticulous Keyed ISAAC Authentication Format" align="center">
         <artwork><![CDATA[
-    0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        Sequence Number                        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                             Seed                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                            Auth Key                           |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   ]]></artwork>
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        Sequence Number                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Seed                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                            Auth Key                           |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	]]></artwork>
       </figure>
 
       <dl newline="true">
 	<dt>
-	    Auth Type:
+	  Auth Type:
 	</dt>
 	<dd>
 	  The current Auth Type.  It MUST provide for meticulous
@@ -580,8 +589,8 @@
 	  Auth Len:
 	</dt>
 	<dd>
-	    The length of the Authentication Section, in bytes.  For
-	    Meticulous Keyed ISAAC Authentication, the length is 16.
+	  The length of the Authentication Section, in bytes.  For
+	  Meticulous Keyed ISAAC Authentication, the length is 16.
 	</dd>
 
 	<dt>
@@ -595,14 +604,6 @@
 	<dt>
 	  Opt Mode:
 	</dt>
-	<dd>
-	  The Optimized Authentication Mode, as defined in <xref
-	  target="I-D.ietf-bfd-optimizing-authentication"/>.  allows
-	  for systems to switch to a less computationally intensive
-	  authentication method, without changing the main
-	  bdf.AuthType.
-	</dd>
-
 	<dd>
 	  This document uses two values for the Opt Mode field.
 	  These values are used for both of the Meticulous Keyed MD5
@@ -1039,242 +1040,274 @@
       variables and data structures to zero (0).  The PRNG is then
       seeded by using the the following structure:</t>
 
-      <figure title="ISAAC Initialization Structure" name="isaac-seed">
+      <t>
+	<figure title="ISAAC Initialization Structure" align="center">
           <artwork><![CDATA[
-    0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                             Seed                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                       Your Discriminator                      |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                          Secret Key ...            |  Counter |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            ]]></artwork>
+0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             Seed                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Your Discriminator                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                          Secret Key ...            |  Counter |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	  ]]></artwork>
         </figure>
+      </t>
 
-    <t>Where the "Your Discriminator" field is taken from the BFD
-    packet defined in <xref target="RFC5880">RFC5880 Section
-    4.1</xref>.  This field is taken from the respective values used
-    by a sending system.  For receiving systems, the field are taken
-    from the received packet.  As the size of the buffer used to seed is limited, the length of the Secret Key MUST be no more than 1015 octets.  The Counter field is used to ensure the the
-    initial seeding of ISAAC avoids the seeding issues discussed in
-    <xref target="ISAAC+">ISAAC+</xref>.</t>
+      <t>
+	Where the "Your Discriminator" field is taken from the BFD
+	packet defined in <xref target="RFC5880">RFC5880 Section
+	4.1</xref>.  This field is taken from the respective values
+	used by a sending system.  For receiving systems, the field
+	are taken from the received packet.  As the size of the buffer
+	used to seed is limited, the length of the Secret Key MUST be
+	no more than 1015 octets.  The Counter field is used to ensure
+	the the initial seeding of ISAAC avoids the seeding issues
+	discussed in <xref target="ISAAC+">ISAAC+</xref>.
+      </t>
 
-    <t>Whatever the API or other interface used to input the Secret
-    Key, any implementation-specific internal representations of the
-    Secret Key MUST NOT be used when encoding the Secret Key into the
-    above data structure.  That is, there is no "length field which
-    indicates how long the Secret Key is, and there is no trailing
-    zero or NUL byte which indicates the end of the Secret Key.
-    Implementers are reminded that internal representations of data
-    should not affect protocol operation.</t>
+      <t>
+	Whatever the API or other interface used to input the Secret
+	Key, any implementation-specific internal representations of
+	the Secret Key MUST NOT be used when encoding the Secret Key
+	into the above data structure.  That is, there is no "length
+	field which indicates how long the Secret Key is, and there is
+	no trailing zero or NUL byte which indicates the end of the
+	Secret Key.  Implementers are reminded that internal
+	representations of data should not affect protocol
+	operation.
+      </t>
 
-    <t>
-      The buffer used to initialize ISAAC filled it with repeated
-      copies of the above structure.  For each complete copy of the
-      structure, the Counter field is incremented, starting from zero
-      (0).  The final portion of the initialization buffer holds a partial copy of the structure, which is however much can be accommodated in the remaining portion of the buffer.
-    </t>
+      <t>
+	The buffer used to initialize ISAAC filled it with repeated
+	copies of the above structure.  For each complete copy of the
+	structure, the Counter field is incremented, starting from
+	zero (0).  The final portion of the initialization buffer
+	holds a partial copy of the structure, which is however much
+	can be accommodated in the remaining portion of the buffer.
+      </t>
 
-    <t>Once the ISAAC "page" is initialized, the data is processed
-    through the "randinit()" function of <xref target="ISAAC">ISAAC</xref>.  Pseudo-random
-    numbers are then produced 32 bits at a time by calling the
-    "isaac()" function.</t>
+      <t>
+	Once the ISAAC "page" is initialized, the data is processed
+	through the "randinit()" function of <xref
+	target="ISAAC">ISAAC</xref>.  Pseudo-random numbers are then
+	produced 32 bits at a time by calling the "isaac()" function.
+      </t>
 
-    <t>For the sender, this calculation can be done outside of the BFD
-    "fast path" as soon as the "Your Discriminator" value is known.
-    For the receiver, this calculation can only be done when the Seed
-    is received from the sender, and therefore the initial seeding needs to be done in the
-    BFD "fast path".</t>
+      <t>
+	For the sender, this calculation can be done outside of the
+	BFD "fast path" as soon as the "Your Discriminator" value is
+	known.  For the receiver, this calculation can only be done
+	when the Seed is received from the sender, and therefore the
+	initial seeding needs to be done in the BFD "fast path".
+      </t>
 
-    <t>
-      The following table gives Seed and Your-Discriminator as 32-bit
-      hexadeciaml values, and the Secret Key as an eleven-character string.
-      The subsequent table shows the first eight Sequence numbers and
-      corresponding Auth Key values which were generated using the
-      above initial values.
-    </t>
+      <t>
+	The following table gives Seed and Your-Discriminator as
+	32-bit hexadeciaml values, and the Secret Key as an
+	eleven-character string.  The subsequent table shows the first
+	eight Sequence numbers and corresponding Auth Key values which
+	were generated using the above initial values.
+      </t>
 
-      <figure title="Test Inputs for seeding ISAAC" name="isaac-test-inputs">
-          <artwork><![CDATA[
-    Field       Value(s)
-    ----------  ------------
-    Seed        0x0bfd5eed
-    Y-Disc      0x4002d15c
-    Secret Key  RFC5880June
-    Counter     0...50
-            ]]></artwork>
-        </figure>
+      <figure title="Test Inputs for seeding ISAAC">
+        <artwork><![CDATA[
+	Field       Value(s)
+	----------  ------------
+	Seed        0x0bfd5eed
+	Y-Disc      0x4002d15c
+	Secret Key  RFC5880June
+	Counter     0...50
+	]]></artwork>
+      </figure>
 
 
-      <figure title="Expected Outputs" name="isaac-test-outputs">
-          <artwork><![CDATA[
-   Sequence Auth Key
-    -------- --------
-    0        9af65d83
-    1        44355d56
-    2        9334074e
-    3        b643ef59
-    4        74d659f1
-    5        8966dc56
-    6        a1f6f9bc
-    7        21895a46
-            ]]></artwork>
-        </figure>
+      <figure title="Expected Outputs">
+        <artwork><![CDATA[
+	Sequence Auth Key
+	-------- --------
+	0        9af65d83
+	1        44355d56
+	2        9334074e
+	3        b643ef59
+	4        74d659f1
+	5        8966dc56
+	6        a1f6f9bc
+	7        21895a46
+	]]></artwork>
+      </figure>
 
-     <t>This construct provides for 64 bits of entropy, of which 32
-     bits is controlled by each party in a BFD session.  For security,
-     each implemention SHOULD randomize their discrimator fields at
-     the start of a session, as discussed in <xref
-     target="RFC5880">Section 10</xref>.</t>
+      <t>
+	This construct provides for 64 bits of entropy, of which 32
+	bits is controlled by each party in a BFD session.  For
+	security, each implemention SHOULD randomize their discrimator
+	fields at the start of a session, as discussed in <xref
+	target="RFC5880">Section 10</xref>.
+      </t>
 
-    <t>Note that this construct only uses the "Your Discriminator"
-    field once, to seed ISAAC.  It therefore allows the "My
-    Discriminator" field to change as permitted by <xref
-    target="RFC5880" sectionFormat="parens" section="6.3">BFD</xref>.</t>
+      <t>
+	Note that this construct only uses the "Your Discriminator"
+	field once, to seed ISAAC.  It therefore allows the "My
+	Discriminator" field to change as permitted by <xref
+	target="RFC5880" sectionFormat="parens"
+	section="6.3">BFD</xref>.
+      </t>
 
-     <t>
-       While the "Your Discriminator" field may change, there is no way to signal or negotiate Seed changes.  The Seed is set once by each party after the session transitions into the Up state, and then remains unchanged for the duration of the session.  The
-       receiving party MUST remember the current Seed value.  The Seed value MUST NOT
-       change unless sending party has signalled a BFD state change
-       with a packet that is authenticated using a strong
-       authentication method.  When a system receives a BFD packet containing Meticulous Keyed ISAAC
-      Authentication, it MUST check that the received Seed contains the expected value, and if not, it MUST discard the packet as inauthentic.
-     </t>
+      <t>
+	While the "Your Discriminator" field may change, there is no
+	way to signal or negotiate Seed changes.  The Seed is set once
+	by each party after the session transitions into the Up state,
+	and then remains unchanged for the duration of the session.
+	The receiving party MUST remember the current Seed value.  The
+	Seed value MUST NOT change unless sending party has signalled
+	a BFD state change with a packet that is authenticated using a
+	strong authentication method.  When a system receives a BFD
+	packet containing Meticulous Keyed ISAAC Authentication, it
+	MUST check that the received Seed contains the expected value,
+	and if not, it MUST discard the packet as inauthentic.
+      </t>
 
-     <section title="Sender Variable Initialization"
-      anchor="sender-variable-initialization">
-       <t>A system which sends packets initializes ISAAC as described
-       above.  The ISAAC related variables are initialized as
-       follows:</t>
+      <section title="Sender Variable Initialization"
+	       anchor="sender-variable-initialization">
+	<t>
+	  A system which sends packets initializes ISAAC as described
+	  above.  The ISAAC related variables are initialized as
+	  follows:
+	</t>
 
-       <dl newline="true">
-	 <dt>
-	   bfd.MetKeyIsaacXmitKeyKnown:
-	 </dt>
-	 <dd>
-	   This variable transitions from "false" to "true" when the
-	   sender decides to start using ISAAC.  The sender also
-	   initializes the other variables at the same time.
-	 </dd>
+	<dl newline="true">
+	  <dt>
+	    bfd.MetKeyIsaacXmitKeyKnown:
+	  </dt>
+	  <dd>
+	    This variable transitions from "false" to "true" when the
+	    sender decides to start using ISAAC.  The sender also
+	    initializes the other variables at the same time.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacXmitAuthBase:
-	 </dt>
-	 <dd>
-	   The sender copies the bfd.XmitAuthSeq number from the
-	   current packet to be sent into this variable.
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacXmitAuthBase:
+	  </dt>
+	  <dd>
+	    The sender copies the bfd.XmitAuthSeq number from the
+	    current packet to be sent into this variable.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacXmitAuthIndex:
-	 </dt>
-	 <dd>
-	   The sender sets this variable to zero.
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacXmitAuthIndex:
+	  </dt>
+	  <dd>
+	    The sender sets this variable to zero.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacXmitAuthSeed:
-	 </dt>
-	 <dd>
-	   The sender copies the current Seed value into this
-	   variable.  This variable is then copied into the "Seed"
-	   field of each Auth Type packet.
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacXmitAuthSeed:
+	  </dt>
+	  <dd>
+	    The sender copies the current Seed value into this
+	    variable.  This variable is then copied into the "Seed"
+	    field of each Auth Type packet.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacXmitAuthData:
-	 </dt>
-	 <dd>
-	   The ISAAC state for sending is encapsulated in this
-	   variable.
-	 </dd>
-       </dl>
-     </section>
+	  <dt>
+	    bfd.MetKeyIsaacXmitAuthData:
+	  </dt>
+	  <dd>
+	    The ISAAC state for sending is encapsulated in this
+	    variable.
+	  </dd>
+	</dl>
+      </section>
 
-     <section title="Receiver Variable Initialization"
-      anchor="receiver-variable-initialization">
-       <t>
-	 When a system receives packets with Meticulous Keyed
-	 ISAAC Authentication and is able to authenticate such a
-	 packet the first time, the ISAAC related variables are
-	 initialized as follows:
-       </t>
-       <dl newline="true">
-	 <dt>
-	   bfd.MetKeyIsaacRcvKeyKnown:
-	 </dt>
-	 <dd>
-	   This variable transitions from "false" to "true" when the
-	   receiver sees that the sender has started using Meticulous
-	   Keyed ISAAC Authentication.  The receiver also initializes
-	   the other variables at the same time.
-	 </dd>
+      <section title="Receiver Variable Initialization"
+	       anchor="receiver-variable-initialization">
+	<t>
+	  When a system receives packets with Meticulous Keyed
+	  ISAAC Authentication and is able to authenticate such a
+	  packet the first time, the ISAAC related variables are
+	  initialized as follows:
+	</t>
+	<dl newline="true">
+	  <dt>
+	    bfd.MetKeyIsaacRcvKeyKnown:
+	  </dt>
+	  <dd>
+	    This variable transitions from "false" to "true" when the
+	    receiver sees that the sender has started using Meticulous
+	    Keyed ISAAC Authentication.  The receiver also initializes
+	    the other variables at the same time.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacRcvAuthBase:
-	 </dt>
-	 <dd>
-	   The bfd.RcvAuthSeq number from the current packet
-	   is copied into this variable.
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacRcvAuthBase:
+	  </dt>
+	  <dd>
+	    The bfd.RcvAuthSeq number from the current packet
+	    is copied into this variable.
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacRcvAuthIndex:
-	 </dt>
-	 <dd>
-	   The receiver sets this value to zero
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacRcvAuthIndex:
+	  </dt>
+	  <dd>
+	    The receiver sets this value to zero
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacRcvAuthSeed:
-	 </dt>
-	 <dd>
-	   The receiver copies the Seed value from the received packet
-	   into this variable.  Note that this copy only occurs when the
-	   bfd.MetKeyIsaacXmitKeyKnown variable transitions from "false"
-	   to true."
-	 </dd>
+	  <dt>
+	    bfd.MetKeyIsaacRcvAuthSeed:
+	  </dt>
+	  <dd>
+	    The receiver copies the Seed value from the received packet
+	    into this variable.  Note that this copy only occurs when the
+	    bfd.MetKeyIsaacXmitKeyKnown variable transitions from "false"
+	    to true."
+	  </dd>
 
-	 <dt>
-	   bfd.MetKeyIsaacRcvAuthData:
-	 </dt>
-	 <dd>
-	   The ISAAC state for receiving is encapsulated in this
-	   variable.
-	 </dd>
-       </dl>
+	  <dt>
+	    bfd.MetKeyIsaacRcvAuthData:
+	  </dt>
+	  <dd>
+	    The ISAAC state for receiving is encapsulated in this
+	    variable.
+	  </dd>
+	</dl>
 
-       <t>
-	 As there may be packet loss, the receiver has to take special
-	 care to initialize the bfd.MetKeyIsaacRcvAuthBase variable.
-	 If there has been no packet loss, the
-	 bfd.MetKeyIsaacRcvAuthBase is taken directly from the
-	 bfd.RcvAuthSeq variable, and the bfd.MetKeyIsaacRcvAuthIndex
-	 is set to zero.
-       </t>
+	<t>
+	  As there may be packet loss, the receiver has to take special
+	  care to initialize the bfd.MetKeyIsaacRcvAuthBase variable.
+	  If there has been no packet loss, the
+	  bfd.MetKeyIsaacRcvAuthBase is taken directly from the
+	  bfd.RcvAuthSeq variable, and the bfd.MetKeyIsaacRcvAuthIndex
+	  is set to zero.
+	</t>
 
-       <t>
-	 If, however, the packet's Sequence Number differs from the
-	 expected value, then the difference "N" indicates how many
-	 packets were lost.  The receiver then can use this difference to index into the ISAAC page to find the corresponding Auth Key.  If the key in the ISAAC page does not match
-	 the corresponding Auth Key in the packets, the packet fails validation, and is discarded.
-       </t>
+	<t>
+	  If, however, the packet's Sequence Number differs from the
+	  expected value, then the difference "N" indicates how many
+	  packets were lost.  The receiver then can use this
+	  difference to index into the ISAAC page to find the
+	  corresponding Auth Key.  If the key in the ISAAC page does
+	  not match the corresponding Auth Key in the packets, the
+	  packet fails validation, and is discarded.
+	</t>
 
-      <t>If a found key does match the Auth Key in
-      the packet, then the bfd.MetKeyIsaacRcvAuthIndex field is
-      initialized to the this value.  The bfd.MetKeyIsaacRcvAuthBase field
-      is then initialized to contain the value of bfd.RcvAuthSeq,
-      minus the value of bfd.MetKeyIsaacRcvAuthIndex.  This process
-      allows the pseudo-random stream to be re-synchronized in the
-      event of lost packets.</t>
+	<t>
+	  If a found key does match the Auth Key in the packet, then
+	  the bfd.MetKeyIsaacRcvAuthIndex field is initialized to the
+	  this value.  The bfd.MetKeyIsaacRcvAuthBase field is then
+	  initialized to contain the value of bfd.RcvAuthSeq, minus
+	  the value of bfd.MetKeyIsaacRcvAuthIndex.  This process
+	  allows the pseudo-random stream to be re-synchronized in the
+	  event of lost packets.
+	</t>
 
-      <t>That is, the value for bfd.MetKeyIsaacRcvAuthBase is the
-      Sequence Number for first Auth Key used in this session.  This
-      value may be from a lost packet, but can never the less be
-      calculated by the receiver from a later packet.</t>
-     </section>
+	<t>That is, the value for bfd.MetKeyIsaacRcvAuthBase is the
+	Sequence Number for first Auth Key used in this session.  This
+	value may be from a lost packet, but can never the less be
+	calculated by the receiver from a later packet.</t>
+      </section>
 
     </section>
 
@@ -1368,29 +1401,29 @@
 	asynchronous calculations are preferable to calculating the
 	next page in the BFD fast path.</t>
 
-      <t>This document does not make provisions for dealing with the
-      case of losing more than 512 packets.  Implementors MUST limit
-      the value of "Detect Multi" to a small enough number in order to keep
-      the number of lost packets within an acceptable limit.</t>
+	<t>This document does not make provisions for dealing with the
+	case of losing more than 512 packets.  Implementors MUST limit
+	the value of "Detect Multi" to a small enough number in order to keep
+	the number of lost packets within an acceptable limit.</t>
       </section>
 
       <section title="Multiple Keys">
-      <t>In a keyed algorithm, the key is shared between the two
-      systems. Distribution of this key to all the systems at the same
-      time can be quite a cumbersome task. BFD sessions running a fast
-      rate may require these keys to be refreshed often, which poses
-      a further challenge. Therefore, it is difficult to change the
-      keys during the operation of a BFD session without affecting the
-      stability of the BFD session. Therefore, it is RECOMMENDED to
-      administratively disable the BFD session before changing the
-      keys.</t>
+	<t>In a keyed algorithm, the key is shared between the two
+	systems. Distribution of this key to all the systems at the same
+	time can be quite a cumbersome task. BFD sessions running a fast
+	rate may require these keys to be refreshed often, which poses
+	a further challenge. Therefore, it is difficult to change the
+	keys during the operation of a BFD session without affecting the
+	stability of the BFD session. Therefore, it is RECOMMENDED to
+	administratively disable the BFD session before changing the
+	keys.</t>
 
-      <t>That is, while the Auth Key ID field provides for the use of
-      multiple keys simultaneously, there is no way within the BFD
-      protocol for each party to signal which set of Key IDs are
-      supported.  Any such signalling or negotiation needs to be done
-      "out of band" for BFD, and usually via manual administrator
-      configuration.</t>
+	<t>That is, while the Auth Key ID field provides for the use of
+	multiple keys simultaneously, there is no way within the BFD
+	protocol for each party to signal which set of Key IDs are
+	supported.  Any such signalling or negotiation needs to be done
+	"out of band" for BFD, and usually via manual administrator
+	configuration.</t>
       </section>
 
     </section>
@@ -1555,7 +1588,7 @@ reference:    RFC XXXX
 	BFD end-points to detect a malicious packet via a number of
 	different methods.  Packets which are malformed are discarded.
 	Packets which do not pass the <xref target="RFC5880"
-	sectionFormat="parens" section="6.2">BFD state machine</cref>
+	sectionFormat="parens" section="6.2">BFD state machine</xref>
 	checks are discarded.  Packets which do not have the correct
 	Sequence Number, Seed and Auth Key are discarded.  These
 	discarded packets have no effect on the BFD state machine.</t>
@@ -1636,6 +1669,7 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.3688.xml'?>
       <?rfc include='reference.RFC.5880.xml'?>
       <?rfc include='reference.RFC.6020.xml'?>
+      <?rfc include='reference.RFC.8174.xml'?>
       <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
 
       <reference anchor="ISAAC">
