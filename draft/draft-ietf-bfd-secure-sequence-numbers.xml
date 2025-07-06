@@ -123,7 +123,7 @@
     </author>
 
     <author fullname="Jeffrey Haas" initials="J." surname="Haas">
-      <organization>Juniper Networks</organization>
+      <organization>HPE</organization>
       <address>
         <email>jhaas@juniper.net</email>
       </address>
@@ -289,7 +289,7 @@
       </t>
 
       <t>
-	The text first updates the <xref target="RFC5880">RFC5080</xref>
+	The text first updates the <xref target="RFC5880"/>
 	definitions, and then define a new authentication type which
 	uses these updated definitions.
       </t>
@@ -550,131 +550,298 @@
       </section>
     </section>
 
-    <section title="Meticulous Keyed ISAAC Authentication Format" anchor="meticulous_keyed_isaac">
+    <section title="Meticulous Keyed ISAAC Authentication Types">
+      <section title="Meticulous Keyed ISAAC Authentication, ISAAC Format" anchor="meticulous_keyed_isaac">
 
-      <t>If the Authentication Present (A) bit is set in the header,
-      and the State (Sta) field equals 3 (Up), and the Authentication
-      Type field contains Optimized MD5 Meticulous Keyed ISAAC Authentication (TBD1); or
-      Optimized SHA-1 Meticulous Keyed ISAAC Authentication (TBD2), the Authentication Section has the
-      following format:</t>
+	<t>If the Authentication Present (A) bit is set in the header,
+        and the Authentication Type field contains either Optimized MD5
+        Meticulous Keyed ISAAC Authentication (TBD1), or Optimized SHA-1
+        Meticulous Keyed ISAAC Authentication (TBD2), and the Opt. Mode field
+        contains 2
+	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
+	the Authentication Section has the following format:</t>
 
-      <figure title="Meticulous Keyed ISAAC Authentication Format" align="center">
-        <artwork><![CDATA[
-0                   1                   2                   3
-0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                        Sequence Number                        |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                             Seed                              |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-|                            Auth Key                           |
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	]]></artwork>
-      </figure>
+	<figure title="Meticulous Keyed ISAAC Authentication Format" align="center">
+	  <artwork><![CDATA[
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                        Sequence Number                        |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                             Seed                              |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                            Auth Key                           |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	  ]]></artwork>
+	</figure>
 
-      <dl newline="true">
-	<dt>
-	  Auth Type:
-	</dt>
-	<dd>
-	  The current Auth Type.  It MUST provide for meticulous
-	  keying.  That is, an authentication type where each packet
-	  is authenticated, and also where the Sequence Number field
-	  is incremented by one (1) for every packet which is sent.
-	</dd>
+	<dl newline="true">
+	  <dt>
+	    Auth Type:
+	  </dt>
+	  <dd>
+	    The current Auth Type.  It MUST provide for meticulous
+	    keying.  That is, an authentication type where each packet
+	    is authenticated, and also where the Sequence Number field
+	    is incremented by one (1) for every packet which is sent.
+	  </dd>
 
-	<dt>
-	  Auth Len:
-	</dt>
-	<dd>
-	  The length of the Authentication Section, in bytes.  For
-	  Meticulous Keyed ISAAC Authentication, the length is 16.
-	</dd>
+	  <dt>
+	    Auth Len:
+	  </dt>
+	  <dd>
+	    The length of the Authentication Section, in bytes.  For
+	    Meticulous Keyed ISAAC Authentication, the length is 16.
+	  </dd>
 
-	<dt>
-	  Auth Key ID:
-	</dt>
-	<dd>
-          The authentication key ID in use for this packet.  This
-          allows multiple secret keys to be active simultaneously.
-	</dd>
+	  <dt>
+	    Auth Key ID:
+	  </dt>
+	  <dd>
+	    The authentication key ID in use for this packet.  This
+	    allows multiple secret keys to be active simultaneously.
+	  </dd>
 
-	<dt>
-	  Opt Mode:
-	</dt>
-	<dd>
-	  This document uses two values for the Opt Mode field.
-	  These values are used for both of the Meticulous Keyed MD5
-	  and Meticulous Keyed SHA1 authentication methods.
+	  <dt>
+	    Opt Mode:
+	  </dt>
+	  <dd>
+	    The Optimized Authentiation Mode is defined in 
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
+            Authentiation (TBD1), or Optimized SHA-1 Meticulous Keyed ISAAC
+            Authentication (TBD2), and the format is Meticulous Keyed ISAAC
+            Authentication Format, the Optimized Authentication Mode field will
+            be set to 2, Optimized.
+	  </dd>
 
-	  <dl newline="true">
-	    <dt>
-	      (1) Strong
-	    </dt>
+	  <dt>
+	    Sequence Number:
+	  </dt>
+	  <dd>
+	    The sequence number for this packet.  For Meticulous Keyed
+	    ISAAC Authentication, this value is incremented once for
+	    each successive packet transmitted for a session.  This
+	    provides protection against replay attacks.
+	  </dd>
 
-	    <dd>
-	      The strong authentication type for optimized BFD Auth Types.
-	    </dd>
+	  <dt>
+	    Seed:
+	  </dt>
+	  <dd>
+	    A 32-bit (4 octet) seed which is used in conjunction with
+	    the shared key in order to configure and initialize the
+	    ISAAC pseudo-random-number-generator (PRNG).  It is used to
+	    identify and secure different "streams" of random numbers
+	    which are generated by ISAAC.
+	  </dd>
 
-	    <dt>
-	      (2) Optimized
-	    </dt>
+	  <dt>
+	    Auth Key:
+	  </dt>
+	  <dd>
+	    <t>
+	      This field carries the 32-bit (4 octet) ISAAC output which
+	      is associated with the Sequence Number.  The ISAAC PRNG
+	      MUST be configured and initialized as given in <xref
+	      target="seeding-isaac"/>, below.
+	    </t>
+	    <t>
+	      Note that the Auth Key here does not include any summary
+	      or hash of the packet.  The packet itself is completely
+	      unauthenticated.
+	    </t>
+	  </dd>
+	</dl>
+	<t>When the receiving party receives a BFD packet with an
+	expected sequence number and the correct corresponding ISAAC
+	output in the Auth Key field, it knows that only the authentic
+	sending party could have sent that message.  The sending party is
+	therefore "Up", as it is the only one who could have sent the
+	message.</t>
+      </section>
 
-	    <dd>
-	      The optimized authentication type for optimized BFD Auth Types.
-	    </dd>
-	  </dl>
-	</dd>
+      <section title="Meticulous Keyed ISAAC Authentication, MD5 Format">
 
-	<dt>
-	  Sequence Number:
-	</dt>
-	<dd>
-          The sequence number for this packet.  For Meticulous Keyed
-          ISAAC Authentication, this value is incremented once for
-          each successive packet transmitted for a session.  This
-          provides protection against replay attacks.
-	</dd>
+	<t>If the Authentication Present (A) bit is set in the header,
+        and the Authentication Type field contains Optimized MD5 Meticulous
+        Keyed ISAAC Authentication (TBD1), and the Opt. Mode field contains 1 
+	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
+	the Authentication Section has the following format:</t>
 
-	<dt>
-	  Seed:
-	</dt>
-	<dd>
-	  A 32-bit (4 octet) seed which is used in conjunction with
-	  the shared key in order to configure and initialize the
-	  ISAAC pseudo-random-number-generator (PRNG).  It is used to
-	  identify and secure different "streams" of random numbers
-	  which are generated by ISAAC.
-	</dd>
+	<figure title="Meticulous Keyed ISAAC Authentication, MD5 Format" align="center">
+	  <artwork><![CDATA[
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                        Sequence Number                        |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                      Auth Key/Digest...                       |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                              ...                              |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-	<dt>
-	  Auth Key:
-	</dt>
-	<dd>
-	  <t>
-	    This field carries the 32-bit (4 octet) ISAAC output which
-	    is associated with the Sequence Number.  The ISAAC PRNG
-	    MUST be configured and initialized as given in <xref
-	    target="seeding-isaac"/>, below.
-	  </t>
-	  <t>
-	    Note that the Auth Key here does not include any summary
-	    or hash of the packet.  The packet itself is completely
-	    unauthenticated.
-	  </t>
-	</dd>
-      </dl>
-      <t>When the receiving party receives a BFD packet with an
-      expected sequence number and the correct corresponding ISAAC
-      output in the Auth Key field, it knows that only the authentic
-      sending party could have sent that message.  The sending party is
-      therefore "Up", as it is the only one who could have sent the
-      message.</t>
+	  ]]></artwork>
+	</figure>
+
+	<dl newline="true">
+	  <dt>
+	    Auth Type:
+	  </dt>
+	  <dd>
+	    The current Auth Type.  It MUST provide for meticulous
+	    keying.  That is, an authentication type where each packet
+	    is authenticated, and also where the Sequence Number field
+	    is incremented by one (1) for every packet which is sent.
+	  </dd>
+
+	  <dt>
+	    Auth Len:
+	  </dt>
+	  <dd>
+	    The length of the Authentication Section, in bytes.  For
+	    Meticulous Keyed ISAAC MD5 Authentication Format, the length is 24.
+	  </dd>
+
+	  <dt>
+	    Auth Key ID:
+	  </dt>
+	  <dd>
+	    The authentication key ID in use for this packet.  This
+	    allows multiple secret keys to be active simultaneously.
+	  </dd>
+
+	  <dt>
+	    Opt Mode:
+	  </dt>
+	  <dd>
+	    The Optimized Authentiation Mode is defined in 
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
+            Authentiation (TBD1), and the format is MD5 Authentication Format, 
+            the Optimized Authentication Mode field will be set to 1, Strong.
+	  </dd>
+
+	  <dt>
+	    Sequence Number:
+	  </dt>
+	  <dd>
+	    The sequence number for this packet.  For Meticulous Keyed
+	    ISAAC Authentication, this value is incremented once for
+	    each successive packet transmitted for a session.  This
+	    provides protection against replay attacks.
+	  </dd>
+
+	  <dt>
+	    Auth Key/Digest:
+	  </dt>
+	  <dd>
+	    This field carries the 16-byte MD5 digest for the packet.  
+	    The procedure for calculating this field is documented in
+	    <xref target="RFC5880" section="6.7.3"/>.
+	  </dd>
+	</dl>
+      </section>
+
+      <section title="Meticulous Keyed ISAAC Authentication, SHA1 Format">
+
+	<t>If the Authentication Present (A) bit is set in the header,
+	and the Authentication Type field contains Optimized SHA1 Meticulous
+	Keyed ISAAC Authentication (TBD2), and the Opt. Mode field contains 1 
+	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
+	the Authentication Section has the following format:</t>
+
+	<figure title="Meticulous Keyed ISAAC Authentication, SHA1 Format" align="center">
+	  <artwork><![CDATA[
+  0                   1                   2                   3
+  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |   Auth Type   |   Auth Len    |  Auth Key ID  |   Opt. Mode   |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                        Sequence Number                        |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                       Auth Key/Hash...                        |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  |                              ...                              |
+  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	  ]]></artwork>
+	</figure>
+
+	<dl newline="true">
+	  <dt>
+	    Auth Type:
+	  </dt>
+	  <dd>
+	    The current Auth Type.  It MUST provide for meticulous
+	    keying.  That is, an authentication type where each packet
+	    is authenticated, and also where the Sequence Number field
+	    is incremented by one (1) for every packet which is sent.
+	  </dd>
+
+	  <dt>
+	    Auth Len:
+	  </dt>
+	  <dd>
+	    The length of the Authentication Section, in bytes.  For
+	    Meticulous Keyed ISAAC SHA1 Authentication Format, the length is 28.
+	  </dd>
+
+	  <dt>
+	    Auth Key ID:
+	  </dt>
+	  <dd>
+	    The authentication key ID in use for this packet.  This
+	    allows multiple secret keys to be active simultaneously.
+	  </dd>
+
+	  <dt>
+	    Opt Mode:
+	  </dt>
+	  <dd>
+	    The Optimized Authentiation Mode is defined in 
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    When the Auth Type is either Optimized SHA1 Meticulous Keyed ISAAC
+            Authentiation (TBD1), and the format is SHA1 Authentication Format, 
+            the Optimized Authentication Mode field will be set to 1, Strong.
+	  </dd>
+
+	  <dt>
+	    Sequence Number:
+	  </dt>
+	  <dd>
+	    The sequence number for this packet.  For Meticulous Keyed
+	    ISAAC Authentication, this value is incremented once for
+	    each successive packet transmitted for a session.  This
+	    provides protection against replay attacks.
+	  </dd>
+
+	  <dt>
+	    Auth Key/Digest:
+	  </dt>
+	  <dd>
+	    This field carries the 16-byte SHA1 hash for the packet.  
+	    The procedure for calculating this field is documented in
+	    <xref target="RFC5880" section="6.7.4"/>.
+	  </dd>
+	</dl>
+      </section>
     </section>
 
-    <section title="Meticulous Keyed ISAAC Authentication">
+    <section title="Meticulous Keyed ISAAC Authentication, MD5 or SHA1 Formats">
+      <t>For these modes of authentication, the sending and receiving procedures
+      are identical to those documented in <xref target="RFC5880"/>
+      for the Meticulous MD5 <xref target="RFC5880" section="6.7.3"/>
+      or SHA1 Authentication <xref target="RFC5880" section="6.7.4"/>
+      with the exceptions that different authentication types are exercising
+      the same procedures in their meticulous modes.</t>
+    </section>
+
+    <section title="Meticulous Keyed ISAAC Authentication, ISAAC Format">
       <t>In this mode of optimized authentication, one or more secret
       keys (with corresponding key IDs) are configured in each system.
       One of the keys is used to seed the ISAAC PRNG.  The output of
@@ -692,7 +859,7 @@
       validation, and is discarded.</t>
 
       <t>
-	Transmission Using Meticulous Keyed ISAAC Authentication
+	Transmission Using Meticulous Keyed ISAAC Authentication, ISAAC Format
       </t>
       <list empty="true">
 	<t>
@@ -736,14 +903,16 @@
       </list>
 
       <t>
-	Receipt using Meticulous Keyed ISAAC Authentication
+	Receipt using Meticulous Keyed ISAAC Authentication, ISAAC Format
       </t>
       <list empty="true">
-	<t>
-	  If the received BFD Control packet does not contain an
-	  Authentication Section, or the Auth Type is not correct (either Optimized MD5 Meticulous Keyed ISAAC Authentication (TBD1) or
-	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication (TBD2)), then the received packet MUST be discarded.
-	</t>
+        <t>
+          If the received BFD Control packet does not contain an Authentication
+          Section, or the Auth Type is not correct (either Optimized MD5
+          Meticulous Keyed ISAAC Authentication (TBD1) or Optimized SHA-1
+          Meticulous Keyed ISAAC Authentication (TBD2)), then the received
+          packet MUST be discarded.
+        </t>
 
 	<t>
 	  If the Auth Key ID field does not match the ID of a
@@ -752,9 +921,10 @@
 	</t>
 
 	<t>
-	  If the Optimized Authentication Mode is not 2, <xref
-	  target="I-D.ietf-bfd-optimizing-authentication"
-	  section="3.0"/>, the received packet MUST be discarded.
+          The Optimized Authentication Mode field MUST be 2, the "less
+          computationally intensive authentication type". See <xref
+          target="I-D.ietf-bfd-optimizing-authentication"
+          section="3.0"/>.
 	</t>
 
 	<t>
@@ -1106,7 +1276,7 @@
 
       <t>
 	The following table gives Seed and Your-Discriminator as
-	32-bit hexadeciaml values, and the Secret Key as an
+	32-bit hexadecimal values, and the Secret Key as an
 	eleven-character string.  The subsequent table shows the first
 	eight Sequence numbers and corresponding Auth Key values which
 	were generated using the above initial values.
@@ -1518,9 +1688,26 @@
 
     <section anchor="iana-considerations" title="IANA Considerations">
       <t>
-	This documents requests the assignment of one URI and one YANG
-	model.
+        This documents requests the assignment of two BFD Auth Types, one URI
+        and one YANG model.
       </t>
+      <section title="BFD Auth Types">
+        <t>
+          This document requests an update to the registry titled "BFD
+          Authentication Types". IANA is requested to assign two new BFD
+          AuthType:
+	  <ul>
+            <li>
+              TBD1: Optimized MD5 Meticulous Keyed ISAAC Authentication with a
+              suggested value of 7.
+	    </li>
+	    <li>
+	      TBD2: Optimized SHA-1 Meticulous Keyed ISAAC Authentication
+	      with a suggested value of 8.
+	    </li>
+	  </ul>
+        </t>
+      </section>
       <section anchor="ietf-xml-registry" title="IETF XML Registry">
 	<t>
 	  This document registers one URIs in the "ns"
