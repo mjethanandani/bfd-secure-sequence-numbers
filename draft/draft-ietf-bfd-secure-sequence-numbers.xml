@@ -163,7 +163,7 @@
 	parties to believe that the link is up when it is, in fact,
 	down.  The goal of this specification is to use a simple
 	method to prevent spoofing of the BFD session being "Up".
-	This specification therefore define a Optimized Auth Type that
+	This specification therefore defines a Optimized Auth Type that
 	allows parties to securely signal that they are still in the
 	Up state.
       </t>
@@ -290,7 +290,7 @@
 
       <t>
 	The text first updates the <xref target="RFC5880"/>
-	definitions, and then define a new authentication type which
+	definitions, and then defines a new authentication type which
 	uses these updated definitions.
       </t>
 
@@ -373,17 +373,27 @@
 
       <t>
 	However, once the session transitions into the Up state, the
-	packet integrity checks may not be needed. The continued reception of correctly formed packets in the Up state serve as a good indication that the sender is operational.  However,
-	removing all security poses issues where an
-	attacker could spoof Up packets, causing a session to erroneously
-      remain in the Up state.  Or an attack could spoof a single Down packet, causing the session to erroneously go down.</t>
+	packet integrity checks may not be needed. The continued
+	reception of correctly formed packets in the Up state serve as
+	a good indication that the sender is operational.  However,
+	removing all security poses issues where an attacker could
+	spoof Up packets, causing a session to erroneously remain in
+	the Up state.  Or an attack could spoof a single Down packet,
+	causing the session to erroneously go down.</t>
 
       <t>
-	Instead, an optimized authentication mechanism
-	as described in <xref
+	Instead, an optimized authentication mechanism as described in
+	<xref
 	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>, which permits BFD to use an authentication method which is less computationally expensive than MD5 or SHA1, but is still strong enough that to prevent an
-      on-path attack.  The method defined here does not provide for per-packet integrity checks, and is therefore is not suitable for signaling state changes.  Instead, it provides a difficult to forge indication that the session remains in the Up state.</t>
+	Authentication</xref>, which permits BFD to use an
+	authentication method which is less computationally expensive
+	than MD5 or SHA1, but is still strong enough that to prevent
+	an on-path attack.  The method defined here does not provide
+	for per-packet integrity checks, and is therefore not suitable
+	for signaling state changes.  Instead, it provides a difficult
+	to forge indication that the session remains in the Up
+	state.
+      </t>
 
       <t>
 	This indication is a 32-bit number taken from a CSPRNG.  The
@@ -552,14 +562,16 @@
 
     <section title="Meticulous Keyed ISAAC Authentication Types">
       <section title="Meticulous Keyed ISAAC Authentication, ISAAC Format" anchor="meticulous_keyed_isaac">
-
-	<t>If the Authentication Present (A) bit is set in the header,
-        and the Authentication Type field contains either Optimized MD5
-        Meticulous Keyed ISAAC Authentication (TBD1), or Optimized SHA-1
-        Meticulous Keyed ISAAC Authentication (TBD2), and the Opt. Mode field
-        contains 2
-	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
-	the Authentication Section has the following format:</t>
+	<t>
+	  If the Authentication Present (A) bit is set in the header,
+	  and the Authentication Type field contains either Optimized
+	  MD5 Meticulous Keyed ISAAC Authentication (TBD1), or
+	  Optimized SHA-1 Meticulous Keyed ISAAC Authentication
+	  (TBD2), and the Optimized Authentication Mode field contains
+	  2 (<xref target="I-D.ietf-bfd-optimizing-authentication"
+	  section="7"/>) the Authentication Section has the following
+	  format:
+	</t>
 
 	<figure title="Meticulous Keyed ISAAC Authentication Format" align="center">
 	  <artwork><![CDATA[
@@ -664,12 +676,15 @@
       </section>
 
       <section title="Meticulous Keyed ISAAC Authentication, MD5 Format">
-
-	<t>If the Authentication Present (A) bit is set in the header,
-        and the Authentication Type field contains Optimized MD5 Meticulous
-        Keyed ISAAC Authentication (TBD1), and the Opt. Mode field contains 1 
-	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
-	the Authentication Section has the following format:</t>
+	<t>
+	  If the Authentication Present (A) bit is set in the header,
+	  and the Authentication Type field contains Optimized MD5
+	  Meticulous Keyed ISAAC Authentication (TBD1), and the
+	  Optimized Authentication Mode field contains 1 (<xref
+	  target="I-D.ietf-bfd-optimizing-authentication"
+	  section="7"/>) the Authentication Section has the following
+	  format:
+	</t>
 
 	<figure title="Meticulous Keyed ISAAC Authentication, MD5 Format" align="center">
 	  <artwork><![CDATA[
@@ -748,12 +763,15 @@
       </section>
 
       <section title="Meticulous Keyed ISAAC Authentication, SHA1 Format">
-
-	<t>If the Authentication Present (A) bit is set in the header,
-	and the Authentication Type field contains Optimized SHA1 Meticulous
-	Keyed ISAAC Authentication (TBD2), and the Opt. Mode field contains 1 
-	(<xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>)
-	the Authentication Section has the following format:</t>
+	<t>
+	  If the Authentication Present (A) bit is set in the header,
+	  and the Authentication Type field contains Optimized SHA1
+	  Meticulous Keyed ISAAC Authentication (TBD2), and the
+	  Optimized Authentication Mode field contains 1 (<xref
+	  target="I-D.ietf-bfd-optimizing-authentication"
+	  section="7"/>) the Authentication Section has the following
+	  format:
+	</t>
 
 	<figure title="Meticulous Keyed ISAAC Authentication, SHA1 Format" align="center">
 	  <artwork><![CDATA[
