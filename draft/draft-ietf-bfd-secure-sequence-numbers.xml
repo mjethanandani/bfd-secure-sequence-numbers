@@ -138,7 +138,7 @@
 	authenticate BFD packets with less CPU time cost than using
 	MD5 or SHA1, with the tradeoff of decreased security.  This
 	mechanism cannot be used to signal state changes, but it can
-	be used to maintain a session in the the "Up" state.
+	be used to maintain a session in the the Up state.
       </t>
     </abstract>
   </front>
@@ -162,8 +162,8 @@
 	parties to believe that a link is down, or they can cause
 	parties to believe that the link is up when it is, in fact,
 	down.  The goal of this specification is to use a simple
-	method to prevent spoofing of the BFD session being "Up".
-	This specification therefore defines a Optimized Auth Type that
+	method to prevent spoofing of the BFD session being Up.
+	This specification therefore define a Optimized Auth Type that
 	allows parties to securely signal that they are still in the
 	Up state.
       </t>
@@ -508,26 +508,26 @@
 	      addition or subtraction of Sequence Numbers.
 	    </li>
 	    <li>
-	      If / when there is a lost packet, the BFD state machine
-	      simply "seeks" to the entry which is associated with the
+	      If there is a lost packet, the BFD state machine
+	      simply seeks to the entry which is associated with the
 	      received packet, and checks if the received packet
 	      contains the expected number.
 	    </li>
 	    <li>
 	      BFD supports packet rates of hundred of packets per
 	      second.  Even at those rates, 256 entries per ISAAC
-	      "page" provides for about a second of BFD operation
-	      before the "next" page has to be calculated.
+	      page provides for about a second of BFD operation
+	      before the next page has to be calculated.
 	    </li>
 	    <li>
-	      As the "next" page calculation is complex, and there is
-	      a long period of time available before the "next" page
+	      As the next page calculation is complex, and there is
+	      a long period of time available before the next page
 	      is needed, this calculation can be done in the background.
 	    </li>
 	    <li>
-	      If the "next page" calculation is started immediately
+	      If the next page calculation is started immediately
 	      after the current page is fully use, there should be
-	      sufficient time to calculate the "next page" as a
+	      sufficient time to calculate the next page as a
 	      background task, no matter what the packet rate.
 	    </li>
 	  </ul>
@@ -538,7 +538,7 @@
 	    to guess or attack via an off-line dictionary attack.
 	    ISAAC has been subject to cryptographic analysis, and the
 	    numbers produced by it are secure.  The generated numbers
-	    are saved in an array, where the BFD "fast path" can
+	    are saved in an array, where the BFD fast path can
 	    consume them at essentially zero cost.
 	  </t>
 	  <t>
@@ -671,7 +671,7 @@
 	expected sequence number and the correct corresponding ISAAC
 	output in the Auth Key field, it knows that only the authentic
 	sending party could have sent that message.  The sending party is
-	therefore "Up", as it is the only one who could have sent the
+	therefore Up, as it is the only one who could have sent the
 	message.</t>
       </section>
 
@@ -850,7 +850,7 @@
       </section>
     </section>
 
-    <section title="Meticulous Keyed ISAAC Authentication, MD5 or SHA1 Formats">
+    <section title="Procedures for BFD Authentication using Meticulous Keyed ISAAC, MD5 or SHA1 Formats">
       <t>For these modes of authentication, the sending and receiving procedures
       are identical to those documented in <xref target="RFC5880"/>
       for the Meticulous MD5 <xref target="RFC5880" section="6.7.3"/>
@@ -859,7 +859,7 @@
       the same procedures in their meticulous modes.</t>
     </section>
 
-    <section title="Meticulous Keyed ISAAC Authentication, ISAAC Format">
+    <section title="Procedures for BFD Authentication using Meticulous Keyed ISAAC, ISAAC Format">
       <t>In this mode of optimized authentication, one or more secret
       keys (with corresponding key IDs) are configured in each system.
       One of the keys is used to seed the ISAAC PRNG.  The output of
@@ -973,7 +973,7 @@
 	</t>
 
 	<t>
-	  If bfd.MetKeyIsaacRcvKeyKnown is "false", the ISAAC related
+	  If bfd.MetKeyIsaacRcvKeyKnown is false, the ISAAC related
 	  variables are initialized as per <xref
 	  target="receiver-variable-initialization"/> using the
 	  contents of the packet.
@@ -1008,7 +1008,7 @@
 	<dd>
 	  A boolean value which indicates whether or not the system
 	  knows the receive key for the Meticulous Keyed ISAAC
-	  Authentication.  The initial value is "false".  This value
+	  Authentication.  The initial value is false.  This value
 	  is changed to "true" when a party verifies that the other
 	  party has started to use the Meticulous Keyed ISAAC
 	  Authentication, with an authenticated Auth Key.
@@ -1055,7 +1055,7 @@
 	<dd>
 	  A boolean value which indicates whether or not the system
 	  knows the xmit key for Meticulous Keyed ISAAC Authentication.
-	  The initial value is "false".  This value is
+	  The initial value is false.  This value is
 	  changed to "true" when a party starts to transmit using
 	  Meticulous Keyed ISAAC Authentication.
 	</dd>
@@ -1137,8 +1137,9 @@
     </section>
 
     <section title="Transition to using ISAAC">
-      <t>A BFD session which uses Meticulous Keyed MD5 and Meticulous
-      Keyed SHA1 MUST begin a session with Auth Type set to the
+      <t>A BFD session which uses Optimized MD5 Meticulous Keyed ISAAC
+      Authenticationor or Optimized SHA-1 Meticulous Keyed ISAAC Authentication 
+      MUST begin a session with Auth Type set to the
       relevant authentication type, and the the Optimized
       Authentication Mode field set to 1 (Strong).
       </t>
@@ -1174,22 +1175,23 @@
       <t>The first packet after the transition to the Up state is the
       only time when the ISAAC random number generator is initialized.
       In contrast, a temporary transition away from using Meticulous
-      Keyed ISAAC Authentication (<xref target="transition-away"/>)
+      Keyed ISAAC Authentication, ISAAC format (<xref target="transition-away"/>)
       and back, does not cause ISAAC to be re-keyed.</t>
 
       <t>There is no negotiation as to when authentication switches
-      from the original type, to using Meticulous Keyed ISAAC.  The
-      sender simply begins sending packets with a relevant Auth-Type,
+      from the original type, to using Meticulous Keyed ISAAC Authentication
+      using the ISAAC format.  The sender simply begins sending packets with a
+      relevant Auth-Type,
       and with the Optimized Authentication Mode field set to 1.  When
       the sender switches to using using Meticulous Keyed ISAAC
-      Authentication, it sets the Optimized Authentication Mode field
+      Authentication, ISAAC format, it sets the Optimized Authentication Mode field
       to 2, and starts performing the ISAAC calculations as described
       here.</t>
 
       <t>Similarly, a receiving system switches to using this method
       when it sees that it has received a packet contains Optimized
       Authentication Mode field set to 2 when
-      bfd.MetKeyIsaacRcvKeyKnown variable is "false".  The receiving
+      bfd.MetKeyIsaacRcvKeyKnown variable is false.  The receiving
       system then initializes its variables, and authenticates the
       received packet, by comparing the Auth Key in the packet with
       the key it generated itself.</t>
@@ -1211,7 +1213,7 @@
       <t>The Seed field is used to identify and secure
       different "streams" of random numbers which are generated by
       ISAAC.  Each session uses a different Seed, which is used along
-      with the "Your Discriminator" field, and the Secret Key, to
+      with the Your Discriminator field, and the Secret Key, to
       initialize ISAAC.</t>
 
       <t>The value of the Seed field MUST be derived from a CSPRNG
@@ -1219,8 +1221,8 @@
       this document.</t>
 
       <t>A new Seed value MUST be created every time a BFD session
-      transitions into the "Up" state.  In order to prevent continuous
-      rekeying, once the session is in the "Up" state, the Seed for a
+      transitions into the Up state.  In order to prevent continuous
+      rekeying, once the session is in the Up state, the Seed for a
       session MUST NOT be changed until another state transition
       occurs.</t>
 
@@ -1245,7 +1247,7 @@
       </t>
 
       <t>
-	Where the "Your Discriminator" field is taken from the BFD
+	Where the Your Discriminator field is taken from the BFD
 	packet defined in <xref target="RFC5880">RFC5880 Section
 	4.1</xref>.  This field is taken from the respective values
 	used by a sending system.  For receiving systems, the field
@@ -1286,14 +1288,14 @@
 
       <t>
 	For the sender, this calculation can be done outside of the
-	BFD "fast path" as soon as the "Your Discriminator" value is
+	BFD "fast path" as soon as the Your Discriminator value is
 	known.  For the receiver, this calculation can only be done
 	when the Seed is received from the sender, and therefore the
 	initial seeding needs to be done in the BFD "fast path".
       </t>
 
       <t>
-	The following table gives Seed and Your-Discriminator as
+	The following table gives Seed and Your Discriminator as
 	32-bit hexadecimal values, and the Secret Key as an
 	eleven-character string.  The subsequent table shows the first
 	eight Sequence numbers and corresponding Auth Key values which
@@ -1336,15 +1338,15 @@
       </t>
 
       <t>
-	Note that this construct only uses the "Your Discriminator"
-	field once, to seed ISAAC.  It therefore allows the "My
-	Discriminator" field to change as permitted by <xref
+	Note that this construct only uses the Your Discriminator
+	field once, to seed ISAAC.  It therefore allows the My
+	Discriminator field to change as permitted by <xref
 	target="RFC5880" sectionFormat="parens"
 	section="6.3">BFD</xref>.
       </t>
 
       <t>
-	While the "Your Discriminator" field may change, there is no
+	While the Your Discriminator field may change, there is no
 	way to signal or negotiate Seed changes.  The Seed is set once
 	by each party after the session transitions into the Up state,
 	and then remains unchanged for the duration of the session.
@@ -1370,7 +1372,7 @@
 	    bfd.MetKeyIsaacXmitKeyKnown:
 	  </dt>
 	  <dd>
-	    This variable transitions from "false" to "true" when the
+	    This variable transitions from false to true when the
 	    sender decides to start using ISAAC.  The sender also
 	    initializes the other variables at the same time.
 	  </dd>
@@ -1422,7 +1424,7 @@
 	    bfd.MetKeyIsaacRcvKeyKnown:
 	  </dt>
 	  <dd>
-	    This variable transitions from "false" to "true" when the
+	    This variable transitions from false to true when the
 	    receiver sees that the sender has started using Meticulous
 	    Keyed ISAAC Authentication.  The receiver also initializes
 	    the other variables at the same time.
@@ -1449,7 +1451,7 @@
 	  <dd>
 	    The receiver copies the Seed value from the received packet
 	    into this variable.  Note that this copy only occurs when the
-	    bfd.MetKeyIsaacXmitKeyKnown variable transitions from "false"
+	    bfd.MetKeyIsaacXmitKeyKnown variable transitions from false
 	    to true."
 	  </dd>
 
@@ -1502,14 +1504,14 @@
     <section title="Operation">
       <t>Once the variables have been initialized, ISAAC will be able
       to produce 256 random numbers to use as Auth Keys, at near-zero
-      cost.  The "AuthIndex" field is incremented by one for every new
+      cost.  The AuthIndex field is incremented by one for every new
       Auth Key generated.  Each new value of the Sequence Number field
       (sent or received) is then calculated by adding the relevant
-      "AuthBase" and "AuthIndex" fields.</t>
+      AuthBase and AuthIndex fields.</t>
 
-      <t>When all 256 numbers are consumed the "AuthIndex" field will
+      <t>When all 256 numbers are consumed the AuthIndex field will
       wrap to zero.  The ISAAC mixing function is then run, which then
-      results in another set of 256 random numbers.  The "AuthBase"
+      results in another set of 256 random numbers.  The AuthBase
       variable is then incremented by 256, to indicate that 256 Auth
       Keys have been consumed.  This process then continues until a
       BFD state change.</t>
@@ -1525,7 +1527,7 @@
       <t>The receiving party can then look at the Sequence Number to
       determine which particular PRNG value is being used in the
       packet.  By subtracting the bfd.MetKeyIsaacAuthBase from the
-      Sequence Number (with possible wrapping), an expected "Index" can be
+      Sequence Number (with possible wrapping), an expected Index can be
       derived, and a corresponding Auth Key found.  This process thus permits
       the two parties to synchronize if/when a packet or packets are lost.</t>
 
@@ -1551,47 +1553,47 @@
 
       <section title="Page Flipping">
 	<t>Once all 256 Auth Keys from the current page have been used,
-	the "next" page is calculated by calling the isaac() function.
-	This function modifies the current "page" to create the "next"
+	the next page is calculated by calling the isaac() function.
+	This function modifies the current page to create the next
 	page, and is inherently destructive.  In order to prevent
 	issues, care should be taken to perform this process
 	correctly.</t>
 
-	<t>It is RECOMMENDED that implementations keep both a "current"
-	page, and a "next" page associated with the ISAAC state.  The
-	"next" can be calculated by making a copy of the "current" page,
+	<t>It is RECOMMENDED that implementations keep both a current
+	page, and a next page associated with the ISAAC state.  The
+	next can be calculated by making a copy of the current page,
 	and then calling the isaac() function.</t>
 
-	<t>The system needs to maintain the "current" page at all
+	<t>The system needs to maintain the current page at all
 	times when Meticulous Keyed ISAAC Authentication is used.  The
-	"next" page does not need to be maintained at all times, and
+	next page does not need to be maintained at all times, and
 	can be calculated on demand.  However, in order to avoid
-	impacting the fast path, the "next" page should be calculated in
+	impacting the fast path, the next page should be calculated in
 	the background in an asynchronous manner.</t>
 
 	<t>This process has a number of benefits. First, At 60 packets
 	per second, the system has approximately four (4) seconds of
-	time to calculate the "next" page.  If the calculation is done
-	quickly, the "next" page is available to the fast path before
+	time to calculate the next page.  If the calculation is done
+	quickly, the next page is available to the fast path before
 	it is needed.</t>
 
-	<t>Second, having the "next" page available early means that
+	<t>Second, having the next page available early means that
 	an attacker cannot spoof BFD packets, and force the received
-	to spend significant resources calculating a "next" page on
-	the BFD "fast path".  Instead, the receiver can simply check
-	the contents of the "next" page at near-zero cost, and discard
+	to spend significant resources calculating a next page on
+	the BFD fast path.  Instead, the receiver can simply check
+	the contents of the next page at near-zero cost, and discard
 	the spoofed packet.</t>
 
 	<t>When the receiver determines that it needs to move to the
-	"next" page, it can simply swap the "current" and "next" pages
+	next page, it can simply swap the current and next pages
 	(updating the BFD variables as appropriate), and then begin
-	an asynchronous calculation of the "next" page.  Such
+	an asynchronous calculation of the next page.  Such
 	asynchronous calculations are preferable to calculating the
 	next page in the BFD fast path.</t>
 
 	<t>This document does not make provisions for dealing with the
 	case of losing more than 512 packets.  Implementors MUST limit
-	the value of "Detect Multi" to a small enough number in order to keep
+	the value of Detect Multi to a small enough number in order to keep
 	the number of lost packets within an acceptable limit.</t>
       </section>
 
@@ -1624,7 +1626,7 @@
       with a strong authentication.  The second situation is where one
       party wishes to temporarily signal via a strong method that it is still Up,
       by setting the Optimized Authentication Mode field away from
-      value "2" (Optimized) to value "1" (Strong).</t>
+      value 2 (Optimized) to value 1 (Strong).</t>
 
       <t>The strong authentication type provides for full packet
       integrity checks, which serves as a stronger indication that the
@@ -1672,7 +1674,7 @@
       the strong authentication mode be no more than the value of
       bfd.DetectMulti.  Implementations MUST also run the ISAAC state
       machine as normal during any strong authentication, including
-      calculating any "next" pages.  This requirement ensures that the
+      calculating any next pages.  This requirement ensures that the
       parties can switch back to Meticulous Keyed ISAAC Authentication
       mode at any time, as the ISAAC state machine remains in
       synchronization with the Sequence number in the packets.</t>
@@ -1816,7 +1818,7 @@ reference:    RFC XXXX
 	  ISAAC state.</t>
 	</list>
 
-	<t>These conditions are unlikely to all be true.  The ISAAC RNG has been shown to be infeasibe to reverse.  If the Secret Key is long and complex, the search space to guess the Secret Key is too large to discover via brute-force.  The use of the Seed and Your Discriminator fields when seeding ISAAC adds 64 bits of entropy to each session, which makes an off-line dictionary attaches infeasible. </t>
+	<t>These conditions are unlikely to all be true.  The ISAAC RNG has been shown to be infeasibe to reverse.  If the Secret Key is long and complex, the search space to guess the Secret Key is too large to discover via brute-force.  The use of the Seed and Your Discriminator fields when seeding ISAAC adds 64 bits of entropy to each session, which makes an off-line dictionary attacks infeasible. </t>
 
 	<t>However, the actual attack which we are protecting
 	BFD from is availability.  That is, the attacker is trying to
