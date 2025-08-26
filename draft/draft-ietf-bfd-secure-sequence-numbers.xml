@@ -133,7 +133,7 @@
 
     <abstract>
       <t>
-	This document describes a new BFD Optimized Authentication Mode,
+	This document describes a BFD Optimized Authentication Mode,
 	Meticulous Keyed ISAAC Authentication.  This mode  can be used to
 	authenticate BFD packets with less CPU time cost than using
 	MD5 or SHA1, with the tradeoff of decreased security.  This
@@ -263,7 +263,7 @@
 	document should not be considered as compliant with <xref
 	target="RFC5880">BFD</xref> and should not assume
 	interoperability with other implementations that conform to
-	the existing document.
+	this document.
       </t>
 
       <t>
@@ -431,7 +431,7 @@
 
       <section title="Rationale for ISAAC and Operational Overview">
 	<t>
-	  There are many CSPRNGs available, so we explain why ISAAC was chosen.
+	  There are many CSPRNGs available. This section explains why ISAAC was chosen.
 	</t>
 
 	<t>
@@ -452,7 +452,7 @@
 	  minimal state, and are designed to produce a long sequence
 	  of pseudo-random numbers from a few simple calculations.  In
 	  general, every call to the CSPRNG function modifies the
-	  internal state un an irreversible fashion, and then produces
+	  internal state in an irreversible fashion, and then produces
 	  a new random number as the result.
 	</t>
 
@@ -470,7 +470,7 @@
 	  administrator is not directly usable as a seed for the
 	  generator.  Instead, any secret key (including any
 	  per-session data) would have to be hashed before being used
-	  to see the generator.  Again, we choose ISAAC as the answer here.  It
+	  to see the generator.  For these reasons, ISAAC was chosen. It
 	  can accept keys up to 8192 octets in length, which is more
 	  than sufficient for BFD.
 	</t>
