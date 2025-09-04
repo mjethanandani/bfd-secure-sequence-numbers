@@ -1770,89 +1770,123 @@ reference:    RFC XXXX
     </section>
 
     <section anchor="Security" title="Security Considerations">
-      <t>The security of this proposal depends strongly on the length
-      of the Secret Key, and on its entropy.  It is RECOMMENDED
-      that the key be 16 octets in length or more.</t>
+      <section title="Protocol Security Considerations">
+	<t>The security of this proposal depends strongly on the length
+	of the Secret Key, and on its entropy.  It is RECOMMENDED
+	that the key be 16 octets in length or more.</t>
 
-      <t>The dependency on the Secret Key for security is mitigated
-      through the use of two 32-bit random numbers, with one generated
-      by each party to the BFD session.  An attacker cannot simply
-      perform an off-line brute-force dictionary attack to discover
-      the key.  Instead, any analysis has to include the particular 64
-      bits of entropy used for a particular session.  As a result,
-      dictionary attacks are more difficult than they would be if the
-      PRNG generator depended on nothing more than the Secret Key.</t>
+	<t>The dependency on the Secret Key for security is mitigated
+	through the use of two 32-bit random numbers, with one generated
+	by each party to the BFD session.  An attacker cannot simply
+	perform an off-line brute-force dictionary attack to discover
+	the key.  Instead, any analysis has to include the particular 64
+	bits of entropy used for a particular session.  As a result,
+	dictionary attacks are more difficult than they would be if the
+	PRNG generator depended on nothing more than the Secret Key.</t>
 
-      <t>The security of this proposal depends strongly on ISAAC.
-      This generator has been analyzed for almost three decades, and
-      has not been broken.  Research shows that there are few other
-      CSRNGs which are as simple and as fast as ISAAC.  For example,
-      many other generators are based on AES, which is infeasibe for
-      resource constrained systems.</t>
+	<t>The security of this proposal depends strongly on ISAAC.
+	This generator has been analyzed for almost three decades, and
+	has not been broken.  Research shows that there are few other
+	CSRNGs which are as simple and as fast as ISAAC.  For example,
+	many other generators are based on AES, which is infeasibe for
+	resource constrained systems.</t>
 
-      <section title="Spoofing">
-	<t>The Meticulous Keyed ISAAC Authentication method allows the
-	BFD end-points to detect a malicious packet via a number of
-	different methods.  Packets which are malformed are discarded.
-	Packets which do not pass the <xref target="RFC5880"
-	sectionFormat="parens" section="6.2">BFD state machine</xref>
-	checks are discarded.  Packets which do not have the correct
-	Sequence Number, Seed and Auth Key are discarded.  These
-	discarded packets have no effect on the BFD state machine.</t>
+	<section title="Spoofing">
+	  <t>The Meticulous Keyed ISAAC Authentication method allows the
+	  BFD end-points to detect a malicious packet via a number of
+	  different methods.  Packets which are malformed are discarded.
+	  Packets which do not pass the <xref target="RFC5880"
+	  sectionFormat="parens" section="6.2">BFD state machine</xref>
+	  checks are discarded.  Packets which do not have the correct
+	  Sequence Number, Seed and Auth Key are discarded.  These
+	  discarded packets have no effect on the BFD state machine.</t>
 
-	<t>The correlation between the Sequence Number and the Auth
-	Key ensures that each Sequence Number has a corresponding Auth
-	Key associated with it.  The structure and design of the ISAAC
-	CSPRNG ensures that each Auth Key is unique and is
-	unguessable.</t>
+	  <t>The correlation between the Sequence Number and the Auth
+	  Key ensures that each Sequence Number has a corresponding Auth
+	  Key associated with it.  The structure and design of the ISAAC
+	  CSPRNG ensures that each Auth Key is unique and is
+	  unguessable.</t>
 
-	<t>Performing an attack on this authentication method would require all of the following to be true:</t>
+	  <t>Performing an attack on this authentication method would require all of the following to be true:</t>
 
-	<list>
-	  <t>The attacker is on-path, and can perform an active attack.</t>
+	  <list>
+	    <t>The attacker is on-path, and can perform an active attack.</t>
 
-	  <t>The attacker has the contents of one or more packets.</t>
+	    <t>The attacker has the contents of one or more packets.</t>
 
-	  <t>The attacker has deduced the Secret Key used for ISAAC,
-	  and is able to correlate the Sequence Number to the current
-	  ISAAC state.</t>
-	</list>
+	    <t>The attacker has deduced the Secret Key used for ISAAC,
+	    and is able to correlate the Sequence Number to the current
+	    ISAAC state.</t>
+	  </list>
 
-	<t>These conditions are unlikely to all be true.  The ISAAC RNG has been shown to be infeasibe to reverse.  If the Secret Key is long and complex, the search space to guess the Secret Key is too large to discover via brute-force.  The use of the Seed and Your Discriminator fields when seeding ISAAC adds 64 bits of entropy to each session, which makes an off-line dictionary attacks infeasible. </t>
+	  <t>These conditions are unlikely to all be true.  The ISAAC RNG has been shown to be infeasibe to reverse.  If the Secret Key is long and complex, the search space to guess the Secret Key is too large to discover via brute-force.  The use of the Seed and Your Discriminator fields when seeding ISAAC adds 64 bits of entropy to each session, which makes an off-line dictionary attacks infeasible. </t>
 
-	<t>However, the actual attack which we are protecting
-	BFD from is availability.  That is, the attacker is trying to
-	shut down then connection when the attacked parties are trying
-	to keep it up.  An on-path attacker can simply discard or corrupt any packets at will, which will affect not just BFD, but all traffic on the connection.  As a result, the attacks here seem to be
-	irrelevant in practice.</t>
+	  <t>However, the actual attack which we are protecting
+	  BFD from is availability.  That is, the attacker is trying to
+	  shut down then connection when the attacked parties are trying
+	  to keep it up.  An on-path attacker can simply discard or corrupt any packets at will, which will affect not just BFD, but all traffic on the connection.  As a result, the attacks here seem to be
+	  irrelevant in practice.</t>
+	</section>
+
+	<section title="Re-Use of keys">
+	  <t>The strength of the Auth-Type methods is significantly
+	  different between the strong one like SHA-1 and ISAAC.  While
+	  ISAAC has had cryptanalysis, and has not been shown to be
+	  broken, that analysis is limited. The question then is whether
+	  or not it is safe to use the same key for both Auth Type
+	  methods (SHA1 and ISAAC), or should we require different
+	  keys for each method?</t>
+
+	  <t>If we recommend different keys, then it is possible for the
+	  two keys to be configured differently on each side of a BFD
+	  link.  For example, a correctly configured key could allow to
+	  the BFD state machine to advance to Up.  Then when the session
+	  switches to using to weaker Auth Type with a different key,
+	  that key may not match, and the session would immediatley drop.
+	  Suggesting instead that the keys be identical means that no
+	  such misconfiguration is possible.</t>
+
+	  <t>  Implementations are therefore free to use the same key, or different keys.  The use of the same key for for both strong and optimized
+	  authentication is acceptable, as ISAAC is keyed not only with
+	  the authentication key, but also depends on 32 bits of random
+	  data, along with 32 bits of a Sequence Number.  The use of
+	  this added randomness increases the difficulty of breaking the
+	  key, and makes off-line dictionary attacks infeasible.</t>
+	</section>
       </section>
 
-      <section title="Re-Use of keys">
-	<t>The strength of the Auth-Type methods is significantly
-	different between the strong one like SHA-1 and ISAAC.  While
-	ISAAC has had cryptanalysis, and has not been shown to be
-	broken, that analysis is limited. The question then is whether
-	or not it is safe to use the same key for both Auth Type
-	methods (SHA1 and ISAAC), or should we require different
-	keys for each method?</t>
+      <section anchor="YANG Security" title="YANG Security Considerations">
+	<t>
+	  This section is modeled after the template described in Section 3.7
+	  of <xref target="I-D.ietf-netmod-rfc8407bis"/>.
+	</t>
+	<t>
+	  The "ietf-bfd-met-keyed-isaac" YANG module defines a data model that
+	  is designed to be accessed via YANG-based management protocols, such
+	  as <xref target="RFC6241">NETCONF</xref> or <xref target="RFC8040">RESTCONF</xref>.
+	  These YANG-based management protocols (1) have to use a secure
+	  transport layer (e.g., <xref target="RFC4252">SSH</xref>
+	  <xref target="RFC8446">TLS</xref>, and <xref target="RFC9000">QUIC</xref>)
+	  and (2) have to use mutual authentication.
+	</t>
 
-	<t>If we recommend different keys, then it is possible for the
-	two keys to be configured differently on each side of a BFD
-	link.  For example, a correctly configured key could allow to
-	the BFD state machine to advance to Up.  Then when the session
-	switches to using to weaker Auth Type with a different key,
-	that key may not match, and the session would immediatley drop.
-	Suggesting instead that the keys be identical means that no
-	such misconfiguration is possible.</t>
+	<t>
+	  The Network Configuration Access Control Model
+	  <xref target="RFC8341">(NACM)</xref> provides the means to restrict
+	  access for particular NETCONF or RESTCONF users to a preconfigured
+	  subset of all available NETCONF or RESTCONF protocol operations and
+	  content.
+	</t>
 
-	<t>  Implementations are therefore free to use the same key, or different keys.  The use of the same key for for both strong and optimized
-	authentication is acceptable, as ISAAC is keyed not only with
-	the authentication key, but also depends on 32 bits of random
-	data, along with 32 bits of a Sequence Number.  The use of
-	this added randomness increases the difficulty of breaking the
-	key, and makes off-line dictionary attacks infeasible.</t>
+	<t>
+	  The YANG module defines a set of identities. These identities are
+	  intended to be reused by other YANG modules. The module by itself
+	  does not expose any data nodes that are writable, data nodes that
+	  contain read-only state, or RPCs.  As such, there are no additional
+	  security issues related to the YANG module that need to be
+	  considered.
+	</t>
       </section>
-
     </section>
 
     <section title="Contributors" anchor="contributors">
@@ -1878,6 +1912,7 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.6020.xml'?>
       <?rfc include='reference.RFC.8174.xml'?>
       <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
+      <?rfc include='reference.I-D.ietf-netmod-rfc8407bis.xml'?>
 
       <reference anchor="ISAAC">
 	<front>
@@ -1898,7 +1933,12 @@ reference:    RFC XXXX
 	</front>
 	<refcontent>https://eprint.iacr.org/2006/438.pdf</refcontent>
       </reference>
-
+      <?rfc include='reference.RFC.4252.xml'?>
+      <?rfc include='reference.RFC.6241.xml'?>
+      <?rfc include='reference.RFC.8040.xml'?>
+      <?rfc include='reference.RFC.8341.xml'?>
+      <?rfc include='reference.RFC.8446.xml'?>
+      <?rfc include='reference.RFC.9000.xml'?>
     </references>
   </back>
 </rfc>
