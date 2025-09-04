@@ -1912,6 +1912,7 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.5880.xml'?>
       <?rfc include='reference.RFC.6020.xml'?>
       <?rfc include='reference.RFC.8174.xml'?>
+      <?rfc include='reference.RFC.8177.xml'?>
       <?rfc include='reference.I-D.ietf-bfd-optimizing-authentication.xml'?>
       <?rfc include='reference.I-D.ietf-netmod-rfc8407bis.xml'?>
 
@@ -1937,7 +1938,6 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.4252.xml'?>
       <?rfc include='reference.RFC.6241.xml'?>
       <?rfc include='reference.RFC.8040.xml'?>
-      <?rfc include='reference.RFC.8177.xml'?>
       <?rfc include='reference.RFC.8341.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
       <?rfc include='reference.RFC.9000.xml'?>
