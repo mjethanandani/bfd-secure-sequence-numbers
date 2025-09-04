@@ -1688,7 +1688,8 @@
     <section anchor="the-yang-model" title="The YANG Model">
       <t>
         This YANG module adds two identities defined in this
-        document. One of them uses the Meticulous Keyed MD5 as the
+        document to the <xref target="RFC8177">IETF Keychain Model</xref>.
+        One of them uses the Meticulous Keyed MD5 as the
         strong authentication and Meticulous Keyed ISAAC Keyed as the
         less computationally intensive authentication. The other uses
         the Meticulous Keyed SHA-1 as the strong authentication and
@@ -1760,7 +1761,7 @@ XML: N/A, the requested URI is an XML namespace.
 	      <![CDATA[
 name:         ietf-bfd-met-keyed-isaac
 namespace:    urn:ietf:params:xml:ns:yang:ietf-bfd-met-keyed-isaac
-prefix:       bfdmia
+prefix:       bfd-mki
 reference:    RFC XXXX
 	      ]]>
 	    </artwork>
@@ -1936,6 +1937,7 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.4252.xml'?>
       <?rfc include='reference.RFC.6241.xml'?>
       <?rfc include='reference.RFC.8040.xml'?>
+      <?rfc include='reference.RFC.8177.xml'?>
       <?rfc include='reference.RFC.8341.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
       <?rfc include='reference.RFC.9000.xml'?>
