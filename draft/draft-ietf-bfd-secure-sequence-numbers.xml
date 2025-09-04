@@ -1940,6 +1940,7 @@ reference:    RFC XXXX
       <?rfc include='reference.RFC.8341.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
       <?rfc include='reference.RFC.9000.xml'?>
+      <?rfc include='reference.I-D.ietf-netmod-rfc8407bis.xml'?>
     </references>
   </back>
 </rfc>
