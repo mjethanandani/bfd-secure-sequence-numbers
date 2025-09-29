@@ -13,6 +13,7 @@ Mask on use of >32 bits, not on assignment: from Paul Eggert
  */
 #include "sequence.h"
 #include <stdio.h>
+#include <sys/time.h>
 
 #define ind(x)  (start[(x >> 2) & (RANDSIZ - 1)])
 #define rngstep(mix,a,b,m,m2,r) \
@@ -121,7 +122,7 @@ void bfd_isaac_init(bfd_isaac_ctx *ctx,  uint32_t seed, uint32_t discriminator, 
 			to_copy = (end - p);
 			if (to_copy > size) to_copy = size;
 
-			fprintf(stderr, "count %u copy %zu\n", count, to_copy);
+			//fprintf(stderr, "count %u copy %zu\n", count, to_copy);
 
 			memcpy(p, start, to_copy);
 			p += to_copy;
@@ -461,6 +462,8 @@ int bfd_isaac_fnv1a_check(bfd_isaac_ctx *ctx, uint8_t const *sequence, uint8_t *
 #include <sys/types.h>
 #include <limits.h>
 
+#define ROUNDS 1000000
+
 int main(int argc, char const *argv[])
 {
 	int i;
@@ -475,6 +478,9 @@ int main(int argc, char const *argv[])
 	uint8_t nbo_sequence[4];
 	uint8_t nbo_auth_key[4];
 
+	struct timeval start, end;
+	long micros_used;
+
 	if (argc >= 2) {
 		key = argv[1];
 	}
@@ -487,8 +493,22 @@ int main(int argc, char const *argv[])
 		your_discriminator = strtoul(argv[3], NULL, 16);
 	}
 
+	/* Calculate elapsed time for a number of rounds. */
+	gettimeofday(&start, NULL);
+
 	bfd_isaac_init(&ctx, seed, your_discriminator, (uint8_t const *) key, strlen(key));
 
+	for (i = 0; i < ROUNDS; i++) {
+		isaac(&ctx.randctx[0]);
+	}
+
+	gettimeofday(&end, NULL);
+
+	micros_used = end.tv_sec - start.tv_sec;
+	micros_used = ((micros_used * 1000000) + end.tv_usec) - start.tv_usec;
+	printf("%d rounds uses %ld micro-seconds\n", ROUNDS, micros_used);
+
+#if 0
 	memset(nbo_sequence, 0, sizeof(nbo_sequence));
 	memset(nbo_auth_key, 0, sizeof(nbo_auth_key));
 
@@ -504,6 +524,7 @@ int main(int argc, char const *argv[])
 
 		printf("%d %08x\n", sequence, auth_key);
 	}
+#endif
 
 
 	return 0;

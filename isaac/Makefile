@@ -30,3 +30,6 @@ modern: modern.c
 #
 sequence: sequence.c
 	@$(CC) -DNEVER $< -o $@
+
+aes_example: aes_example.c
+	@$(CC) -DNEVER $< -o $@ -l crypto
