@@ -4,8 +4,8 @@ clean:
 	@rm -f randport randport.txt modern.txt sequence *.o *~
 
 diff: randdvec.txt randport.txt modern.txt
-	@diff randdvec.txt randport.txt
-	@diff randdvec.txt modern.txt
+	@diff randdvec.txt randport.txt || echo "randport.txt is not correct"
+	@diff randdvec.txt modern.txt || echo "modern.txt is not correct"
 
 #
 #  Wildcard rule to build output files
@@ -23,7 +23,7 @@ randport: randport.c standard.h rand.h
 #  Various cleanups
 #
 modern: modern.c
-	@$(CC) -DNEVER $< -o $@
+	@$(CC) -g -DNEVER $< -o $@
 
 #
 #  Tracking BFD sequence numbers

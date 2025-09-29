@@ -26,6 +26,7 @@ Mask on use of >32 bits, not on assignment: from Paul Eggert
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* context of random number generator */
@@ -184,6 +185,18 @@ int main(int argc, char const *argv[])
 	randctx ctx;
 	
 	if (argc == 1) {
+		isaac_randinit(&ctx, NULL, 0);
+
+	} else if (strcmp(argv[1], "-h") == 0) {
+		fprintf(stderr, "Usage: modern [seed]\n");
+		fprintf(stderr, "       seed is 'RFC' (no quotes) for the sample RFC output\n");
+		fprintf(stderr, "        otherwise the seed string is used to initialize ISAAC\n");
+		exit(1);
+
+	} else if (strcmp(argv[1], "RFC") != 0) {
+		isaac_randinit(&ctx, argv[1], strlen(argv[1]));
+
+	} else {
 		uint8_t seed[19];
 
 		seed[0] = 0x0b;
@@ -199,12 +212,12 @@ int main(int argc, char const *argv[])
 		memcpy(seed + 8, "RFC5880June", 11);
 
 		isaac_randinit(&ctx, seed, sizeof(seed));
-	} else {
-		isaac_randinit(&ctx, argv[1], strlen(argv[1]));
-	}
 
-	for (i = 0; i < 8; i++) {
-		printf("%d\t%08x\n", i, isaac_rand(&ctx));
+		for (i = 0; i < 8; i++) {
+			printf("%d\t%08x\n", i, isaac_rand(&ctx));
+		}
+
+		exit(0);
 	}
 
 	for (i = 0; i < 2; ++i) {
