@@ -163,7 +163,7 @@
 	parties to believe that the link is up when it is, in fact,
 	down.  The goal of this specification is to use a simple
 	method to prevent spoofing of the BFD session being Up.
-	This specification therefore define a Optimized Auth Type that
+	This specification therefore defines a Optimized Auth Type that
 	allows parties to securely signal that they are still in the
 	Up state.
       </t>
@@ -512,7 +512,7 @@
 	      contains the expected number.
 	    </li>
 	    <li>
-	      BFD supports packet rates of hundred of packets per
+	      BFD supports packet rates of hundreds of packets per
 	      second.  Even at those rates, 256 entries per ISAAC
 	      page provides for about a second of BFD operation
 	      before the next page has to be calculated.
@@ -534,8 +534,7 @@
 	    In summary, the ISAAC seed depends on both a secret key
 	    and per-session data, so it is difficult for an attacker
 	    to guess or attack via an off-line dictionary attack.
-	    ISAAC has been subject to cryptographic analysis, and the
-	    numbers produced by it are secure.  The generated numbers
+	    The generated numbers
 	    are saved in an array, where the BFD fast path can
 	    consume them at essentially zero cost.
 	  </t>
@@ -1117,8 +1116,7 @@
 	If this Auth Type method was defined as being initialized
 	without a per-session Seed, then an attacker could pre-compute
 	the ISAAC states for many keys, and perform an off-line
-	dictionary attack.  The use of the Seed makes these attacks
-	unfeasable.
+	dictionary attack.
       </t>
 
       <t>For interoperability, the management interface by which the
