@@ -1839,7 +1839,7 @@ reference:    RFC XXXX
 	  link.  For example, a correctly configured key could allow to
 	  the BFD state machine to advance to Up.  Then when the session
 	  switches to using to weaker Auth Type with a different key,
-	  that key may not match, and the session would immediatley drop.
+	  that key may not match, and the session would immediately drop.
 	  Suggesting instead that the keys be identical means that no
 	  such misconfiguration is possible.</t>
 
