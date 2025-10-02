@@ -471,7 +471,15 @@
 	</t>
 
 	<t>
-	  The process for using ISAAC with BFD is then as follows:
+	  An instance of ISAAC is created for transmission and one for
+	  reception.  An instance is required for each direction since the
+	  inputs for seeding ISAAC require the locally randomly generated Seed
+	  value, and the current BFD Your Discriminator value for an Up session,
+	  and these values are distinct on each side of the BFD session.
+	</t>
+
+	<t>
+	  The process for using ISAAC with BFD for each direction is then as follows:
 
 	  <ul>
 	    <li>
