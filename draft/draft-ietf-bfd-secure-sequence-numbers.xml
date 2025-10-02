@@ -1182,17 +1182,11 @@
       received packet, by comparing the Auth Key in the packet with
       the key it generated itself.</t>
 
-      <t>However, the operation of those variables MUST now satisfy
-      the requirements of the new Optimized Authentication Mode.</t>
-
-      <t>That is, when changing Optimized Authentication mode in a session, the current
+      <t>The operation of those state variables MUST now satisfy
+      the requirements of the new Optimized Authentication Mode.
+      That is, when changing Optimized Authentication mode in a session, the current
       value of the bfd.RcvAuthSeq and bfd.XmitAuthSeq variables is
       used as the initial value(s) for the new mode.</t>
-
-      <t>When there is a transition to using ISAAC the first time, the initial
-      ISAAC state has to be seeded.  The next section describes this seeding
-      process.</t>
-
     </section>
 
     <section title="Seeding ISAAC" anchor="seeding-isaac">
