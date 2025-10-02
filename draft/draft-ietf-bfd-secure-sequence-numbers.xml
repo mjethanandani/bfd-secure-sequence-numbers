@@ -834,6 +834,109 @@
       </section>
     </section>
 
+    <section title="New State variables for Meticulous Keyed ISAAC Authentications">
+      <t>
+	This document defines new state variables for use with
+	Meticulous Keyed ISAAC Authentication.
+      </t>
+
+      <dl newline="true">
+	<dt>
+	  bfd.MetKeyIsaacRcvKeyKnown:
+	</dt>
+	<dd>
+	  A boolean value which indicates whether or not the system
+	  knows the receive key for the Meticulous Keyed ISAAC
+	  Authentication.  The initial value is false.  This value
+	  is changed to "true" when a party verifies that the other
+	  party has started to use the Meticulous Keyed ISAAC
+	  Authentication, with an authenticated Auth Key.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthBase:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the
+	  bfd.RcvAuthSeq number which is associated with the current
+	  ISAAC "page" for authenticating received packets.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthIndex:
+	</dt>
+	<dd>
+	  An 8-bit number used to index within a particular "page" of
+	  pseudo-random numbers.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthSeed:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the Seed
+	  associated with received packets.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacRcvAuthData:
+	</dt>
+	<dd>
+	  A data structure which contains the ISAAC data for the
+	  received Auth Type method.  The format and contents of this
+	  structure are implementation specific, and hold the internal
+	  state of the ISAAC CSPRNG.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacXmitKeyKnown:
+	</dt>
+	<dd>
+	  A boolean value which indicates whether or not the system
+	  knows the xmit key for Meticulous Keyed ISAAC Authentication.
+	  The initial value is false.  This value is
+	  changed to "true" when a party starts to transmit using
+	  Meticulous Keyed ISAAC Authentication.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthBase:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the
+	  bfd.XmitAuthSeq number which is associated with the current
+	  ISAAC "page" for authenticating sent packets.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthIndex:
+	</dt>
+	<dd>
+	  An 8-bit number used to index within a particular "page" of
+	  pseudo-random numbers.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthSeed:
+	</dt>
+	<dd>
+	  A 32-bit unsigned integer containing a copy of the Seed
+	  associated with sent packets.
+	</dd>
+
+	<dt>
+	  bfd.MetKeyIsaacXmitAuthData:
+	</dt>
+	<dd>
+	  A data structure which contains the ISAAC data for the
+	  sending Auth Type method.  The format and contents of this
+	  structure are implementation specific, and hold the internal
+	  state of the ISAAC CSPRNG.
+	</dd>
+      </dl>
+    </section>
+
+
     <section title="Procedures for BFD Authentication using Meticulous Keyed ISAAC, MD5 or SHA1 Formats">
       <t>
         The transmit and receive procedures utilize the additional procedures
@@ -986,108 +1089,6 @@
 	  cached for later use.
 	</t>
       </list>
-    </section>
-
-    <section title="New State variables for Meticulous Keyed ISAAC Authentications">
-      <t>
-	This document defines new state variables for use with
-	Meticulous Keyed ISAAC Authentication.
-      </t>
-
-      <dl newline="true">
-	<dt>
-	  bfd.MetKeyIsaacRcvKeyKnown:
-	</dt>
-	<dd>
-	  A boolean value which indicates whether or not the system
-	  knows the receive key for the Meticulous Keyed ISAAC
-	  Authentication.  The initial value is false.  This value
-	  is changed to "true" when a party verifies that the other
-	  party has started to use the Meticulous Keyed ISAAC
-	  Authentication, with an authenticated Auth Key.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacRcvAuthBase:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing a copy of the
-	  bfd.RcvAuthSeq number which is associated with the current
-	  ISAAC "page" for authenticating received packets.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacRcvAuthIndex:
-	</dt>
-	<dd>
-	  An 8-bit number used to index within a particular "page" of
-	  pseudo-random numbers.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacRcvAuthSeed:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing a copy of the Seed
-	  associated with received packets.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacRcvAuthData:
-	</dt>
-	<dd>
-	  A data structure which contains the ISAAC data for the
-	  received Auth Type method.  The format and contents of this
-	  structure are implementation specific, and hold the internal
-	  state of the ISAAC CSPRNG.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacXmitKeyKnown:
-	</dt>
-	<dd>
-	  A boolean value which indicates whether or not the system
-	  knows the xmit key for Meticulous Keyed ISAAC Authentication.
-	  The initial value is false.  This value is
-	  changed to "true" when a party starts to transmit using
-	  Meticulous Keyed ISAAC Authentication.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacXmitAuthBase:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing a copy of the
-	  bfd.XmitAuthSeq number which is associated with the current
-	  ISAAC "page" for authenticating sent packets.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacXmitAuthIndex:
-	</dt>
-	<dd>
-	  An 8-bit number used to index within a particular "page" of
-	  pseudo-random numbers.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacXmitAuthSeed:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing a copy of the Seed
-	  associated with sent packets.
-	</dd>
-
-	<dt>
-	  bfd.MetKeyIsaacXmitAuthData:
-	</dt>
-	<dd>
-	  A data structure which contains the ISAAC data for the
-	  sending Auth Type method.  The format and contents of this
-	  structure are implementation specific, and hold the internal
-	  state of the ISAAC CSPRNG.
-	</dd>
-      </dl>
     </section>
 
     <section title="Secret Key">
