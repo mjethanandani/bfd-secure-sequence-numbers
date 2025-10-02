@@ -183,14 +183,18 @@
       </t>
 
       <t>
-	ISAAC has been
-	subject to significant cryptanalysis in the past thirty years,
-	most notably <xref target="ISAAC+">ISAAC+</xref>.  The only
-	issue found was with initial seeding, and the method proposed
-	here is safe from that attack.  ISAAC requires only a few CPU
+	ISAAC requires only a few CPU
 	operations per generated 32-bit number, can take a large
 	secret key as a seed, and it has an extremely long cycle
-        length.  These properties make it ideal for use in BFD.</t>
+        length.  These properties make it ideal for use in BFD.
+      </t>
+
+      <t>
+	<xref target="ISAAC+">ISAAC+</xref> documents some cryptanalysis of the
+	ISAAC mechanism.  This analysis addressed an issue with initial seeding,
+	and the method proposed here incorporates recomendations to address
+	that attack.
+      </t>
 
       <section title="Meticulous Keying">
 	<t>
@@ -461,11 +465,9 @@
 	</t>
 
 	<t>
-	  Finally, ISAAC has been subject to significant cryptanalysis
-	  in the past thirty years, most notably <xref
+	  ISAAC has been subject to cryptanalysis, most notably <xref
 	  target="ISAAC+">ISAAC+</xref>.  There are no known
-	  vulnerabilities.  In contrast, other CSPRNGs may be newer,
-	  but have generally been subject to less analysis.
+	  vulnerabilities.
 	</t>
 
 	<t>
@@ -1746,11 +1748,10 @@ reference:    RFC XXXX
 	</t>
 
 	<t>The security of this proposal depends strongly on ISAAC.
-	This generator has been analyzed for almost three decades, and
-	has not been broken.  Research shows that there are few other
+	Research shows that there are few other
 	CSRNGs which are as simple and as fast as ISAAC.  For example,
-	many other generators are based on AES, which is infeasibe for
-	resource constrained systems.</t>
+	many other generators are based on AES, which may perform worse than
+	ISAAC on resource constrained systems without hardware acceleration.</t>
 
 	<section title="Spoofing">
 	  <t>Meticulously Keyed ISAAC authentication protects vs. the spoofing
@@ -1792,7 +1793,12 @@ reference:    RFC XXXX
 	    ISAAC state.</t>
 	  </list>
 
-	  <t>These conditions are unlikely to all be true.  The ISAAC RNG has been shown to be infeasibe to reverse.  If the Secret Key is long and complex, the search space to guess the Secret Key is too large to discover via brute-force.  The use of the Seed and Your Discriminator fields when seeding ISAAC adds 64 bits of entropy to each session, which makes an off-line dictionary attacks infeasible. </t>
+	  <t>These conditions are unlikely to all be true.
+	  If the Secret Key is long and
+	  complex, the search space to guess the Secret Key is too large to
+	  discover via brute-force.  The use of the Seed and Your Discriminator
+	  fields when seeding ISAAC adds 64 bits of entropy to each session,
+	  which further makes off-line dictionary attacks impractical. </t>
 
 	</section>
 
@@ -1820,7 +1826,7 @@ reference:    RFC XXXX
 	  keyed not only with the authentication key, but also depends on 32
 	  bits of random data, along with 32 bits of a Sequence Number.  The
 	  use of this added randomness increases the difficulty of breaking the
-	  key, and makes off-line dictionary attacks infeasible.</t>
+	  key.</t>
 	</section>
       </section>
 
