@@ -1109,13 +1109,6 @@
       ongoing session with a different Auth Key ID and correspondingly
       different Secret Key.</t>
 
-      <t>
-	If this Auth Type method was defined as being initialized
-	without a per-session Seed, then an attacker could pre-compute
-	the ISAAC states for many keys, and perform an off-line
-	dictionary attack.
-      </t>
-
       <t>For interoperability, the management interface by which the
       key is configured MUST accept ASCII strings, and SHOULD also
       allow for the configuration of any arbitrary binary string in
@@ -1750,13 +1743,12 @@ reference:    RFC XXXX
 	that the key be 16 octets in length or more.</t>
 
 	<t>The dependency on the Secret Key for security is mitigated
-	through the use of two 32-bit random numbers, with one generated
-	by each party to the BFD session.  An attacker cannot simply
-	perform an off-line brute-force dictionary attack to discover
-	the key.  Instead, any analysis has to include the particular 64
-	bits of entropy used for a particular session.  As a result,
-	dictionary attacks are more difficult than they would be if the
-	PRNG generator depended on nothing more than the Secret Key.</t>
+	through the use of two 32-bit numbers: the Your Discriminator field from
+	the BFD protocol, and the ISAAC Seed.  Both numbers are procedurally
+	required to be random.  These numbers serve as a nonce that inhibits
+	attackers from performing an off-line brute-force dictionary attack to
+	discover the key.
+	</t>
 
 	<t>The security of this proposal depends strongly on ISAAC.
 	This generator has been analyzed for almost three decades, and
