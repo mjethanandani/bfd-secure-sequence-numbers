@@ -161,29 +161,36 @@
 	These attacks have a number of side effects.  They can cause
 	parties to believe that a link is down, or they can cause
 	parties to believe that the link is up when it is, in fact,
-	down.  The goal of this specification is to use a simple
-	method to prevent spoofing of the BFD session being Up.
-	This specification therefore defines a Optimized Auth Type that
-	allows parties to securely signal that they are still in the
-	Up state.
+	down.
+      </t>
+      <t>
+	<xref target="I-D.ietf-bfd-optimizing-authentication"/> defines
+	procedures that enable better scaling of authentication for BFD by
+	splitting BFD authentication work between more computationally intensive
+	authentication used for significant changes, and less computationally
+	intensive authentication for packets validating that the session is in
+	the Up state.  See that document for general performance and security
+	considerations.
+      </t>
+      <t>
+        This document provides the definition of BFD optimized authentication
+	modes using the existing 
+	MD5 (<xref target="RFC5880" section="6.7.3"/>) and
+	SHA1 (<xref target="RFC5880" section="6.7.4"/>) authentication
+	mechanisms for the more computationally intensive work.  It also defines
+	methods for using a mechanism, <xref target="ISAAC">ISAAC</xref>, for
+	the less computationally intensive mechanism.
       </t>
 
       <t>
-	This document proposes the use of an Authentication method
-	which provides per-packet authentication using methods similar
-	to that defined in <xref target="RFC5880">BFD</xref> for
-	Meticulous Keyed MD5 and Meticulous Keyed SHA1.  The method
-	defined here has the benefit that it has less impact on
-	resource constrained systems than either MD5 or SHA1.  The
-	algorithm chosen is a seeded pseudo-random number generator
-	named <xref target="ISAAC">ISAAC</xref>.  ISAAC has been
+	ISAAC has been
 	subject to significant cryptanalysis in the past thirty years,
 	most notably <xref target="ISAAC+">ISAAC+</xref>.  The only
 	issue found was with initial seeding, and the method proposed
 	here is safe from that attack.  ISAAC requires only a few CPU
 	operations per generated 32-bit number, can take a large
 	secret key as a seed, and it has an extremely long cycle
-      length.  These properties make it ideal for use in BFD.</t>
+        length.  These properties make it ideal for use in BFD.</t>
 
       <section title="Meticulous Keying">
 	<t>
@@ -215,8 +222,8 @@
 	  authenticated via the use of a secret key or keys which
 	  are known to both sender and receiver.  The term
 	  "meticulous keyed" therefore refers to BFD authentication
-	  type where each packet is unique, and can be
-	  authenticated.
+	  type where each subsequently transmitted packet has a sequence number
+	  one greater than the immediately prior one, and can be authenticated.
 	</t>
       </section>
       <section title="Requirements Language">
@@ -313,11 +320,14 @@
 	  </t>
 
 	  <t>
-	    Packets which indicate a state transition MUST use an authentication
-	    method which provides for full packet integrity checks.
-	    When the bfd.SessionState value is Up, packets MAY use an optimized authentication method (<xref
-	    target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	    Authentication</xref>) such as Meticulous Keyed ISAAC.
+	    When using an authentication method implementing optimized authentication 
+	    (<xref target="I-D.ietf-bfd-optimizing-authentication"/>),
+	    packets which indicate a BFD significant change MUST use an authentication
+	    method which provides for full packet integrity checks with the
+	    more computationally intensive authentication method.  When the
+	    bfd.SessionState value is Up, packets MAY use a less
+	    computationally intensive authentication method such as Meticulous
+	    Keyed ISAAC.
 	  </t>
 	</dd>
 
@@ -327,7 +337,7 @@
 	<dd>
 	  A 32-bit unsigned integer containing the last sequence
 	  number for the current Authentication Section that was
-	  received.  The initial value is unimportant.
+	  received and accepted.  The initial value is unimportant.
 	</dd>
 
 	<dt>
@@ -364,68 +374,45 @@
 
     <section title="Architecture of the Auth Type Method">
       <t>
-	When BFD uses authentication, methods using MD5 or SHA1 are
-	CPU intensive, and can negatively impact systems with limited
-	computational power.
+	This document specifies two 
+	<xref target="I-D.ietf-bfd-optimizing-authentication">Optimized BFD</xref>
+	authentication modes:
+
+	<ul>
+	<li>
+	For the more computationally intensive authentication mechanisms, the existing
+	MD5 (<xref target="RFC5880" section="6.7.3"/>) and
+	SHA1 (<xref target="RFC5880" section="6.7.4"/>) authentication
+	mechanisms are leveraged with small PDU changes necessary to carry the
+	Optimization Mode encoding.  These changes are documented in 
+	<xref target="md5 format"/> and <xref target="sha1 format"/>
+	respectively.
+	</li>
+	<li>
+
+	For the less computationally intensive authentication mode, this
+	document defines the Meticulous Keyed ISAAC Authentication mechanism.
+	The PDU format for this mode is defined in <xref target="meticulous_keyed_isaac"/>.
+	The procedures for using this format are covered later in this document.
+	
+        </li>
+	</ul>
       </t>
 
-      <t>
-	However, once the session transitions into the Up state, the
-	packet integrity checks may not be needed. The continued
-	reception of correctly formed packets in the Up state serve as
-	a good indication that the sender is operational.  However,
-	removing all security poses issues where an attacker could
-	spoof Up packets, causing a session to erroneously remain in
-	the Up state.  Or an attack could spoof a single Down packet,
-	causing the session to erroneously go down.</t>
-
-      <t>
-	Instead, an optimized authentication mechanism as described in
-	<xref
-	target="I-D.ietf-bfd-optimizing-authentication">Optimizing BFD
-	Authentication</xref>, which permits BFD to use an
-	authentication method which is less computationally expensive
-	than MD5 or SHA1, but is still strong enough that to prevent
-	an on-path attack.  The method defined here does not provide
-	for per-packet integrity checks, and is therefore not suitable
-	for signaling state changes.  Instead, it provides a difficult
-	to forge indication that the session remains in the Up
-	state.
-      </t>
-
-      <t>
-	This indication is a 32-bit number taken from a CSPRNG.  The
-	number changes for every packet, and has a 1-1 correlation
-	with the Sequence Number.  Changing the Sequence Number for
-	every packet means that the receiving party knows the packet
-	is timely, and was not replayed.  The associated 32-bit
-	number indicates that the packet was from the correct
-	sender.  The combination of the two prevents on-path
-	attackers from forging packets.
-      </t>
-
-      <t>ISAAC is used here as a way to generate an infinite stream of
-      pseudo-random numbers, referred to here as "Auth Key"s.  With
+      <t>ISAAC is used as a way to generate an infinite stream of
+      pseudo-random numbers, referred to here as "Auth Keys".  With
       Meticulous Keyed ISAAC Authentication, these Auth Keys are used
       as a signal that the sending party is authentic.  That is, only
       the sending party can generate the correct Auth Keys.  Therefore
-      if the receiving party sees a correct Auth Key, then only the
-      sending party could have generated it.  The sender is therefore
-      authentic, even if the packet contents have potentially been
-      modified in transit.</t>
+      if the receiving party sees a correct Auth Key in a BFD Control Packet in
+      the Up state, then only the sending party could have generated it.
+      </t>
 
-      <t>Note that with this Auth Type method, the full packet
-      contents are not signed or authenticated.  Therefore, Meticulous
-      Keyed ISAAC Authentication MUST NOT be used to signal BFD state
-      changes. For BFD state changes, and a more optimized way to
-      authenticate packets, please refer to <xref
-      target="I-D.ietf-bfd-optimizing-authentication">BFD
-      Authentication</xref>. Instead, the packets containing
-      Meticulous Keyed ISAAC Authentication are only a signal that the
-      sending party is still alive, and that the sending party is
-      authentic.  That is, this Auth Type method MUST only be used
-      when bfd.SessionState=Up, and the State (Sta) field equals 3
-      (Up).</t>
+      <t>Note that BFD Control Packets with the less computationally intensive
+      ISAAC authentication format type are NOT signed or authenticated.  Therefore, 
+      this format MUST NOT be used to signal BFD state
+      changes.
+      </t>
 
       <section title="Rationale for ISAAC and Operational Overview">
 	<t>
@@ -433,8 +420,8 @@
 	</t>
 
 	<t>
-	  The goal for this optimized authentication was to provide a
-	  strong signal that the session was in the Up state, in the
+	  The goal for this less computationally intensive authentication was to provide a
+	  signal that the session was in the Up state, in the
 	  form of a 32-bit number which is difficult for an attacker
 	  to guess.  The number should be generated from a CSPRNG
 	  which produces results based on a seed composed of both
@@ -458,7 +445,7 @@
 	  It could be possible to use such a generator, and then to
 	  manually save many results in a buffer.  This buffer could
 	  then enable "seeking" within a short window.  In contrast,
-	  ISAAC produces large sets of numbers of design, making it
+	  ISAAC produces large sets of numbers by design, making it
 	  an integrated solution.
 	</t>
 
@@ -524,7 +511,7 @@
 	    </li>
 	    <li>
 	      If the next page calculation is started immediately
-	      after the current page is fully use, there should be
+	      after the current page is fully used, there should be
 	      sufficient time to calculate the next page as a
 	      background task, no matter what the packet rate.
 	    </li>
@@ -618,12 +605,12 @@
 	  </dt>
 	  <dd>
 	    The Optimized Authentiation Mode is defined in 
-	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
             Authentiation (TBD1), or Optimized SHA-1 Meticulous Keyed ISAAC
             Authentication (TBD2), and the format is Meticulous Keyed ISAAC
             Authentication Format, the Optimized Authentication Mode field will
-            be set to 2, Optimized.
+            be set to 2.
 	  </dd>
 
 	  <dt>
@@ -659,7 +646,7 @@
 	    </t>
 	    <t>
 	      Note that the Auth Key here does not include any summary
-	      or hash of the packet.  The packet itself is completely
+	      or hash of the BFD Control Packet.  The packet itself is completely
 	      unauthenticated.
 	    </t>
 	  </dd>
@@ -672,7 +659,7 @@
 	message.</t>
       </section>
 
-      <section title="Meticulous Keyed ISAAC Authentication, MD5 Format">
+      <section anchor="md5 format" title="Meticulous Keyed ISAAC Authentication, MD5 Format">
 	<t>
 	  If the Authentication Present (A) bit is set in the header,
 	  and the Authentication Type field contains Optimized MD5
@@ -732,10 +719,10 @@
 	  </dt>
 	  <dd>
 	    The Optimized Authentiation Mode is defined in 
-	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
             Authentiation (TBD1), and the format is MD5 Authentication Format, 
-            the Optimized Authentication Mode field will be set to 1, Strong.
+            the Optimized Authentication Mode field will be set to 1.
 	  </dd>
 
 	  <dt>
@@ -759,7 +746,7 @@
 	</dl>
       </section>
 
-      <section title="Meticulous Keyed ISAAC Authentication, SHA1 Format">
+      <section anchor="sha1 format" title="Meticulous Keyed ISAAC Authentication, SHA1 Format">
 	<t>
 	  If the Authentication Present (A) bit is set in the header,
 	  and the Authentication Type field contains Optimized SHA1
@@ -819,10 +806,10 @@
 	  </dt>
 	  <dd>
 	    The Optimized Authentiation Mode is defined in 
-	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="3"/>.
+	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized SHA1 Meticulous Keyed ISAAC
             Authentiation (TBD1), and the format is SHA1 Authentication Format, 
-            the Optimized Authentication Mode field will be set to 1, Strong.
+            the Optimized Authentication Mode field will be set to 1.
 	  </dd>
 
 	  <dt>
@@ -848,12 +835,21 @@
     </section>
 
     <section title="Procedures for BFD Authentication using Meticulous Keyed ISAAC, MD5 or SHA1 Formats">
-      <t>For these modes of authentication, the sending and receiving procedures
-      are identical to those documented in <xref target="RFC5880"/>
-      for the Meticulous MD5 <xref target="RFC5880" section="6.7.3"/>
-      or SHA1 Authentication <xref target="RFC5880" section="6.7.4"/>
-      with the exceptions that different authentication types are exercising
-      the same procedures in their meticulous modes.</t>
+      <t>
+        The transmit and receive procedures utilize the additional procedures
+	documented in
+	<xref target="I-D.ietf-bfd-optimizing-authentication" section="7.1"/>.
+      </t>
+      <t>
+        The authentication procedure for Meticulous Keyed ISAAC, MD5 Format is
+	covered by <xref target="RFC5880" section="6.7.3"/> for the Meticulous
+	Keyed MD5 Authentication mode.
+      </t>
+      <t>
+        The authentication procedure for Meticulous Keyed ISAAC, SHA1 Format is
+	covered by <xref target="RFC5880" section="6.7.4"/> for the Meticulous
+	Keyed SHA1 Authentication mode.
+      </t>
     </section>
 
     <section title="Procedures for BFD Authentication using Meticulous Keyed ISAAC, ISAAC Format">
@@ -906,14 +902,14 @@
           The Optimized Authentication Mode field MUST be 2, the "less
           computationally intensive authentication type". See <xref
           target="I-D.ietf-bfd-optimizing-authentication"
-          section="3.0"/>.
+          section="7"/>.
 	</t>
 
 	<t>
 	  For Meticulous Keyed ISAAC Authentication, bfd.XmitAuthSeq MUST be
 	  incremented by one on each packet, in a circular fashion (when
 	  treated as an unsigned 32-bit value).  The bfd.XmitAuthSeq
-	  MUST NOT be incremented by more than one for a packet.
+	  MUST NOT be incremented by more than one per packet.
 	</t>
       </list>
 
@@ -939,7 +935,7 @@
           The Optimized Authentication Mode field MUST be 2, the "less
           computationally intensive authentication type". See <xref
           target="I-D.ietf-bfd-optimizing-authentication"
-          section="3.0"/>.
+          section="7"/>.
 	</t>
 
 	<t>
@@ -1137,30 +1133,30 @@
       Authenticationor or Optimized SHA-1 Meticulous Keyed ISAAC Authentication 
       MUST begin a session with Auth Type set to the
       relevant authentication type, and the the Optimized
-      Authentication Mode field set to 1 (Strong).
+      Authentication Mode field set to 1.
       </t>
 
       <t>
-	When a BFD session using strong authentication transitions to
-	the Up state, the first Up packet MUST contain an Optimized
-	Authentication Mode field with value 1 (Strong).  Since state
+	When a BFD session using more computationally intensive authentication
+	transitions to the Up state, the first Up packet MUST contain an
+	Optimized Authentication Mode field with value 1.  Since state
 	transitions require full packet integrity checks, an Optimized
-	Authentication Mode field with value 2 (Optimized) is not
+	Authentication Mode field with value 2 is not
 	permitted for state changes.  Each party MUST continue to use
-	the strong authentication mode until the other side has
+	the more computationally intensive authentication mode until the other side has
 	confirmed the switch to the Up state, with a packet that also
-	uses strong authentication.
+	uses more computationally intensive  authentication.
       </t>
 
       <t>
 	Once the BFD session has transitioned to the Up state, the
-	sender MAY send the second and subsequent packets for the Up
-	start with the Optimized Authentication Mode field containing value
-	2 (Optimized).
+	sender MAY send the subsequent packets for the Up
+	state with the Optimized Authentication Mode field containing value
+	2 using ISAAC format.
       </t>
 
       <t>When a system first receives a packet containing Optimized
-      Authentication Mode field with value 2 (Optimized), it
+      Authentication Mode field with value 2, it
       initialize the ISAAC PRNG state using the Seed from that packet.
       A system originating a packet using Meticulous Keyed ISAAC
       Authentication will generate a Seed, and place it into the
@@ -1169,7 +1165,7 @@
       <xref target="receiver-variable-initialization"/>.</t>
 
       <t>The first packet after the transition to the Up state is the
-      only time when the ISAAC random number generator is initialized.
+      only time when the ISAAC random number generator for transmission is initialized.
       In contrast, a temporary transition away from using Meticulous
       Keyed ISAAC Authentication, ISAAC format (<xref target="transition-away"/>)
       and back, does not cause ISAAC to be re-keyed.</t>
@@ -1266,6 +1262,7 @@
 	operation.
       </t>
 
+      <!-- XXX JMH - what size is the buffer?  We should state that here. -->
       <t>
 	The buffer used to initialize ISAAC filled it with repeated
 	copies of the above structure.  For each complete copy of the
@@ -1349,7 +1346,7 @@
 	The receiving party MUST remember the current Seed value.  The
 	Seed value MUST NOT change unless sending party has signalled
 	a BFD state change with a packet that is authenticated using a
-	strong authentication method.  When a system receives a BFD
+	more computationally intensive authentication method.  When a system receives a BFD
 	packet containing Meticulous Keyed ISAAC Authentication, it
 	MUST check that the received Seed contains the expected value,
 	and if not, it MUST discard the packet as inauthentic.
@@ -1598,18 +1595,20 @@
 	systems. Distribution of this key to all the systems at the same
 	time can be quite a cumbersome task. BFD sessions running a fast
 	rate may require these keys to be refreshed often, which poses
-	a further challenge. Therefore, it is difficult to change the
-	keys during the operation of a BFD session without affecting the
-	stability of the BFD session. Therefore, it is RECOMMENDED to
-	administratively disable the BFD session before changing the
-	keys.</t>
+	a further challenge.</t>
 
-	<t>That is, while the Auth Key ID field provides for the use of
+	<t>While the Auth Key ID field provides for the provisioning of
 	multiple keys simultaneously, there is no way within the BFD
 	protocol for each party to signal which set of Key IDs are
 	supported.  Any such signalling or negotiation needs to be done
 	"out of band" for BFD, and usually via manual administrator
 	configuration.</t>
+
+	<t>The seeding mechanism for ISAAC, covered in 
+	<xref target="seeding-isaac"/>, is carried out only once for a BFD
+	session.  In order to rotate keys, it is REQUIRED to administratively
+	disable the BFD session as part of changing the keys.  This permits the
+	new session to be seeded as part of bringing up the new session.</t>
       </section>
 
     </section>
@@ -1619,65 +1618,38 @@
       <t>There are two ways to transition away from using ISAAC.  One
       way is via state changes: the link either goes down due to an
       fault, or one party signals a state change via a packet signed
-      with a strong authentication.  The second situation is where one
-      party wishes to temporarily signal via a strong method that it is still Up,
+      with a more computationally instensive  authentication.  The second
+      situation is where one party wishes to temporarily signal via a more
+      computationally intensive method that it is still Up,
       by setting the Optimized Authentication Mode field away from
-      value 2 (Optimized) to value 1 (Strong).</t>
+      value 2 to value 1.</t>
 
-      <t>The strong authentication type provides for full packet
+      <t>The more computationally intensive authentication type provides for full packet
       integrity checks, which serves as a stronger indication that the
       session is Up, and that both parties are fully synchronized.
       This switch can be done at any time during a session.</t>
 
       <t>It is RECOMMENDED that implementations periodically switch to
-      the strong authentication type for packets which maintain the
+      the more computationally intensive  authentication type for packets which maintain the
       session in an Up state.  The interval between these switches
       SHOULD be long enough that the system still gains significant
-      benefit from using Meticulous Keyed ISAAC Authentication.  That
-      is, there SHOULD be thousands of packets used in between any
-      switch to the strong authentication type.  See <xref
-      target="I-D.ietf-bfd-optimizing-authentication">BFD
-      Authentication</xref> for appropriate procedure on switching
+      benefit from using Meticulous Keyed ISAAC Authentication.  See
+      <xref target="I-D.ietf-bfd-optimizing-authentication"/>
+      for appropriate procedure on switching
       Optimized Authentication Mode.</t>
 
-      <t>The nature of Meticulous Keyed ISAAC Authentication means that
-      there is no issue with this switch, so long as it is for a small
-      number of packets.  From the point of view of the Meticulous
-      Keyed ISAAC state machine, this switch can be handled similarly
-      to a lost packet.  The state machine simply notices that instead
-      of Sequence Number value being one more than the last value used
-      for ISAAC, it is larger by two.  The ISAAC state machine then
-      calculates the index into the current "page", and uses the found
-      number to validate (or send) the Auth Key.</t>
-
-      <t>That is, the switch away from, and back to Meticulous Keyed
-      ISAAC Authentication MUST NOT cause the Meticulous Keyed ISAAC
-      Authentication mode to be re-seeded.  ISAAC is only re-seeded
-      when the session transitions to the Up state, and the session
-      remains in the Up state during this process.  As a result, no
-      re-seeding is performed.</t>
-
-      <t>It is RECOMMENDED that the session use the strong
-      authentication type only for a small number of packets, before
-      moving back to using Meticulous Keyed ISAAC Authentication.
-      There are few benefits to continuing the strong authentication
-      type for extended periods of time.  If the party would send
-      hundreds of packets with strong authentication authentication,
-      that would negate the benefit of using optimized
-      authentication.</t>
-
-      <t>It is therefore RECOMMENDED that the number of packets using
-      the strong authentication mode be no more than the value of
-      bfd.DetectMulti.  Implementations MUST also run the ISAAC state
-      machine as normal during any strong authentication, including
-      calculating any next pages.  This requirement ensures that the
-      parties can switch back to Meticulous Keyed ISAAC Authentication
-      mode at any time, as the ISAAC state machine remains in
-      synchronization with the Sequence number in the packets.</t>
+      <t>When switching to  the more computationally intensive authentication
+      mode after ISAAC has been seeded, the Authentication Section's Sequence
+      Number field will continue meticulously increasing.  In order to permit
+      transition back to ISAAC as the less computationally intensive
+      authentication mechanism, it is necessary for ISAAC to continue to
+      generate pages appropriate for validating the received sequence
+      number.</t>
 
       <t><xref target="I-D.ietf-bfd-optimizing-authentication"></xref>
-      describes this switch in more detail, including the suggestion
-      to use Poll sequence to start the strong authentication.</t>
+      describes the procedures that require the switch to the more
+      computationally intensive authentication mode - particularly BFD Poll
+      Sequences.</t>
 
     </section>
 
@@ -1686,9 +1658,9 @@
         This YANG module adds two identities defined in this
         document to the <xref target="RFC8177">IETF Keychain Model</xref>.
         One of them uses the Meticulous Keyed MD5 as the
-        strong authentication and Meticulous Keyed ISAAC Keyed as the
+        more computationally intensive authentication and Meticulous Keyed ISAAC Keyed as the
         less computationally intensive authentication. The other uses
-        the Meticulous Keyed SHA-1 as the strong authentication and
+        the Meticulous Keyed SHA-1 as the more computationally intensive authentication and
         Meticulous Keyed ISAAC Keyed as the less computationally
         intensive authentication.
       </t>
@@ -1768,6 +1740,10 @@ reference:    RFC XXXX
 
     <section anchor="Security" title="Security Considerations">
       <section title="Protocol Security Considerations">
+        <t>All security considerations of <xref target="RFC5880"/> and
+	<xref target="I-D.ietf-bfd-optimizing-authentication"/> apply to this
+	document.</t>
+
 	<t>The security of this proposal depends strongly on the length
 	of the Secret Key, and on its entropy.  It is RECOMMENDED
 	that the key be 16 octets in length or more.</t>
@@ -1826,8 +1802,8 @@ reference:    RFC XXXX
 	</section>
 
 	<section title="Re-Use of keys">
-	  <t>The strength of the Auth-Type methods is significantly
-	  different between the strong one like SHA-1 and ISAAC.  While
+	  <t>The cryptographic strength of the Auth-Type methods is significantly
+	  different between SHA-1 and ISAAC.  While
 	  ISAAC has had cryptanalysis, and has not been shown to be
 	  broken, that analysis is limited. The question then is whether
 	  or not it is safe to use the same key for both Auth Type
@@ -1843,11 +1819,12 @@ reference:    RFC XXXX
 	  Suggesting instead that the keys be identical means that no
 	  such misconfiguration is possible.</t>
 
-	  <t>  Implementations are therefore free to use the same key, or different keys.  The use of the same key for for both strong and optimized
-	  authentication is acceptable, as ISAAC is keyed not only with
-	  the authentication key, but also depends on 32 bits of random
-	  data, along with 32 bits of a Sequence Number.  The use of
-	  this added randomness increases the difficulty of breaking the
+	  <t>Implementations are therefore free to use the same key, or
+	  different keys.  The use of the same key for for both more and less
+	  computationally intensive authentication is acceptable, as ISAAC is
+	  keyed not only with the authentication key, but also depends on 32
+	  bits of random data, along with 32 bits of a Sequence Number.  The
+	  use of this added randomness increases the difficulty of breaking the
 	  key, and makes off-line dictionary attacks infeasible.</t>
 	</section>
       </section>
