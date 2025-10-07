@@ -134,11 +134,11 @@
     <abstract>
       <t>
 	This document describes a BFD Optimized Authentication Mode,
-	Meticulous Keyed ISAAC Authentication.  This mode  can be used to
-	authenticate BFD packets with less CPU time cost than using
+	Meticulous Keyed ISAAC Authentication.  This mode can be used to
+	authenticate some BFD packets with less CPU time cost than using
 	MD5 or SHA1, with the tradeoff of decreased security.  This
 	mechanism cannot be used to signal state changes, but it can
-	be used to maintain a session in the the Up state.
+	be used to maintain a session in the Up state.
       </t>
     </abstract>
   </front>
@@ -614,10 +614,10 @@
 	    Opt Mode:
 	  </dt>
 	  <dd>
-	    The Optimized Authentiation Mode is defined in 
+	    The Optimized Authentication Mode is defined in 
 	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
-            Authentiation (TBD1), or Optimized SHA-1 Meticulous Keyed ISAAC
+            Authentication (TBD1), or Optimized SHA-1 Meticulous Keyed ISAAC
             Authentication (TBD2), and the format is Meticulous Keyed ISAAC
             Authentication Format, the Optimized Authentication Mode field will
             be set to 2.
@@ -728,10 +728,10 @@
 	    Opt Mode:
 	  </dt>
 	  <dd>
-	    The Optimized Authentiation Mode is defined in 
+	    The Optimized Authentication Mode is defined in 
 	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized MD5 Meticulous Keyed ISAAC
-            Authentiation (TBD1), and the format is MD5 Authentication Format, 
+            Authentication (TBD1), and the format is MD5 Authentication Format, 
             the Optimized Authentication Mode field will be set to 1.
 	  </dd>
 
@@ -815,10 +815,10 @@
 	    Opt Mode:
 	  </dt>
 	  <dd>
-	    The Optimized Authentiation Mode is defined in 
+	    The Optimized Authentication Mode is defined in 
 	    <xref target="I-D.ietf-bfd-optimizing-authentication" section="7"/>.
 	    When the Auth Type is either Optimized SHA1 Meticulous Keyed ISAAC
-            Authentiation (TBD1), and the format is SHA1 Authentication Format, 
+            Authentication (TBD1), and the format is SHA1 Authentication Format, 
             the Optimized Authentication Mode field will be set to 1.
 	  </dd>
 
@@ -1074,7 +1074,7 @@
 	<t>
 	  Calculate the current expected output of ISAAC, which
 	  depends on the secret Key, the current Seed, and the
-	  Sequence Number.  If the value does not matches the Auth Key
+	  Sequence Number.  If the value does not match the Auth Key
 	  field, then the packet MUST be discarded.
 	</t>
 
@@ -1122,7 +1122,7 @@
       <t>For interoperability, the management interface by which the
       key is configured MUST accept ASCII strings, and SHOULD also
       allow for the configuration of any arbitrary binary string in
-      hexadecimal form.  Other configuration methods MAY be support.</t>
+      hexadecimal form.  Other configuration methods MAY be supported.</t>
 
       <t>The Secret Key MUST be at least eight (8) octets in length,
       and SHOULD NOT be more than 128 octets in length.</t>
@@ -1134,9 +1134,9 @@
 
     <section title="Transition to using ISAAC">
       <t>A BFD session which uses Optimized MD5 Meticulous Keyed ISAAC
-      Authenticationor or Optimized SHA-1 Meticulous Keyed ISAAC Authentication 
+      Authenticationo or Optimized SHA-1 Meticulous Keyed ISAAC Authentication 
       MUST begin a session with Auth Type set to the
-      relevant authentication type, and the the Optimized
+      relevant authentication type, and the Optimized
       Authentication Mode field set to 1.
       </t>
 
@@ -1161,7 +1161,7 @@
 
       <t>When a system first receives a packet containing Optimized
       Authentication Mode field with value 2, it
-      initialize the ISAAC PRNG state using the Seed from that packet.
+      initializes the ISAAC PRNG state using the Seed from that packet.
       A system originating a packet using Meticulous Keyed ISAAC
       Authentication will generate a Seed, and place it into the
       packet which is then sent.  Further discussion of initialization
@@ -1476,8 +1476,9 @@
 	</t>
 
 	<t>
-	  If a found key does match the Auth Key in the packet, then
-	  the bfd.MetKeyIsaacRcvAuthIndex field is initialized to the
+	  If a key foudn by indexing into this ISAAC page 
+          does match the Auth Key in the packet, then
+	  the bfd.MetKeyIsaacRcvAuthIndex field is initialized to
 	  this value.  The bfd.MetKeyIsaacRcvAuthBase field is then
 	  initialized to contain the value of bfd.RcvAuthSeq, minus
 	  the value of bfd.MetKeyIsaacRcvAuthIndex.  This process
