@@ -231,12 +231,14 @@
 	</t>
       </section>
       <section title="Requirements Language">
-        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+	<t>
+	  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
           "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT
           RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
           interpreted as described in BCP 14 <xref target="RFC2119"/>
           <xref target="RFC8174"/> when, and only when, they appear in
-          all capitals, as shown here.</t>
+	  all capitals, as shown here.
+	</t>
       </section>
 
       <section anchor="note-to-rfc-editor" title="Note to RFC Editor">
@@ -383,23 +385,21 @@
 	authentication modes:
 
 	<ul>
-	<li>
-	For the more computationally intensive authentication mechanisms, the existing
-	MD5 (<xref target="RFC5880" section="6.7.3"/>) and
-	SHA1 (<xref target="RFC5880" section="6.7.4"/>) authentication
-	mechanisms are leveraged with small PDU changes necessary to carry the
-	Optimization Mode encoding.  These changes are documented in 
-	<xref target="md5 format"/> and <xref target="sha1 format"/>
-	respectively.
-	</li>
-	<li>
-
-	For the less computationally intensive authentication mode, this
-	document defines the Meticulous Keyed ISAAC Authentication mechanism.
-	The PDU format for this mode is defined in <xref target="meticulous_keyed_isaac"/>.
-	The procedures for using this format are covered later in this document.
-	
-        </li>
+	  <li>
+	    For the more computationally intensive authentication mechanisms, the existing
+	    MD5 (<xref target="RFC5880" section="6.7.3"/>) and
+	    SHA1 (<xref target="RFC5880" section="6.7.4"/>) authentication
+	    mechanisms are leveraged with small PDU changes necessary to carry the
+	    Optimization Mode encoding.  These changes are documented in 
+	    <xref target="md5 format"/> and <xref target="sha1 format"/>
+	    respectively.
+	  </li>
+	  <li>
+	    For the less computationally intensive authentication mode, this
+	    document defines the Meticulous Keyed ISAAC Authentication mechanism.
+	    The PDU format for this mode is defined in <xref target="meticulous_keyed_isaac"/>.
+	    The procedures for using this format are covered later in this document.
+	  </li>
 	</ul>
       </t>
 
