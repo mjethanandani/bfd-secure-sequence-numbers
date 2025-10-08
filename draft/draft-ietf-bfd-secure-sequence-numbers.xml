@@ -1476,7 +1476,7 @@
 	</t>
 
 	<t>
-	  If a key foudn by indexing into this ISAAC page 
+	  If a key found by indexing into this ISAAC page 
           does match the Auth Key in the packet, then
 	  the bfd.MetKeyIsaacRcvAuthIndex field is initialized to
 	  this value.  The bfd.MetKeyIsaacRcvAuthBase field is then
