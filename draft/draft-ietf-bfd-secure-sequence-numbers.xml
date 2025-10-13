@@ -418,7 +418,7 @@
       changes.
       </t>
 
-      <section title="Rationale for ISAAC and Operational Overview">
+      <section anchor="rationale" title="Rationale for ISAAC and Operational Overview">
 	<t>
 	  There are many CSPRNGs available. This section explains why ISAAC was chosen.
 	</t>
@@ -1744,9 +1744,35 @@ reference:    RFC XXXX
 	<xref target="I-D.ietf-bfd-optimizing-authentication"/> apply to this
 	document.</t>
 
-	<t>The security of this proposal depends strongly on the length
-	of the Secret Key, and on its entropy.  It is RECOMMENDED
-	that the key be 16 octets in length or more.</t>
+	<t>The security of this proposal depends on the security of
+	the ISAAC algorithm, which has had minimal analysis.  While it
+	is believed that the algorithm is secure enough for this use
+	case, no proof is offered.  ISAAC was chosen for the
+	reasons discussed in <xref target="rationale"/>, as no other
+	option was found to be suitable.</t>
+
+	<t>The choice of ISAAC was driven in part by the limited
+	functionality of systems which implement this specification.
+	Many of these systems do not have hardware assistance for
+	cryptographic operations, meaning that any CSPRNG based on a
+	block cipher would be unsuitably slow.  Where hardware
+	assistance for block ciphers is available, ISAAC offers no
+	advantanges over those methods.</t>
+
+	<t>As CPUs get faster and hardware acceleration becomes more
+	prevalent, more secure methods become better options.
+	Alternative solutions could be AES with hardware acceleration
+	in OFB mode (FIPS 197, SP 800-38A, Output Feedback Mode), or
+	CHACHA in software (<xref target="RFC7539">RFC7539</xref>), or
+	other well understood techniques.</t>
+
+	<t>For these reasons and many others, the ISAAC CSPRNG is, at
+	best, tolerable for use in this specification, and is
+	completely unsuitable for use in any other IETF protocol.</t>
+
+	<t>The security of this proposal depends strongly on the
+	length of the Secret Key, and on its entropy.  It is
+	RECOMMENDED that the key be 16 octets in length, or more.</t>
 
 	<t>The dependency on the Secret Key for security is mitigated
 	through the use of two 32-bit numbers: the Your Discriminator field from
@@ -1755,12 +1781,6 @@ reference:    RFC XXXX
 	attackers from performing an off-line brute-force dictionary attack to
 	discover the key.
 	</t>
-
-	<t>The security of this proposal depends strongly on ISAAC.
-	Research shows that there are few other
-	CSRNGs which are as simple and as fast as ISAAC.  For example,
-	many other generators are based on AES, which may perform worse than
-	ISAAC on resource constrained systems without hardware acceleration.</t>
 
 	<section title="Spoofing">
 	  <t>Meticulously Keyed ISAAC authentication protects vs. the spoofing
@@ -1919,6 +1939,7 @@ reference:    RFC XXXX
       </reference>
       <?rfc include='reference.RFC.4252.xml'?>
       <?rfc include='reference.RFC.6241.xml'?>
+      <?rfc include='reference.RFC.7539.xml'?>
       <?rfc include='reference.RFC.8040.xml'?>
       <?rfc include='reference.RFC.8341.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
