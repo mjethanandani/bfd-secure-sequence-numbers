@@ -284,98 +284,16 @@
 	session.  However, the definitions given in <xref
 	target="RFC5880">BFD</xref> are specific to Keyed MD5 or SHA1
 	Authentication, which limit their utility for new
-	authentication types. For the purpose of the experiment, this
-	specification updates the definition of some of the state
-	variables as given below.
+        authentication types. This document presumes a relaxed definition for
+        the following BFD state variables that do not limit them to MD5 and
+        SHA1, and extend them to the mechanism defined herein:
       </t>
 
-      <t>
-	These updated definitions are entirely compatible with the
-	definitions given in <xref target="RFC5880"
-	sectionFormat="parens" section="6.8.1">BFD</xref>, and require
-	no changes to existing configurations or
-	implementations. Instead, the updated definitions clarify that
-	the state variables apply to the current authentication type,
-	no matter what it is.
-      </t>
-
-      <t>
-	The text first updates the <xref target="RFC5880"/>
-	definitions, and then defines a new authentication type which
-	uses these updated definitions.
-      </t>
-
-      <t>These updated definitions also mean that Authentication
-      Sections SHOULD include a Sequence Number field.  Where a
-      Sequence Number is not used (as with Simple Password) the
-      variables bfd.RcvAuthSeq and bfd.XmitAuthSeq MUST be set to
-      zero.  Where an Authentication Section uses a meticulous keyed
-      authentication type, it MUST include a Sequence Number
-      field.</t>
-
-      <dl newline="true">
-	<dt>
-	  bfd.AuthType:
-	</dt>
-	<dd>
-	  <t>
-	    The current authentication type in use for this session,
-	    as defined in <xref target="RFC5880"
-	    sectionFormat="parens" section="4.1">BFD</xref>, or zero
-	    if no authentication is in use.
-	  </t>
-
-	  <t>
-	    When using an authentication method implementing optimized authentication 
-	    (<xref target="I-D.ietf-bfd-optimizing-authentication"/>),
-	    packets which indicate a BFD significant change MUST use an authentication
-	    method which provides for full packet integrity checks with the
-	    more computationally intensive authentication method.  When the
-	    bfd.SessionState value is Up, packets MAY use a less
-	    computationally intensive authentication method such as Meticulous
-	    Keyed ISAAC.
-	  </t>
-	</dd>
-
-	<dt>
-	  bfd.RcvAuthSeq:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing the last sequence
-	  number for the current Authentication Section that was
-	  received and accepted.  The initial value is unimportant.
-	</dd>
-
-	<dt>
-	  bfd.XmitAuthSeq:
-	</dt>
-	<dd>
-	  A 32-bit unsigned integer containing the next sequence
-	  number for the Authentication Section which will be
-	  transmitted.  This variable MUST be initialized to a random
-	  32-bit value.  This value SHOULD be taken from a
-	  cryptographically strong pseudo-random number generator
-	  (CSPRNG).
-	</dd>
-
-	<dt>
-	  bfd.AuthSeqKnown:
-	</dt>
-	<dd>
-	  <t>
-	    Set to 1 if the next expected Authentication Section has a
-	    sequence number which is known, or 0 if it is not known.
-	    This variable MUST be initialized to zero.
-	  </t>
-
-	  <t>
-	    This variable MUST be set to zero after no packets have
-	    been received on this session for at least twice the
-	    Detection Time.  This ensures that the sequence number can
-	    be resynchronized if the remote system restarts.
-	  </t>
-	</dd>
-      </dl>
+      <ul spacing="compact">
+	<li>bfd.RcvAuthSeq</li>
+	<li>bfd.XmitAuthSeq</li>
+	<li>bfd.AuthSeqKnown</li>
+      </ul>
     </section>
 
     <section title="Architecture of the Auth Type Method">
