@@ -1108,7 +1108,16 @@
       pseudo-random numbers using the ISAAC random number
       generator.</t>
 
-      <t>A particular Secret Key is identified via the Auth Key ID
+      <t>Using the same or distinct Secret Keys for each Optimized
+      Authentication Mode has security and operational impacts.  See
+      <xref target="key reuse"/> for discussion on these points.</t>
+
+      <t>It is RECOMMENDED that implementations permit distinct Secret Keys to
+      be provisioned for a given Auth Key ID for each Optimized Authentication
+      Mode.  The operator's choice to use such distinct Secret Keys instead of a single
+      Secret Key is out of scope for this document.</t>
+
+      <t>A particular Secret Key set is identified via the Auth Key ID
       field.  This Auth Key ID is either placed in the packet by the
       sender, or verified by the receiver.  Meticulous Keyed ISAAC
       Authentication permits systems to have multiple Secret
@@ -1127,9 +1136,6 @@
       <t>The Secret Key MUST be at least eight (8) octets in length,
       and SHOULD NOT be more than 128 octets in length.</t>
 
-      <t>There are no known issues with using the same secret Key for
-      multiple Auth Type methods.  However, it is RECOMMENDED that
-      administrators use different Secret Keys for each Auth Type.</t>
     </section>
 
     <section title="Transition to using ISAAC">
@@ -1590,7 +1596,7 @@
 	the number of lost packets within an acceptable limit.</t>
       </section>
 
-      <section title="Multiple Keys">
+      <section anchor="multiple keys" title="Multiple Keys">
 	<t>In a keyed algorithm, the key is shared between the two
 	systems. Distribution of this key to all the systems at the same
 	time can be quite a cumbersome task. BFD sessions running a fast
@@ -1744,9 +1750,18 @@ reference:    RFC XXXX
 	<xref target="I-D.ietf-bfd-optimizing-authentication"/> apply to this
 	document.</t>
 
+	<t>The distribution of Secret Keys is typically accomplished using
+	provisioning.  Secure distribution of these keys for any particular
+	provisioning mechanism is out of scope for this document.</t>
+
+	<t>Keys generated and distributed out of band for the purposes described in
+	this specification are generally limited in the security they can
+	provide. It is essential that these keys are selected well, and
+	protected when stored.</t>
+
 	<t>The security of this proposal depends strongly on the length
-	of the Secret Key, and on its entropy.  It is RECOMMENDED
-	that the key be 16 octets in length or more.</t>
+	of the Secret Key, and on its entropy.  It MUST be at least 8 octets in
+	length and is RECOMMENDED to be 16 octets in length or more.</t>
 
 	<t>The dependency on the Secret Key for security is mitigated
 	through the use of two 32-bit numbers: the Your Discriminator field from
@@ -1811,31 +1826,41 @@ reference:    RFC XXXX
 
 	</section>
 
-	<section title="Re-Use of keys">
-	  <t>The cryptographic strength of the Auth-Type methods is significantly
-	  different between SHA-1 and ISAAC.  While
+	<section anchor="key reuse" title="Re-Use of keys">
+	  <t>The cryptographic strength of the Optimized Authentication Mode
+	  methods is significantly different between SHA-1 and ISAAC.  While
 	  ISAAC has had cryptanalysis, and has not been shown to be
 	  broken, that analysis is limited. The question then is whether
-	  or not it is safe to use the same key for both Auth Type
-	  methods (SHA1 and ISAAC), or should we require different
-	  keys for each method?</t>
+	  or not it is safe to use the same key for both
+	  mechanisms (SHA1 and ISAAC), or should we require different
+	  keys for each mechanism?</t>
+
+	  <t>ISAAC is seeded not only with the secret key, but also 32 bits of
+	  random data, along with 32 bits of a Sequence Number.  The use of this
+	  added randomness increases the difficulty of breaking the secret
+	  key.</t>
 
 	  <t>If we recommend different keys, then it is possible for the
 	  two keys to be configured differently on each side of a BFD
 	  link.  For example, a correctly configured key could allow to
 	  the BFD state machine to advance to Up.  Then when the session
-	  switches to using to weaker Auth Type with a different key,
+	  switches to using to less computationally intensive Optimized
+	  Authentication Mode with a different key,
 	  that key may not match, and the session would immediately drop.
 	  Suggesting instead that the keys be identical means that no
 	  such misconfiguration is possible.</t>
 
+	  <t>If it becomes possible to recover the Secret Key for the Meticulous
+	  Keyed ISAAC Auth Type, and the same key is utilized as a key for more
+	  computationally intensive authentication types such as the MD5 and
+	  SHA1 types defined in this document, then authentication for those
+	  mechanisms would be compromised.</t>
+
 	  <t>Implementations are therefore free to use the same key, or
-	  different keys.  The use of the same key for for both more and less
-	  computationally intensive authentication is acceptable, as ISAAC is
-	  keyed not only with the authentication key, but also depends on 32
-	  bits of random data, along with 32 bits of a Sequence Number.  The
-	  use of this added randomness increases the difficulty of breaking the
-	  key.</t>
+	  different keys for the Optimized Authentication Modes.  The choice to
+	  use the a single Secret Key or distinct Secret Key per Optimized
+	  Authentication Mode must be evaluated by the operator balancing their
+	  security and operational requirements.</t>
 	</section>
       </section>
 
