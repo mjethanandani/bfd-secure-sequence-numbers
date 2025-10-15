@@ -1866,12 +1866,13 @@ reference:    RFC XXXX
 	  for the BFD protocol and for initializing ISAAC utilize a
 	  non-ISAAC CSPRNG.</t>
 
-	  <t>Should an implementation for unknown reasons not have alternative
-	  CSPRNGs available, ISAAC could be utilized to provide local random
-	  numbers.  In order to avoid inappropriate disclosure of local random number
-	  generator state, the random number generator for these locally
-	  generated values MUST NOT reuse instances of ISAAC initialized for use
-	  for BFD sessions.</t>
+	  <t>Random numbers in BFD MUST come from a different source than the
+	  ISAAC generator used to create per-BFD session Auth Keys.  A
+	  different instance of an ISAAC generator MAY be used to create random
+	  numbers for use elsewhere in BFD. In order avoid inappropriate
+	  disclosure of local random number generator state, that instance MUST
+	  be distinct from the generator used for per-session Auth Keys, and it
+	  MUST NOT be keyed from any BFD session's Secret Key.</t>
 	</section>
       </section>
 
