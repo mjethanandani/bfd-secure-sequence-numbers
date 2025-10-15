@@ -260,9 +260,9 @@
       </section>
     </section>
 
-    <section title="Experimental updates to RFC 5880">
+    <section title="Experimental extensions to RFC 5880">
       <t>
-	This document describes an experimental update to <xref
+	This document describes an experimental extensions to <xref
 	target="RFC5880">BFD</xref>. This experiment is intended to
 	provide additional insights into what happens when the
 	authentication method defined in this document is used.
