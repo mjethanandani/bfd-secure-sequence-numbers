@@ -262,7 +262,7 @@
 
     <section title="Experimental extensions to RFC 5880">
       <t>
-	This document describes an experimental extensions to <xref
+	This document describes an experimental extension to <xref
 	target="RFC5880">BFD</xref>. This experiment is intended to
 	provide additional insights into what happens when the
 	authentication method defined in this document is used.
@@ -308,7 +308,7 @@
 	    MD5 (<xref target="RFC5880" section="6.7.3"/>) and
 	    SHA1 (<xref target="RFC5880" section="6.7.4"/>) authentication
 	    mechanisms are leveraged with small PDU changes necessary to carry the
-	    Optimization Mode encoding.  These changes are documented in 
+	    Optimization Mode encoding.  These changes are documented in
 	    <xref target="md5 format"/> and <xref target="sha1 format"/>
 	    respectively.
 	  </li>
@@ -1058,7 +1058,7 @@
 
     <section title="Transition to using ISAAC">
       <t>A BFD session which uses Optimized MD5 Meticulous Keyed ISAAC
-      Authenticationo or Optimized SHA-1 Meticulous Keyed ISAAC Authentication 
+      Authentication or Optimized SHA-1 Meticulous Keyed ISAAC Authentication
       MUST begin a session with Auth Type set to the
       relevant authentication type, and the Optimized
       Authentication Mode field set to 1.
@@ -1696,7 +1696,7 @@ reference:    RFC XXXX
 	prevalent, more secure methods become better options.
 	Alternative solutions could be AES with hardware acceleration
 	in OFB mode (FIPS 197, SP 800-38A, Output Feedback Mode), or
-	CHACHA in software (<xref target="RFC7539">RFC7539</xref>), or
+	CHACHA in software (<xref target="RFC8439">RFC8439</xref>), or
 	other well understood techniques.</t>
 
 	<t>For these reasons and many others, the ISAAC CSPRNG is, at
@@ -1919,9 +1919,9 @@ reference:    RFC XXXX
       </reference>
       <?rfc include='reference.RFC.4252.xml'?>
       <?rfc include='reference.RFC.6241.xml'?>
-      <?rfc include='reference.RFC.7539.xml'?>
       <?rfc include='reference.RFC.8040.xml'?>
       <?rfc include='reference.RFC.8341.xml'?>
+      <?rfc include='reference.RFC.8439.xml'?>
       <?rfc include='reference.RFC.8446.xml'?>
       <?rfc include='reference.RFC.9000.xml'?>
       <?rfc include='reference.I-D.ietf-netmod-rfc8407bis.xml'?>
