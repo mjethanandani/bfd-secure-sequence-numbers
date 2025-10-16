@@ -1677,25 +1677,6 @@ reference:    RFC XXXX
 	provide. It is essential that these keys are selected well, and
 	protected when stored.</t>
 
-	<t>The security of this proposal depends on the security of
-	the ISAAC algorithm, which has had minimal analysis.  While it
-	is believed that the algorithm is secure enough for this use
-	case, no proof is offered.  ISAAC was chosen for the
-	reasons discussed in <xref target="rationale"/>, as no other
-	option was found to be suitable.</t>
-
-	<t>The choice of ISAAC was driven in part by the limited
-	functionality of systems which implement this specification.
-	Many of these systems do not have hardware assistance for
-	cryptographic operations, meaning that any CSPRNG based on a
-	block cipher would be unsuitably slow.  Where hardware
-	assistance for block ciphers is available, ISAAC offers no
-	advantanges over those methods.</t>
-
-	<t>As CPUs get faster and hardware acceleration becomes more
-	prevalent, more secure methods become better options.
-	Alternative solutions could be AES with hardware acceleration
-	in OFB mode (FIPS 197, SP 800-38A, Output Feedback Mode), or
 	CHACHA in software (<xref target="RFC8439">RFC8439</xref>), or
 	other well understood techniques.</t>
 
@@ -1919,6 +1900,7 @@ reference:    RFC XXXX
       </reference>
       <?rfc include='reference.RFC.4252.xml'?>
       <?rfc include='reference.RFC.6241.xml'?>
+      <?rfc include='reference.RFC.7539.xml'?>
       <?rfc include='reference.RFC.8040.xml'?>
       <?rfc include='reference.RFC.8341.xml'?>
       <?rfc include='reference.RFC.8439.xml'?>
